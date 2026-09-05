@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500" role="img">
+  <defs>
+    <linearGradient id="rozanagf" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#d9d4cc"/>
+      <stop offset=".45" stop-color="#C9C2B6"/>
+      <stop offset="1" stop-color="#8d887f"/>
+    </linearGradient>
+    <linearGradient id="rozanags" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".45" stop-color="#1E1C19" stop-opacity="0"/>
+      <stop offset="1" stop-color="#1E1C19" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="rozanagw"><feTurbulence type="fractalNoise" baseFrequency="0.8 0.5" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="400" height="500" fill="url(#rozanagf)"/>
+  <g opacity=".38" fill="none" stroke="#79746d" stroke-width="1.5">
+    <path d="M-10 150 Q100 116 200 158 T410 140"/>
+    <path d="M-10 232 Q110 196 210 240 T410 220"/>
+    <path d="M-10 316 Q100 280 200 322 T410 302"/>
+  </g>
+  <g opacity=".2" transform="translate(0,-30) scale(1,0.94)">
+    <path d="M200 88 L134 108 L112 176 L146 190 L140 448 Q200 462 260 448 L254 190 L288 176 L266 108 Z" fill="#8d887f"/>
+    <path d="M172 88 Q200 122 228 88" fill="none" stroke="#747068" stroke-width="3"/>
+    <path d="M200 122 L200 300" stroke="#7f7a72" stroke-width="2" opacity=".5"/></g>
+  <rect width="400" height="500" fill="url(#rozanags)"/>
+  <rect width="400" height="500" filter="url(#rozanagw)" opacity=".12" style="mix-blend-mode:multiply"/>
+</svg>

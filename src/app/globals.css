@@ -1,0 +1,528 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+   Bilques design tokens
+
+   Three colours come from the brand: paper, ink, sage. The other three exist
+   so the palette is a system rather than three flat swatches — khaddar for
+   ground alternation, sage-deep for pressed states, ink-soft for secondary
+   text (a warm brown rather than a grey, so it belongs to the cloth).
+--------------------------------------------------------------------------- */
+@theme {
+  --color-paper: #f5f0eb;
+  --color-khaddar: #e8dfd4;
+  --color-sage: #8b9e8b;
+  --color-sage-deep: #5c6b58;
+  --color-ink: #2c2c2c;
+  --color-ink-soft: #6b6055;
+
+  --color-line: #ddd3c6;
+
+  --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-urdu: var(--font-nastaliq), var(--font-inter), serif;
+
+  /* Nav bar height + the phone's home indicator, so fixed bars can clear it. */
+  --spacing-tabbar: calc(3.75rem + env(safe-area-inset-bottom));
+}
+
+/* ---------------------------------------------------------------------------
+   Admin design tokens
+
+   The back office is a dense, everyday tool, not a shop window — it gets its
+   own visual language (dark sidebar, rounded cards, soft shadows) rather than
+   the storefront's flat cloth palette. Scoped entirely to classes below;
+   nothing here changes how the storefront renders.
+--------------------------------------------------------------------------- */
+@theme {
+  --color-admin-sidebar: #17171a;
+  --color-admin-sidebar-line: rgba(255, 255, 255, 0.08);
+  --color-admin-sidebar-ink: rgba(245, 244, 242, 0.86);
+  --color-admin-sidebar-ink-soft: rgba(245, 244, 242, 0.5);
+  --color-admin-sidebar-active: rgba(255, 255, 255, 0.09);
+
+  --color-admin-bg: #f2efe9;
+  --color-admin-card: #ffffff;
+  --color-admin-line: #eae4d9;
+  --color-admin-ink: #201f1c;
+  --color-admin-ink-soft: #85806f;
+
+  --color-admin-accent-clay: #c07b52;
+  --color-admin-accent-clay-soft: #f3e4d9;
+  --color-admin-accent-sage: #6b7d5e;
+  --color-admin-accent-sage-soft: #e3e9dc;
+  --color-admin-accent-gold: #b8933f;
+  --color-admin-accent-gold-soft: #f2e9d3;
+  --color-admin-accent-slate: #5b7086;
+  --color-admin-accent-slate-soft: #e1e7ec;
+
+  /* A hairline and the faintest lift. An admin card should read as a precise
+     edge, not as a floating marketing tile — the diffuse drop shadow is what
+     makes a dashboard look soft and amateur at density. */
+  --shadow-admin-card: 0 0 0 1px var(--color-admin-line), 0 1px 2px rgba(32, 31, 28, 0.03);
+
+  /* Chart series — the first three slots of the validated reference
+     categorical order (blue/orange/aqua), which clear CVD separation and the
+     normal-vision floor for every pairing, not just adjacent ones. A fourth
+     category folds into "Other" (--color-admin-chart-other) rather than
+     reaching for a fourth hue. */
+  --color-admin-chart-1: #2a78d6;
+  --color-admin-chart-2: #eb6834;
+  --color-admin-chart-3: #1baf7a;
+  --color-admin-chart-other: #c3c2b7;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    line-height: 1.6;
+    /* Rendering cloth-coloured type on a cloth-coloured ground. */
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  /* Cormorant is a high-contrast Garamond: it is elegant large and mushy
+     small, so it is never set below 1.25rem anywhere in this site. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 300;
+    letter-spacing: -0.015em;
+    line-height: 1.08;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Prices, quantities and order IDs line up in columns. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-sage-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background: var(--color-sage);
+    color: var(--color-paper);
+  }
+}
+
+@layer components {
+  .urdu {
+    font-family: var(--font-urdu);
+    direction: rtl;
+    unicode-bidi: isolate;
+    /* RTL text defaults to the right edge, which strands a short accent
+       phrase away from the column it belongs to. Glyph order still runs
+       right-to-left; only the block alignment changes. */
+    text-align: left;
+    /* Nastaliq's deep descenders hang below the line box and crowd whatever
+       follows, so the phrase carries its own clearance. Override with pb-0
+       where it sits on a baseline with other text. */
+    line-height: 2.1;
+    padding-block-end: 0.2em;
+  }
+
+  /* Measure: under 80 characters, a touch looser for the serif. */
+  .measure {
+    max-width: 34rem;
+  }
+  .measure-display {
+    max-width: 22ch;
+  }
+
+  .rule {
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* ---- Buttons -------------------------------------------------------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 3rem;
+    padding: 0 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: 0.005em;
+    border: 1px solid transparent;
+    transition:
+      background-color 0.18s ease,
+      color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.12s ease;
+    cursor: pointer;
+  }
+  .btn:active {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-ink {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .btn-ink:hover:not(:disabled) {
+    background: var(--color-sage-deep);
+  }
+
+  .btn-sage {
+    background: var(--color-sage);
+    color: #fff;
+  }
+  .btn-sage:hover:not(:disabled) {
+    background: var(--color-sage-deep);
+  }
+
+  .btn-quiet {
+    background: transparent;
+    color: var(--color-ink);
+    border-color: var(--color-line);
+  }
+  .btn-quiet:hover:not(:disabled) {
+    border-color: var(--color-ink);
+  }
+
+  .field {
+    width: 100%;
+    min-height: 3rem;
+    padding: 0.6rem 0.875rem;
+    background: #fff;
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
+    font-size: 1rem; /* 16px keeps iOS from zooming on focus */
+    transition: border-color 0.18s ease;
+  }
+  .field:focus {
+    border-color: var(--color-sage-deep);
+  }
+  .field::placeholder {
+    color: #a99e91;
+  }
+}
+
+@layer components {
+  /* ---------------------------------------------------------------------------
+     The fold
+
+     The one piece of orchestrated motion on the site. The hero stays put while
+     the paper body slides up over it, the way cloth folds over cloth. Done with
+     sticky positioning, so it costs no JavaScript and no repaints.
+  --------------------------------------------------------------------------- */
+  .fold-hero {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    z-index: 0;
+  }
+
+  .fold-body {
+    position: relative;
+    z-index: 1;
+    background: var(--color-paper);
+  }
+
+  /* The hero image drifts and dims as the fold closes over it. Scroll-driven
+     animations run off the main thread; browsers without them simply hold the
+     image still, which is a perfectly good hero. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .fold-parallax {
+        animation: fold-drift linear both;
+        animation-timeline: view();
+        animation-range: exit-crossing 0% exit-crossing 100%;
+      }
+    }
+  }
+
+  @keyframes fold-drift {
+    from {
+      transform: scale(1.06) translateY(0);
+      filter: brightness(1);
+    }
+    to {
+      transform: scale(1.14) translateY(-3rem);
+      filter: brightness(0.82);
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     Collection cards grow as they reach the middle of the screen.
+
+     Scroll-driven CSS where the browser has it; an IntersectionObserver adds
+     .is-near as the fallback (see CollectionRail). Both paths land on the same
+     transform, and both stand down under reduced motion.
+  --------------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .centre-scale {
+      transform: scale(0.93);
+      opacity: 0.72;
+      transition:
+        transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
+        opacity 0.5s ease;
+      will-change: transform;
+    }
+    .centre-scale.is-near {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    @supports (animation-timeline: view()) {
+      .centre-scale {
+        transform: none;
+        opacity: 1;
+        transition: none;
+        animation: centre-grow linear both;
+        animation-timeline: view();
+        animation-range: entry 8% exit 92%;
+      }
+      .centre-scale.is-near {
+        transform: none;
+      }
+    }
+  }
+
+  @keyframes centre-grow {
+    0% {
+      transform: scale(0.93);
+      opacity: 0.72;
+    }
+    40%,
+    60% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(0.93);
+      opacity: 0.72;
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     Product images lift on interaction only — never an ambient shadow at rest.
+  --------------------------------------------------------------------------- */
+  .lift {
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
+  }
+  @media (hover: hover) {
+    .lift:hover {
+      box-shadow: 0 14px 34px -14px rgba(44, 44, 44, 0.42);
+      transform: translateY(-3px);
+    }
+  }
+  .lift:active {
+    box-shadow: 0 6px 18px -10px rgba(44, 44, 44, 0.38);
+    transform: translateY(-1px);
+  }
+
+  /* ---------------------------------------------------------------------------
+     The hero copy rises in on load, each line a beat after the last.
+  --------------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-copy > * {
+      opacity: 0;
+      animation: hero-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    }
+    .hero-copy > *:nth-child(1) {
+      animation-delay: 0.05s;
+    }
+    .hero-copy > *:nth-child(2) {
+      animation-delay: 0.16s;
+    }
+    .hero-copy > *:nth-child(3) {
+      animation-delay: 0.27s;
+    }
+    .hero-copy > *:nth-child(4) {
+      animation-delay: 0.38s;
+    }
+  }
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---------------------------------------------------------------------------
+     A one-shot fade-and-lift as a section first scrolls into view (see
+     Reveal.tsx). Unlike .centre-scale this never reverses.
+  --------------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition:
+        opacity 0.7s ease,
+        transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+      will-change: transform, opacity;
+    }
+    .reveal.is-visible {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* Search/account icons in the header: a proper tap target on a phone, and
+     a soft tint on hover rather than the plain colour-swap text links use —
+     an icon with nothing but colour change to show for a hover reads as
+     unresponsive. */
+  .icon-tap {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  @media (hover: hover) {
+    .icon-tap:hover {
+      background: var(--color-khaddar);
+    }
+  }
+  .icon-tap:active {
+    background: var(--color-khaddar);
+  }
+
+  /* ---------------------------------------------------------------------------
+     Motion that answers an action
+
+     Everything below fires because someone did something — added a piece,
+     changed a quantity, filtered the shop, placed an order. Nothing here
+     animates on its own as you scroll past it; the fold above is the only
+     orchestrated moment on the site, and it stays the only one.
+  --------------------------------------------------------------------------- */
+
+  /* The cart count, when it has just gone up. */
+  @keyframes bump {
+    0% {
+      transform: scale(1);
+    }
+    38% {
+      transform: scale(1.32);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+  .bump {
+    animation: bump 0.42s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+
+  /* A number that has just changed — a quantity, a total. Brief enough to
+     catch the eye without asking to be watched. */
+  @keyframes tick {
+    0% {
+      opacity: 0.35;
+      transform: translateY(-3px);
+    }
+    100% {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .tick {
+    animation: tick 0.28s ease-out;
+  }
+
+  /* A cart line on its way out: it collapses rather than vanishing, so the
+     rows below do not jump up under the finger that removed it. */
+  @keyframes line-out {
+    to {
+      opacity: 0;
+      transform: translateX(-12px);
+      max-height: 0;
+      padding-top: 0;
+      padding-bottom: 0;
+      border-top-width: 0;
+    }
+  }
+  .line-out {
+    overflow: hidden;
+    max-height: 16rem;
+    animation: line-out 0.3s ease-in forwards;
+    pointer-events: none;
+  }
+
+  /* The shop grid after a filter lands, so a changed result reads as changed
+     rather than as a page that quietly redrew. */
+  @keyframes grid-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .grid-in {
+    animation: grid-in 0.34s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  /* Confirmation of an add: the button says so itself, then goes quiet. */
+  @keyframes settle {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .settle {
+    animation: settle 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  }
+
+  /* Horizontal rails: snap, and hide the scrollbar without killing the scroll. */
+  .rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+  .rail > * {
+    scroll-snap-align: start;
+    flex: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

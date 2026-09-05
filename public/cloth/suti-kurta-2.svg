@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 533" width="400" height="533" role="img">
+  <defs>
+    <linearGradient id="drapevf28ej" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#a09a91" stop-opacity=".5"/>
+      <stop offset=".38" stop-color="#ede8e0" stop-opacity=".25"/>
+      <stop offset=".62" stop-color="#c4bdb2" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#969189" stop-opacity=".55"/>
+    </linearGradient>
+    <filter id="softvf28ej" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="9"/>
+      <feColorMatrix values="0 0 0 0 0.17 0 0 0 0 0.17 0 0 0 0 0.17 0 0 0 .3 0"/>
+      <feOffset dy="10"/>
+    </filter>
+    
+    <filter id="wvf28ej" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9 0.55" numOctaves="2" seed="14"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  
+      <rect width="400" height="533" fill="#E4DCCF"/>
+      <rect width="400" height="533" fill="url(#drapevf28ej)" opacity=".55"/>
+      <path d="M-20 366 L420 300" stroke="#c0b9ae" stroke-width="3"/>
+      <path d="M-20 374 L420 308" stroke="#e9e3d9" stroke-width="1.5" opacity=".7"/>
+  <rect width="400" height="533" filter="url(#wvf28ej)" opacity=".13" style="mix-blend-mode:multiply"/>
+</svg>

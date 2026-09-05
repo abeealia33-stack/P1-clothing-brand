@@ -1,0 +1,155 @@
+// Production schema — MySQL, as included with the Hostinger plan.
+//
+// For local development `npm run db:dev-schema` derives prisma/schema.dev.prisma
+// from this file by swapping the provider to SQLite and dropping the MySQL-only
+// native type attributes. The models are never edited twice: this file is the
+// only source of truth, and the dev schema is generated and gitignored.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// Prisma 7 keeps connection URLs out of the schema — see prisma.config.ts,
+// which also picks this file or the generated SQLite one based on DATABASE_URL.
+datasource db {
+  provider = "mysql"
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  /// Used in the storefront URL, so it must stay unique and stable.
+  slug        String   @unique
+  name        String
+  urdu        String?
+  /// rozana | ghar | azad | bundles
+  collection  String
+  /// Whole rupees. No paisa anywhere in this catalogue.
+  price       Int
+  stock       Int      @default(0)
+  description String   @db.Text
+  /// JSON arrays. Small, always read whole, and never queried by their
+  /// contents — a set of join tables would cost the owner clarity and buy
+  /// nothing at this catalogue size. The repository parses them.
+  sizes       String   @db.Text
+  colors      String   @db.Text
+  photos      String   @db.Text
+  details     String   @db.Text
+  /// Hidden from the storefront without being deleted — the owner's way to
+  /// retire a piece while its past orders stay intact.
+  active      Boolean  @default(true)
+  /// Controls the order pieces appear in on the shop grid.
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  items      OrderItem[]
+  reels      Reel[]
+  /// Separate from `collection` above — collections are the four fixed
+  /// brand sections; categories are whatever the owner creates, and a piece
+  /// can carry several at once (e.g. both "New in" and "Sale").
+  categories Category[]
+
+  @@index([collection, active])
+  @@index([position])
+}
+
+/// Owner-created groupings, distinct from the fixed Collections — the owner
+/// can add, rename, reorder or delete these freely from the admin.
+model Category {
+  id       String @id @default(cuid())
+  name     String
+  /// Used in the shop's category filter link, so it must stay unique.
+  slug     String @unique
+  /// Left-to-right order wherever categories are listed.
+  position Int    @default(0)
+
+  products Product[]
+
+  @@index([position])
+}
+
+/// Site-wide settings the owner edits from the admin, kept as one row rather
+/// than scattered env vars or hardcoded values — starts empty and the
+/// storefront falls back to its built-in defaults until something is saved.
+model Settings {
+  /// Always "site" — a singleton row, not a real identity.
+  id String @id @default("site")
+  /// JSON array of image URLs shown in the home page hero. Empty/absent
+  /// means the storefront uses its placeholder image instead.
+  heroImages String @db.Text @default("[]")
+  /// JSON array of promo banners (image, heading, subtext, button label,
+  /// link) shown between sections of the home page. Empty means none show.
+  banners    String @db.Text @default("[]")
+  updatedAt  DateTime @updatedAt
+}
+
+model Order {
+  /// The human reference read out over the phone, e.g. BQ-2609-1345.
+  id        String   @id
+  name      String
+  phone     String
+  address   String   @db.Text
+  city      String
+  notes     String?  @db.Text
+  /// cod | bank | jazzcash | easypaisa | card
+  payment   String
+  subtotal  Int
+  shipping  Int
+  total     Int
+  /// new | in_progress | shipped | delivered | cancelled
+  /// (orders from before the rename may still hold "packed" or "fulfilled";
+  ///  they are mapped on read — see normaliseStatus in src/lib/types.ts)
+  status    String   @default("new")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items OrderItem[]
+
+  @@index([phone])
+  @@index([status, createdAt])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  /// Kept as a soft link: editing or retiring a product must never rewrite
+  /// what a customer actually bought, so the fields below are a snapshot
+  /// taken at checkout rather than a lookup through this relation.
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  slug  String
+  name  String
+  price Int
+  size  String
+  color String
+  photo String @db.Text
+  qty   Int
+
+  @@index([orderId])
+}
+
+/// A short vertical video, shown in a scrolling rail on the home page, that
+/// opens the product it is tagged with when tapped — the "reels" strip.
+model Reel {
+  id        String   @id @default(cuid())
+  /// The video file itself (Cloudinary or /uploads, same as product photos).
+  video     String   @db.Text
+  /// Optional still shown before the video plays / while it loads.
+  poster    String?  @db.Text
+  caption   String?
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /// Hidden from the rail without losing the upload — same pattern as Product.active.
+  active    Boolean  @default(true)
+  /// Left-to-right order in the rail.
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([active, position])
+  @@index([productId])
+}

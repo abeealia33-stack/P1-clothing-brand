@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500" role="img">
+  <defs>
+    <linearGradient id="azadgf" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#c3beb6"/>
+      <stop offset=".45" stop-color="#A9A296"/>
+      <stop offset="1" stop-color="#767169"/>
+    </linearGradient>
+    <linearGradient id="azadgs" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".45" stop-color="#1E1C19" stop-opacity="0"/>
+      <stop offset="1" stop-color="#1E1C19" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="azadgw"><feTurbulence type="fractalNoise" baseFrequency="0.8 0.5" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="400" height="500" fill="url(#azadgf)"/>
+  <g opacity=".38" fill="none" stroke="#65615a" stroke-width="1.5">
+    <path d="M-10 150 Q100 116 200 158 T410 140"/>
+    <path d="M-10 232 Q110 196 210 240 T410 220"/>
+    <path d="M-10 316 Q100 280 200 322 T410 302"/>
+  </g>
+  <g opacity=".2" transform="translate(0,-30) scale(1,0.94)">
+    <path d="M200 86 L118 110 L88 190 L130 208 L124 470 Q200 486 276 470 L270 208 L312 190 L282 110 Z" fill="#767169"/>
+    <path d="M166 86 Q200 128 234 86" fill="none" stroke="#615d56" stroke-width="3"/>
+    <path d="M130 208 L124 402" stroke="#6a665f" stroke-width="2" opacity=".45"/>
+    <path d="M270 208 L276 402" stroke="#6a665f" stroke-width="2" opacity=".45"/></g>
+  <rect width="400" height="500" fill="url(#azadgs)"/>
+  <rect width="400" height="500" filter="url(#azadgw)" opacity=".12" style="mix-blend-mode:multiply"/>
+</svg>

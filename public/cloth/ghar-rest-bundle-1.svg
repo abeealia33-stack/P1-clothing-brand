@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 533" width="400" height="533" role="img">
+  <defs>
+    <linearGradient id="drape08im94" x1="0" y1="0" x2="1" y2="0.3">
+      <stop offset="0" stop-color="#82867e" stop-opacity=".5"/>
+      <stop offset=".38" stop-color="#d2d6ce" stop-opacity=".25"/>
+      <stop offset=".62" stop-color="#9fa59b" stop-opacity=".3"/>
+      <stop offset="1" stop-color="#7a7f77" stop-opacity=".55"/>
+    </linearGradient>
+    <filter id="soft08im94" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="9"/>
+      <feColorMatrix values="0 0 0 0 0.17 0 0 0 0 0.17 0 0 0 0 0.17 0 0 0 .3 0"/>
+      <feOffset dy="10"/>
+    </filter>
+    
+    <filter id="w08im94" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9 0.55" numOctaves="2" seed="7"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+  
+      <rect width="400" height="533" fill="#F5F0EB"/>
+      <ellipse cx="200" cy="474" rx="122" ry="22" fill="#ddd8d4" opacity=".55"/>
+      <g filter="url(#soft08im94)">
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="#CFCCC4"/>
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="none" stroke="#999791" stroke-width="2"/>
+    <path d="M88 170 H312" stroke="#a6a39d" stroke-width="2" opacity=".65"/>
+    <path d="M102 126 V214" stroke="#b2afa9" stroke-width="1.5" opacity=".5"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="#8B9E8B"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="none" stroke="#677567" stroke-width="2"/>
+    <path d="M76 290 H324" stroke="#6f7e6f" stroke-width="2" opacity=".65"/>
+    <path d="M90 246 V334" stroke="#788878" stroke-width="1.5" opacity=".5"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="#EDE7DD"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="none" stroke="#afaba4" stroke-width="2"/>
+    <path d="M96 410 H304" stroke="#beb9b1" stroke-width="2" opacity=".65"/>
+    <path d="M110 366 V454" stroke="#ccc7be" stroke-width="1.5" opacity=".5"/></g>
+      <g>
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="#CFCCC4"/>
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="none" stroke="#999791" stroke-width="2"/>
+    <path d="M88 170 H312" stroke="#a6a39d" stroke-width="2" opacity=".65"/>
+    <path d="M102 126 V214" stroke="#b2afa9" stroke-width="1.5" opacity=".5"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="#8B9E8B"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="none" stroke="#677567" stroke-width="2"/>
+    <path d="M76 290 H324" stroke="#6f7e6f" stroke-width="2" opacity=".65"/>
+    <path d="M90 246 V334" stroke="#788878" stroke-width="1.5" opacity=".5"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="#EDE7DD"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="none" stroke="#afaba4" stroke-width="2"/>
+    <path d="M96 410 H304" stroke="#beb9b1" stroke-width="2" opacity=".65"/>
+    <path d="M110 366 V454" stroke="#ccc7be" stroke-width="1.5" opacity=".5"/></g>
+      <rect width="400" height="533" fill="url(#drape08im94)" opacity=".38" style="mix-blend-mode:multiply"/>
+  <rect width="400" height="533" filter="url(#w08im94)" opacity=".13" style="mix-blend-mode:multiply"/>
+</svg>

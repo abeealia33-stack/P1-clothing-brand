@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500" role="img">
+  <defs>
+    <linearGradient id="bundlesgf" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#d6cdc2"/>
+      <stop offset=".45" stop-color="#C4B8A8"/>
+      <stop offset="1" stop-color="#898176"/>
+    </linearGradient>
+    <linearGradient id="bundlesgs" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".45" stop-color="#1E1C19" stop-opacity="0"/>
+      <stop offset="1" stop-color="#1E1C19" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="bundlesgw"><feTurbulence type="fractalNoise" baseFrequency="0.8 0.5" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="400" height="500" fill="url(#bundlesgf)"/>
+  <g opacity=".38" fill="none" stroke="#766e65" stroke-width="1.5">
+    <path d="M-10 150 Q100 116 200 158 T410 140"/>
+    <path d="M-10 232 Q110 196 210 240 T410 220"/>
+    <path d="M-10 316 Q100 280 200 322 T410 302"/>
+  </g>
+  <g opacity=".2" transform="translate(0,-30) scale(1,0.94)">
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="#9c958c"/>
+    <rect x="88" y="116" width="224" height="108" rx="4" fill="none" stroke="#736e68" stroke-width="2"/>
+    <path d="M88 170 H312" stroke="#7d7770" stroke-width="2" opacity=".65"/>
+    <path d="M102 126 V214" stroke="#868078" stroke-width="1.5" opacity=".5"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="#898176"/>
+    <rect x="76" y="236" width="248" height="108" rx="4" fill="none" stroke="#655f57" stroke-width="2"/>
+    <path d="M76 290 H324" stroke="#6e675e" stroke-width="2" opacity=".65"/>
+    <path d="M90 246 V334" stroke="#766f65" stroke-width="1.5" opacity=".5"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="#736c63"/>
+    <rect x="96" y="356" width="208" height="108" rx="4" fill="none" stroke="#555049" stroke-width="2"/>
+    <path d="M96 410 H304" stroke="#5c564f" stroke-width="2" opacity=".65"/>
+    <path d="M110 366 V454" stroke="#635d55" stroke-width="1.5" opacity=".5"/></g>
+  <rect width="400" height="500" fill="url(#bundlesgs)"/>
+  <rect width="400" height="500" filter="url(#bundlesgw)" opacity=".12" style="mix-blend-mode:multiply"/>
+</svg>

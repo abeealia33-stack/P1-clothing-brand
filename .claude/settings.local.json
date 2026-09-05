@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash /c/Users/DELL/.claude/plugins/cache/claude-plugins-official/superpowers/5.1.0/skills/brainstorming/scripts/start-server.sh --project-dir '/c/Users/DELL/Desktop/P1 Clothing')",
+      "Bash(sleep 2 && cat \"/c/Users/DELL/AppData/Local/Temp/claude/c--Users-DELL-Desktop-P1-Clothing/b8affc43-662a-4d6c-bd00-2caabfa29e28/tasks/bkcxsio5z.output\")",
+      "Read(//c/Users/DELL/AppData/Local/Temp/claude/c--Users-DELL-Desktop-P1-Clothing/b8affc43-662a-4d6c-bd00-2caabfa29e28/tasks/**)"
+    ]
+  }
+}

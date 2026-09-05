@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1600" width="1200" height="1600" role="img">
+  <defs>
+    <linearGradient id="h" x1="0" y1="0" x2=".7" y2="1">
+      <stop offset="0" stop-color="#EFE7DC"/>
+      <stop offset=".42" stop-color="#DCD2C4"/>
+      <stop offset=".72" stop-color="#C3BAAC"/>
+      <stop offset="1" stop-color="#9E968A"/>
+    </linearGradient>
+    <linearGradient id="light" x1=".2" y1="0" x2=".8" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity=".5"/>
+      <stop offset=".5" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="1" stop-color="#2C2C2C" stop-opacity=".22"/>
+    </linearGradient>
+    <filter id="hw"><feTurbulence type="fractalNoise" baseFrequency="0.7 0.45" numOctaves="3" seed="4"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1200" height="1600" fill="url(#h)"/>
+  <g opacity=".5" fill="none" stroke="#8A8175" stroke-width="2">
+    <path d="M-40 560 Q300 470 620 596 T1240 540"/>
+    <path d="M-40 700 Q320 604 640 742 T1240 686"/>
+    <path d="M-40 980 Q280 900 600 1030 T1240 972"/>
+    <path d="M-40 1160 Q300 1074 620 1206 T1240 1150"/>
+  </g>
+  <rect width="1200" height="1600" fill="url(#light)"/>
+  <rect width="1200" height="1600" filter="url(#hw)" opacity=".11" style="mix-blend-mode:multiply"/>
+</svg>

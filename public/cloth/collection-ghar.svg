@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" width="400" height="500" role="img">
+  <defs>
+    <linearGradient id="ghargf" x1="0" y1="0" x2=".85" y2="1">
+      <stop offset="0" stop-color="#ced3cb"/>
+      <stop offset=".45" stop-color="#B9C0B4"/>
+      <stop offset="1" stop-color="#82867e"/>
+    </linearGradient>
+    <linearGradient id="ghargs" x1="0" y1="0" x2="0" y2="1">
+      <stop offset=".45" stop-color="#1E1C19" stop-opacity="0"/>
+      <stop offset="1" stop-color="#1E1C19" stop-opacity=".62"/>
+    </linearGradient>
+    <filter id="ghargw"><feTurbulence type="fractalNoise" baseFrequency="0.8 0.5" numOctaves="3" seed="9"/><feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="400" height="500" fill="url(#ghargf)"/>
+  <g opacity=".38" fill="none" stroke="#6f736c" stroke-width="1.5">
+    <path d="M-10 150 Q100 116 200 158 T410 140"/>
+    <path d="M-10 232 Q110 196 210 240 T410 220"/>
+    <path d="M-10 316 Q100 280 200 322 T410 302"/>
+  </g>
+  <g opacity=".2" transform="translate(0,-30) scale(1,0.94)">
+    <path d="M200 70 L142 88 L122 144 L152 156 L148 288 Q200 300 252 288 L248 156 L278 144 L258 88 Z" fill="#82867e"/>
+    <path d="M176 70 Q200 98 224 70" fill="none" stroke="#6b6e67" stroke-width="3"/>
+    <path d="M144 330 L256 330 L262 356 L250 496 L208 496 L200 386 L192 496 L150 496 L138 356 Z" fill="#797d75"/>
+    <rect x="144" y="330" width="112" height="22" fill="#6b6e67"/></g>
+  <rect width="400" height="500" fill="url(#ghargs)"/>
+  <rect width="400" height="500" filter="url(#ghargw)" opacity=".12" style="mix-blend-mode:multiply"/>
+</svg>
