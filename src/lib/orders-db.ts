@@ -76,6 +76,18 @@ function makeId(): string {
   return `BQ-${stamp}-${Math.floor(1000 + Math.random() * 9000)}`;
 }
 
+/**
+ * Raised when a piece ran out between the checkout page pricing the cart and
+ * the order actually being written. Carries the name so the customer is told
+ * which piece, not just that something went wrong.
+ */
+export class OutOfStockError extends Error {
+  constructor(readonly productName: string) {
+    super(`${productName} is out of stock`);
+    this.name = "OutOfStockError";
+  }
+}
+
 export type OrderDraft = {
   name: string;
   phone: string;
@@ -96,6 +108,7 @@ export async function createOrder(draft: OrderDraft): Promise<Order> {
     where: { slug: { in: draft.lines.map((l) => l.slug) } },
     select: { id: true, slug: true },
   });
+
   const idBySlug = new Map(known.map((p) => [p.slug, p.id]));
 
   for (let attempt = 0; attempt < 5; attempt++) {
@@ -106,35 +119,57 @@ export async function createOrder(draft: OrderDraft): Promise<Order> {
     });
     if (clash) continue;
 
-    const row = await prisma.order.create({
-      data: {
-        id,
-        name: draft.name,
-        phone: draft.phone,
-        address: draft.address,
-        city: draft.city,
-        notes: draft.notes ?? null,
-        payment: draft.payment,
-        subtotal: draft.subtotal,
-        shipping: draft.shipping,
-        total: draft.total,
-        items: {
-          create: draft.lines.map((line) => ({
-            slug: line.slug,
-            name: line.name,
-            price: line.price,
-            size: line.size,
-            color: line.color,
-            photo: line.photo,
-            qty: line.qty,
-            // Linked when the piece still exists, so the admin can jump from an
-            // order item to the product; the snapshot above is what counts, and
-            // an unknown slug simply leaves the link null.
-            productId: idBySlug.get(line.slug) ?? null,
-          })),
+    /* Taking the stock and writing the order are one transaction: an order
+       that cannot be stocked is never written, and stock taken for an order
+       that fails to write goes back. */
+    const row = await prisma.$transaction(async (tx) => {
+      for (const line of draft.lines) {
+        const productId = idBySlug.get(line.slug);
+        // A line whose product has since been deleted keeps its snapshot and
+        // has no shelf left to take from.
+        if (!productId) continue;
+
+        /* The guard lives in the WHERE clause, not in a read followed by a
+           write: two people checking out the last piece at the same moment
+           both pass a `stock > 0` read, but only one can match `stock >= qty`
+           at the moment of the update. The loser gets told. */
+        const taken = await tx.product.updateMany({
+          where: { id: productId, stock: { gte: line.qty } },
+          data: { stock: { decrement: line.qty } },
+        });
+        if (taken.count === 0) throw new OutOfStockError(line.name);
+      }
+
+      return tx.order.create({
+        data: {
+          id,
+          name: draft.name,
+          phone: draft.phone,
+          address: draft.address,
+          city: draft.city,
+          notes: draft.notes ?? null,
+          payment: draft.payment,
+          subtotal: draft.subtotal,
+          shipping: draft.shipping,
+          total: draft.total,
+          items: {
+            create: draft.lines.map((line) => ({
+              slug: line.slug,
+              name: line.name,
+              price: line.price,
+              size: line.size,
+              color: line.color,
+              photo: line.photo,
+              qty: line.qty,
+              // Linked when the piece still exists, so the admin can jump from an
+              // order item to the product; the snapshot above is what counts, and
+              // an unknown slug simply leaves the link null.
+              productId: idBySlug.get(line.slug) ?? null,
+            })),
+          },
         },
-      },
-      include: { items: true },
+        include: { items: true },
+      });
     });
     return toOrder(row);
   }

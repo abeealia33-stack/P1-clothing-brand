@@ -6,9 +6,8 @@ import ClothImage from "@/components/ClothImage";
 import FreeShipMeter from "@/components/FreeShipMeter";
 import { useCart } from "@/components/useCart";
 import { priceLabel, rupees } from "@/lib/format";
-import { site } from "@/lib/site";
+import { shippingFor } from "@/lib/shipping";
 
-const SHIPPING = 250;
 const LINE_OUT_MS = 300;
 
 /** True when the device has asked for less movement. */
@@ -67,7 +66,9 @@ export default function CartPage() {
     );
   }
 
-  const shipping = subtotal >= site.freeShippingOver ? 0 : SHIPPING;
+  // The same helper the checkout charges from, so the cart cannot quote a
+  // total the next page disagrees with.
+  const shipping = shippingFor(subtotal);
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-10 md:py-14">

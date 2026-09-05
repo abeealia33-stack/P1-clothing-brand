@@ -1,11 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { createOrder } from "@/lib/orders-db";
+import { createOrder, OutOfStockError } from "@/lib/orders-db";
 import { getProductBySlug } from "@/lib/catalogue";
 import { paymentMethods, type PaymentMethod } from "@/lib/types";
-import { site } from "@/lib/site";
-import { SHIPPING_FLAT } from "@/lib/shipping";
+import { shippingFor } from "@/lib/shipping";
+import { orderableQty } from "@/lib/stock";
 
 export type CheckoutResult =
   | { ok: true; orderId: string }
@@ -74,17 +74,17 @@ export async function placeOrderAction(input: {
       errors.cart = `${line.slug} is no longer available. Remove it and try again.`;
       break;
     }
-    const qty = Math.min(Math.max(Math.trunc(Number(line.qty) || 0), 1), 10);
+    const qty = orderableQty(line.qty, product.stock);
+    if (qty === 0) {
+      errors.cart = `${product.name} has just sold out.`;
+      break;
+    }
     if (!product.sizes.includes(line.size)) {
       errors.cart = `${product.name} is not made in size ${line.size}.`;
       break;
     }
     if (!product.colors.some((c) => c.name === line.color)) {
       errors.cart = `${product.name} does not come in ${line.color}.`;
-      break;
-    }
-    if (product.stock <= 0) {
-      errors.cart = `${product.name} has just sold out.`;
       break;
     }
     priced.push({
@@ -101,20 +101,33 @@ export async function placeOrderAction(input: {
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
   const subtotal = priced.reduce((n, l) => n + l.price * l.qty, 0);
-  const shipping = subtotal >= site.freeShippingOver ? 0 : SHIPPING_FLAT;
+  const shipping = shippingFor(subtotal);
 
-  const order = await createOrder({
-    name,
-    phone,
-    address,
-    city,
-    notes: notes || undefined,
-    payment: method!.value as PaymentMethod,
-    lines: priced,
-    subtotal,
-    shipping,
-    total: subtotal + shipping,
-  });
+  let order;
+  try {
+    order = await createOrder({
+      name,
+      phone,
+      address,
+      city,
+      notes: notes || undefined,
+      payment: method!.value as PaymentMethod,
+      lines: priced,
+      subtotal,
+      shipping,
+      total: subtotal + shipping,
+    });
+  } catch (error) {
+    // Someone else took the last piece between the repricing above and the
+    // write. Nothing has been saved; say which piece and let them adjust.
+    if (error instanceof OutOfStockError) {
+      return {
+        ok: false,
+        errors: { cart: `${error.productName} sold out while you were checking out.` },
+      };
+    }
+    throw error;
+  }
 
   // Lets the confirmation page show this order in full without making order
   // numbers guessable — anyone else looking it up gets the tracking view.
