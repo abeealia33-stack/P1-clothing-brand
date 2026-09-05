@@ -1,5 +1,9 @@
 export const site = {
   name: "Bilques",
+  /* Where the site actually lives. Needed for absolute URLs in link previews
+     and the sitemap — a relative OG image is ignored by WhatsApp and every
+     other unfurler. Set NEXT_PUBLIC_SITE_URL in production. */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://bilques.pk",
   tagline: "Aaram se tayaar",
   taglineUrdu: "آرام سے تیار",
   whatsapp: "923001234567",

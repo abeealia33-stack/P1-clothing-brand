@@ -17,7 +17,20 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) return { title: "Piece not found" };
-  return { title: product.name, description: product.description };
+
+  return {
+    title: product.name,
+    description: product.description,
+    alternates: { canonical: `/product/${product.slug}` },
+    // The image itself comes from opengraph-image.tsx alongside this file.
+    openGraph: {
+      type: "website",
+      title: product.name,
+      description: product.description,
+      url: `/product/${product.slug}`,
+    },
+    twitter: { card: "summary_large_image", title: product.name },
+  };
 }
 
 export default async function ProductPage({
