@@ -21,11 +21,10 @@ export default function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setVisible(true);
-      return;
-    }
 
+    /* No reduced-motion branch is needed here: the .reveal rules live inside
+       a `prefers-reduced-motion: no-preference` block, so under reduce the
+       children are visible whatever this class says. */
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

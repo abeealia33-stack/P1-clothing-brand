@@ -9,7 +9,12 @@
 import { PrismaClient } from "../src/generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import "dotenv/config";
+/* Node reads .env natively; see the note in prisma.config.ts. */
+try {
+  process.loadEnvFile();
+} catch {
+  // No .env here — carry on with whatever the environment already holds.
+}
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL is not set. Copy .env.example to .env");

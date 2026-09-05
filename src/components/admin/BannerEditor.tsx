@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useId, useState } from "react";
 import type { PromoBanner } from "@/lib/settings";
 
 type Row = PromoBanner & { uploading?: boolean };
@@ -45,7 +45,12 @@ export default function BannerEditor({
     }
   };
 
-  const saved: PromoBanner[] = rows.map(({ uploading: _uploading, ...b }) => b);
+  // The uploading flag is local bookkeeping; it never goes to the server.
+  const saved: PromoBanner[] = rows.map((row) => {
+    const { uploading, ...banner } = row;
+    void uploading;
+    return banner;
+  });
 
   return (
     <div>

@@ -1,5 +1,13 @@
-import "dotenv/config";
 import { defineConfig, env } from "prisma/config";
+
+/* Node has read .env by itself since 20.12, so this needs no dependency.
+   A missing file is not an error: on a server the values are real
+   environment variables and there is no .env to read. */
+try {
+  process.loadEnvFile();
+} catch {
+  // No .env here — carry on with whatever the environment already holds.
+}
 
 /**
  * Prisma 7 reads the connection URL from here rather than from the schema.

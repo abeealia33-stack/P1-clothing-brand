@@ -1,11 +1,24 @@
 "use server";
 
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { createOrder, OutOfStockError } from "@/lib/orders-db";
+import { createRateLimit } from "@/lib/rate-limit";
 import { getProductBySlug } from "@/lib/catalogue";
 import { paymentMethods, type PaymentMethod } from "@/lib/types";
 import { shippingFor } from "@/lib/shipping";
 import { orderableQty } from "@/lib/stock";
+
+const orderLimit = createRateLimit(5, 10 * 60 * 1000);
+
+/** Best-effort client identity behind Hostinger's proxy, as in the admin. */
+async function clientKey(): Promise<string> {
+  const h = await headers();
+  return (
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    h.get("x-real-ip") ||
+    "unknown"
+  );
+}
 
 export type CheckoutResult =
   | { ok: true; orderId: string }
@@ -37,6 +50,22 @@ export async function placeOrderAction(input: {
   lines: IncomingLine[];
 }): Promise<CheckoutResult> {
   const errors: Record<string, string> = {};
+
+  /* Cash on delivery means a fake order costs a real courier run, so orders
+     are capped the way login attempts are. Five in ten minutes is far more
+     than a shopper needs and far less than a script wants. */
+  const key = await clientKey();
+  if (!orderLimit.take(key)) {
+    const wait = Math.ceil(orderLimit.retryAfter(key) / 60);
+    return {
+      ok: false,
+      errors: {
+        cart: `That is a lot of orders at once. Try again in ${wait} ${
+          wait === 1 ? "minute" : "minutes"
+        }, or message us on WhatsApp.`,
+      },
+    };
+  }
 
   const name = input.name?.trim() ?? "";
   const phone = input.phone?.trim() ?? "";
