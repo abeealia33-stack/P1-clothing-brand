@@ -18,29 +18,30 @@
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio"
   },
+  "//": "Hostinger's deploy installs production dependencies only, so anything the build itself needs — the Prisma CLI, Tailwind, TypeScript and its types — has to live here rather than in devDependencies.",
   "dependencies": {
     "@prisma/adapter-mariadb": "^7.10.0",
     "@prisma/client": "7.10.0",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "mariadb": "^3.5.4",
     "next": "16.3.4",
+    "prisma": "7.10.0",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "tailwindcss": "^4",
+    "typescript": "^5"
   },
   "optionalDependencies": {
     "@prisma/adapter-better-sqlite3": "^7.10.0",
     "better-sqlite3": "^13.0.3"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^24.13.3",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.4",
-    "prisma": "7.10.0",
-    "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5",
     "vitest": "^5.0.0"
   }
 }

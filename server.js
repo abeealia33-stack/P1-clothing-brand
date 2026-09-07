@@ -3,6 +3,8 @@
  * rather than `npm start` — so `next start` needs this small wrapper to boot
  * the production server and listen on the port Hostinger assigns via PORT.
  */
+/* eslint-disable @typescript-eslint/no-require-imports -- CommonJS on purpose:
+   Hostinger starts this file with plain `node`, outside the app's build. */
 const { createServer } = require("http");
 const next = require("next");
 

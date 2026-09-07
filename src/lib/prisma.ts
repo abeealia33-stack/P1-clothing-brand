@@ -15,6 +15,22 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
  * process would open a fresh connection pool each time until the database
  * started refusing them.
  */
+/**
+ * SQLite is for development only, and its driver is a native module that will
+ * not compile on Hostinger — so it is an optional dependency that is simply
+ * absent in production.
+ *
+ * The require is hidden from the bundler on purpose. A plain one is resolved
+ * at build time, which fails on the server where the package was never
+ * installed; going through `eval` leaves it as a runtime lookup that only
+ * happens on the branch below, which production never takes.
+ */
+function sqliteAdapter(url: string) {
+  const runtimeRequire = eval("require");
+  const { PrismaBetterSqlite3 } = runtimeRequire("@prisma/adapter-better-sqlite3");
+  return new PrismaBetterSqlite3({ url });
+}
+
 function createClient(): PrismaClient {
   const url = process.env.DATABASE_URL;
   if (!url) {
@@ -23,12 +39,8 @@ function createClient(): PrismaClient {
     );
   }
 
-  /* SQLite is development-only, and better-sqlite3 is a native module that
-     cannot be compiled on Hostinger's build machine. Loading its adapter here
-     rather than at the top of the file keeps it out of production entirely,
-     where DATABASE_URL is always MySQL. */
   const adapter = url.startsWith("file:")
-    ? new (require("@prisma/adapter-better-sqlite3").PrismaBetterSqlite3)({ url })
+    ? sqliteAdapter(url)
     : new PrismaMariaDb(url);
 
   return new PrismaClient({
