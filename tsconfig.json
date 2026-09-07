@@ -30,5 +30,14 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules"]
+  /* The build type-checks whatever is included here, and it runs on a server
+     that installs production dependencies only. Tests and the seed script
+     reach for vitest and the SQLite adapter, neither of which is there, so
+     they are checked by running them rather than by the build. */
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts",
+    "vitest.config.mts",
+    "prisma/seed.ts"
+  ]
 }
