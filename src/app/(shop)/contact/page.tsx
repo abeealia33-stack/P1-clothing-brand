@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { instagramLink, site, whatsappLink } from "@/lib/site";
+import { WhatsAppGlyph } from "@/components/WhatsAppButton";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -25,11 +26,15 @@ export default function ContactPage() {
           className="block p-6 transition-colors"
           style={{ background: "var(--color-sage)", color: "#fff" }}
         >
-          <span className="block text-3xl" style={{ fontFamily: "var(--font-display)" }}>
+          <span
+            className="flex items-center gap-3 text-3xl"
+            style={{ fontFamily: "var(--font-display)" }}
+          >
+            <WhatsAppGlyph size={28} />
             WhatsApp
           </span>
           <span className="tnum mt-1 block text-sm text-white/85">
-            +92 300 1234567 — sizing, orders, exchanges
+            {site.whatsappDisplay} — sizing, orders, exchanges
           </span>
         </a>
 

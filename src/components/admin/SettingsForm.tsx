@@ -2,16 +2,19 @@
 
 import { useActionState } from "react";
 import BannerEditor from "./BannerEditor";
+import PaymentAccountsEditor from "./PaymentAccountsEditor";
 import PhotoUploader from "./PhotoUploader";
 import { saveSettingsAction, type SettingsFormState } from "@/app/admin/settings/actions";
-import type { PromoBanner } from "@/lib/settings";
+import type { PaymentAccounts, PromoBanner } from "@/lib/settings";
 
 export default function SettingsForm({
   heroImages,
   banners,
+  payments,
 }: {
   heroImages: string[];
   banners: PromoBanner[];
+  payments: PaymentAccounts;
 }) {
   const [state, action, pending] = useActionState<SettingsFormState, FormData>(
     saveSettingsAction,
@@ -49,6 +52,18 @@ export default function SettingsForm({
         </p>
         <div className="mt-3">
           <BannerEditor name="banners" initial={banners} />
+        </div>
+      </div>
+
+      <div className="rule mt-8 pt-6">
+        <label className="block text-sm font-medium">Where customers send money</label>
+        <p className="measure mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          Shown to the customer as soon as they place a bank or wallet order,
+          with a button to send you the receipt. Leave a method blank and they
+          are asked to message you for the details instead.
+        </p>
+        <div className="mt-4">
+          <PaymentAccountsEditor name="payments" initial={payments} />
         </div>
       </div>
 

@@ -70,6 +70,28 @@ export default async function HomePage() {
           </p>
         </section>
 
+        <section className="mx-auto max-w-6xl px-5 pt-4 pb-8">
+          <div
+            className="flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+            style={{ background: "var(--color-khaddar)" }}
+          >
+            <div>
+              <h2 className="text-3xl md:text-4xl">Want it made to fit you?</h2>
+              <p
+                className="measure mt-2 text-sm"
+                style={{ color: "var(--color-ink-soft)" }}
+              >
+                Pick a piece as your starting point, send us your
+                measurements, and we will call to agree a price before
+                anything is cut.
+              </p>
+            </div>
+            <Link href="/customize" className="btn btn-ink shrink-0">
+              Start designing
+            </Link>
+          </div>
+        </section>
+
         <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
           <h2 className="text-4xl md:text-5xl">Four ways to get dressed</h2>
           <p

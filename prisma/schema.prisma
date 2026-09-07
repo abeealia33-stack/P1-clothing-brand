@@ -49,6 +49,7 @@ model Product {
   /// brand sections; categories are whatever the owner creates, and a piece
   /// can carry several at once (e.g. both "New in" and "Sale").
   categories Category[]
+  customRequests CustomDesignRequest[]
 
   @@index([collection, active])
   @@index([position])
@@ -81,6 +82,10 @@ model Settings {
   /// JSON array of promo banners (image, heading, subtext, button label,
   /// link) shown between sections of the home page. Empty means none show.
   banners    String @db.Text @default("[]")
+  /// JSON object of the accounts customers transfer money to, keyed by
+  /// payment method (bank, jazzcash, easypaisa). Empty means the storefront
+  /// falls back to promising the details on WhatsApp instead of showing them.
+  payments   String @db.Text @default("{}")
   updatedAt  DateTime @updatedAt
 }
 
@@ -94,6 +99,15 @@ model Order {
   notes     String?  @db.Text
   /// cod | bank | jazzcash | easypaisa | card
   payment   String
+  /// unpaid | review | paid. Deliberately separate from `status`, which is
+  /// about where the parcel is: a delivered COD order is paid, and a bank
+  /// transfer can be paid before anything is packed. "review" means the
+  /// customer has sent a receipt and the owner has not checked it yet.
+  paymentStatus String @default("unpaid")
+  /// The transfer screenshot the customer uploaded, if they sent one.
+  paymentProof  String? @db.Text
+  /// When the owner (or, later, a gateway) confirmed the money arrived.
+  paidAt        DateTime?
   subtotal  Int
   shipping  Int
   total     Int
@@ -131,6 +145,38 @@ model OrderItem {
   qty   Int
 
   @@index([orderId])
+}
+
+/// A customer asking for a piece made to their own measurements. Quote-first:
+/// nothing is charged here — the owner reviews it and contacts the customer
+/// to agree a price, same as a manual-transfer order today.
+model CustomDesignRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  /// new | contacted | closed
+  status    String   @default("new")
+
+  /// Kept as a soft link, like OrderItem.productId — retiring the product
+  /// must not break old requests, so the name and photo are snapshotted too.
+  styleProductId String?
+  styleProduct   Product? @relation(fields: [styleProductId], references: [id], onDelete: SetNull)
+  styleName      String
+  stylePhoto     String   @db.Text
+
+  heightCm   Float
+  weightKg   Float
+  chestIn    Float
+  waistIn    Float
+  shoulderIn Float
+  sleeveIn   Float
+
+  notes String? @db.Text
+
+  name  String
+  phone String
+  city  String?
+
+  @@index([status, createdAt])
 }
 
 /// A short vertical video, shown in a scrolling rail on the home page, that

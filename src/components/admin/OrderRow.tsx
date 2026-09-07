@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { priceLabel } from "@/lib/format";
-import type { Order } from "@/lib/types";
+import { paymentLabel, type Order } from "@/lib/types";
 import StatusPill from "./StatusPill";
 
 /** How long ago, in the words someone would actually use. */
@@ -49,8 +49,26 @@ export default function OrderRow({ order }: { order: Order }) {
 
         <div className="shrink-0 text-right">
           <p className="tnum">{priceLabel(order.total)}</p>
-          <p className="text-xs" style={{ color: "var(--color-ink-soft)" }}>
-            {order.payment === "cod" ? "Cash on delivery" : "Paid another way"}
+          {/* A receipt waiting to be checked is the one thing in this list she
+              has to act on, so it is the only line that leaves the quiet
+              secondary colour. */}
+          <p
+            className="text-xs"
+            style={{
+              color:
+                order.paymentStatus === "paid"
+                  ? "var(--color-sage-deep)"
+                  : order.paymentStatus === "review"
+                    ? "var(--color-ink)"
+                    : "var(--color-ink-soft)",
+              fontWeight: order.paymentStatus === "review" ? 500 : undefined,
+            }}
+          >
+            {order.paymentStatus === "paid"
+              ? "Paid"
+              : order.paymentStatus === "review"
+                ? "Receipt to check"
+                : paymentLabel(order.payment)}
           </p>
         </div>
       </Link>

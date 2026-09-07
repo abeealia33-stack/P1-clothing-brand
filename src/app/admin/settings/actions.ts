@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
-import { saveSettings, type PromoBanner } from "@/lib/settings";
+import {
+  saveSettings,
+  type PaymentAccounts,
+  type PromoBanner,
+} from "@/lib/settings";
 
 export type SettingsFormState = { errors?: Record<string, string> };
 
@@ -38,8 +42,18 @@ export async function saveSettingsAction(
     }))
     .filter((b) => b.image && b.heading);
 
+  /* Only the shape is checked here; saveSettings drops any account missing a
+     title or a number, so a half-typed row never reaches a customer. */
+  let payments: PaymentAccounts = {};
   try {
-    await saveSettings({ heroImages, banners });
+    const parsed = JSON.parse(String(formData.get("payments") ?? "{}"));
+    if (parsed && typeof parsed === "object") payments = parsed as PaymentAccounts;
+  } catch {
+    payments = {};
+  }
+
+  try {
+    await saveSettings({ heroImages, banners, payments });
   } catch {
     return { errors: { form: "Could not save. Try again." } };
   }

@@ -1,6 +1,7 @@
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import TabBar from "@/components/TabBar";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 /**
  * Everything a customer sees. The admin sits outside this group so it gets
@@ -25,6 +26,7 @@ export default function ShopLayout({
         <main id="main">{children}</main>
         <SiteFooter />
       </div>
+      <WhatsAppButton />
       <div className="md:hidden">
         <TabBar />
       </div>

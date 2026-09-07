@@ -6,7 +6,10 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://bilques.pk",
   tagline: "Aaram se tayaar",
   taglineUrdu: "آرام سے تیار",
-  whatsapp: "923001234567",
+  /* wa.me takes the number in international form, digits only — no plus, no
+     leading zero. 0312 4433199 is the same line, dialled locally. */
+  whatsapp: "923124433199",
+  whatsappDisplay: "0312 4433199",
   instagram: "bilques.pk",
   email: "salam@bilques.pk",
   freeShippingOver: 3000,

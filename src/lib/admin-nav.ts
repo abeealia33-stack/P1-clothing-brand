@@ -12,6 +12,7 @@ export type AdminIconName =
   | "shirt"
   | "tag"
   | "reel"
+  | "ruler"
   | "menu"
   | "settings"
   /* Dashboard stat cards only — not sidebar entries. */
@@ -35,6 +36,7 @@ export const adminNav: AdminNavGroup[] = [
     items: [
       { label: "Dashboard", href: "/admin", icon: "grid" },
       { label: "Orders", href: "/admin/orders", icon: "bag" },
+      { label: "Custom requests", href: "/admin/custom-requests", icon: "ruler" },
     ],
   },
   {

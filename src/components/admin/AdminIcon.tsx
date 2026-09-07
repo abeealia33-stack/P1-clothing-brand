@@ -33,6 +33,15 @@ const paths: Record<AdminIconName, React.ReactNode> = {
       <path d="m11 12.5 4 2.2-4 2.2v-4.4Z" />
     </>
   ),
+  ruler: (
+    <>
+      <rect x="3" y="7" width="18" height="10" rx="1.5" transform="rotate(-20 12 12)" />
+      <path
+        d="m6.8 14.5 1-2.3M9.6 15.7l1-2.3M12.4 16.9l1-2.3M15.2 18.1l1-2.3"
+        transform="rotate(-20 12 12)"
+      />
+    </>
+  ),
   menu: <path d="M4 6h16M4 12h16M4 18h16" />,
   banknote: (
     <>

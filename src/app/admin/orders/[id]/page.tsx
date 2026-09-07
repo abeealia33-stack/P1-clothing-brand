@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 import ClothImage from "@/components/ClothImage";
 import StatusPill from "@/components/admin/StatusPill";
 import StatusButtons from "@/components/admin/StatusButtons";
+import PaymentPanel from "@/components/admin/PaymentPanel";
 import { requireAdmin } from "@/lib/auth";
 import { getOrder } from "@/lib/orders-db";
 import { priceLabel } from "@/lib/format";
-import { paymentLabel } from "@/lib/types";
 import { whatsappLink } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -135,9 +135,14 @@ export default async function AdminOrderPage({
             </div>
           </dl>
 
-          <p className="mt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-            Paying by {paymentLabel(order.payment).toLowerCase()}.
-          </p>
+          <PaymentPanel
+            orderId={order.id}
+            payment={order.payment}
+            paymentStatus={order.paymentStatus}
+            paymentProof={order.paymentProof}
+            paidAt={order.paidAt}
+            total={priceLabel(order.total)}
+          />
         </section>
       </div>
     </div>

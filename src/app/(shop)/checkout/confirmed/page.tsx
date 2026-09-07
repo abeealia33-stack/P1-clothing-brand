@@ -2,9 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import OrderCelebration from "@/components/OrderCelebration";
+import PaymentTransfer from "@/components/PaymentTransfer";
 import { getOrder } from "@/lib/orders-db";
+import { getSettings } from "@/lib/settings";
 import { priceLabel } from "@/lib/format";
-import { paymentMethods, statusLabel } from "@/lib/types";
+import {
+  isTransferMethod,
+  paymentLabel,
+  paymentMethods,
+  statusLabel,
+} from "@/lib/types";
 import { site, whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Order placed" };
@@ -48,6 +55,13 @@ export default async function ConfirmedPage({
   }
 
   const method = paymentMethods.find((m) => m.value === order.payment);
+
+  /* Bank and wallet orders are only half done at this point — the money has
+     not moved yet — so the accounts to send it to come along with the page. */
+  const transfer = isTransferMethod(order.payment);
+  const account = isTransferMethod(order.payment)
+    ? ((await getSettings()).payments[order.payment] ?? null)
+    : null;
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-12 md:py-16">
@@ -109,9 +123,25 @@ export default async function ConfirmedPage({
         </div>
       </dl>
 
-      <p className="measure mt-4 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-        {method?.note}
-      </p>
+      {transfer ? (
+        <PaymentTransfer
+          orderId={order.id}
+          methodLabel={paymentLabel(order.payment)}
+          amount={priceLabel(order.total)}
+          account={account}
+          paymentStatus={order.paymentStatus}
+          initialProof={order.paymentProof}
+          whatsappHref={whatsappLink(
+            `Salam! I have paid for order ${order.id} by ${paymentLabel(
+              order.payment
+            ).toLowerCase()}. Here is the receipt.`
+          )}
+        />
+      ) : (
+        <p className="measure mt-4 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          {method?.note}
+        </p>
+      )}
 
       <div className="mt-9 flex flex-wrap gap-3">
         <Link

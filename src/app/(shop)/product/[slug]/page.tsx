@@ -7,7 +7,8 @@ import ProductCard from "@/components/ProductCard";
 import { getProductBySlug, relatedProducts } from "@/lib/catalogue";
 import { getCollection } from "@/lib/types";
 import { priceLabel, rupees } from "@/lib/format";
-import { site } from "@/lib/site";
+import { site, whatsappLink } from "@/lib/site";
+import { WhatsAppGlyph } from "@/components/WhatsAppButton";
 
 export async function generateMetadata({
   params,
@@ -75,6 +76,22 @@ export default async function ProductPage({
           <p className="measure mt-5">{product.description}</p>
 
           <ProductBuy product={product} />
+
+          {/* Adding to a cart is not how everyone here shops. Plenty would
+              rather ask about the fabric or the fit first, and the message
+              arrives already naming the piece. */}
+          <a
+            href={whatsappLink(
+              `Salam! I'm interested in the ${product.name} (${priceLabel(product.price)}). Could you tell me more?`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-6 inline-flex items-center gap-2 text-sm underline underline-offset-4"
+            style={{ color: "var(--color-sage-deep)" }}
+          >
+            <WhatsAppGlyph size={16} />
+            Ask about this piece on WhatsApp
+          </a>
 
           <div className="rule mt-9 pt-6">
             <h2 className="text-2xl">The details</h2>

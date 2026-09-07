@@ -1,8 +1,14 @@
 import "server-only";
 
 import { prisma } from "./prisma";
-import { normaliseStatus } from "./types";
-import type { Order, OrderLine, OrderStatus, PaymentMethod } from "./types";
+import { isPaymentStatus, normaliseStatus } from "./types";
+import type {
+  Order,
+  OrderLine,
+  OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
+} from "./types";
 
 type ItemRow = {
   id: string;
@@ -24,6 +30,9 @@ type OrderRow = {
   city: string;
   notes: string | null;
   payment: string;
+  paymentStatus: string;
+  paymentProof: string | null;
+  paidAt: Date | null;
   subtotal: number;
   shipping: number;
   total: number;
@@ -41,6 +50,11 @@ function toOrder(row: OrderRow): Order {
     city: row.city,
     notes: row.notes,
     payment: row.payment as PaymentMethod,
+    // Anything unrecognised is treated as money not yet in hand, which is the
+    // side to be wrong on.
+    paymentStatus: isPaymentStatus(row.paymentStatus) ? row.paymentStatus : "unpaid",
+    paymentProof: row.paymentProof,
+    paidAt: row.paidAt ? row.paidAt.toISOString() : null,
     subtotal: row.subtotal,
     shipping: row.shipping,
     total: row.total,
@@ -225,6 +239,37 @@ export async function getOrder(id: string): Promise<Order | null> {
 
 export async function setOrderStatus(id: string, status: OrderStatus) {
   await prisma.order.update({ where: { id }, data: { status } });
+}
+
+/**
+ * The owner's verdict on whether the money arrived. Marking an order back to
+ * unpaid clears the timestamp, so "paid" and "paidAt" can never disagree.
+ */
+export async function setPaymentStatus(id: string, paymentStatus: PaymentStatus) {
+  await prisma.order.update({
+    where: { id },
+    data: {
+      paymentStatus,
+      paidAt: paymentStatus === "paid" ? new Date() : null,
+    },
+  });
+}
+
+/**
+ * A customer sending in their transfer receipt. It moves the order to
+ * "review" — a claim, not a confirmation — and refuses to touch an order the
+ * owner has already settled, so a stray upload cannot reopen a closed sale.
+ * Returns false when the order was not in a state to accept one.
+ */
+export async function attachPaymentProof(
+  id: string,
+  proofUrl: string
+): Promise<boolean> {
+  const changed = await prisma.order.updateMany({
+    where: { id, paymentStatus: { in: ["unpaid", "review"] } },
+    data: { paymentStatus: "review", paymentProof: proofUrl },
+  });
+  return changed.count > 0;
 }
 
 /** The only numbers the owner asked for: what needs doing, and today's takings. */

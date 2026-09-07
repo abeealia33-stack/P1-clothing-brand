@@ -118,3 +118,65 @@ describe("createOrder", () => {
     });
   });
 });
+
+/**
+ * Who is allowed to say the money arrived. A customer can only ever claim it;
+ * the owner is the one who confirms.
+ */
+describe("payment state", () => {
+  const placeOne = async () => {
+    await setStock(5);
+    return orders.createOrder(draft(1));
+  };
+
+  it("starts an order unpaid, with nothing sent in", async () => {
+    const order = await placeOne();
+    expect(order.paymentStatus).toBe("unpaid");
+    expect(order.paymentProof).toBeNull();
+    expect(order.paidAt).toBeNull();
+  });
+
+  it("moves an order to review when a receipt is uploaded, not to paid", async () => {
+    const order = await placeOne();
+    expect(await orders.attachPaymentProof(order.id, "/uploads/receipt.jpg")).toBe(
+      true
+    );
+
+    const after = await orders.getOrder(order.id);
+    expect(after?.paymentStatus).toBe("review");
+    expect(after?.paymentProof).toBe("/uploads/receipt.jpg");
+    expect(after?.paidAt).toBeNull();
+  });
+
+  it("stamps the time when the owner confirms the payment", async () => {
+    const order = await placeOne();
+    await orders.setPaymentStatus(order.id, "paid");
+
+    const after = await orders.getOrder(order.id);
+    expect(after?.paymentStatus).toBe("paid");
+    expect(after?.paidAt).not.toBeNull();
+  });
+
+  it("refuses a receipt uploaded after the owner has settled the order", async () => {
+    const order = await placeOne();
+    await orders.setPaymentStatus(order.id, "paid");
+
+    expect(await orders.attachPaymentProof(order.id, "/uploads/late.jpg")).toBe(
+      false
+    );
+
+    const after = await orders.getOrder(order.id);
+    expect(after?.paymentStatus).toBe("paid");
+    expect(after?.paymentProof).toBeNull();
+  });
+
+  it("clears the paid timestamp when an order is put back to unpaid", async () => {
+    const order = await placeOne();
+    await orders.setPaymentStatus(order.id, "paid");
+    await orders.setPaymentStatus(order.id, "unpaid");
+
+    const after = await orders.getOrder(order.id);
+    expect(after?.paymentStatus).toBe("unpaid");
+    expect(after?.paidAt).toBeNull();
+  });
+});

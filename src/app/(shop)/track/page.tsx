@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { findOrderForCustomer } from "@/lib/orders-db";
 import { priceLabel } from "@/lib/format";
-import { statusLabel, type OrderStatus } from "@/lib/types";
+import { isTransferMethod, statusLabel, type OrderStatus } from "@/lib/types";
 import { whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Track your order" };
@@ -146,6 +146,27 @@ export default async function TrackPage({
             {order.payment === "cod" ? "Pay the courier" : "Total"}:{" "}
             {priceLabel(order.total)}
           </p>
+
+          {/* Someone who has transferred money and heard nothing back will
+              check here before they message. Cash on delivery says nothing —
+              there is nothing to wait on. */}
+          {isTransferMethod(order.payment) && (
+            <p
+              className="mt-1 text-sm"
+              style={{
+                color:
+                  order.paymentStatus === "paid"
+                    ? "var(--color-sage-deep)"
+                    : "var(--color-ink-soft)",
+              }}
+            >
+              {order.paymentStatus === "paid"
+                ? "Payment received."
+                : order.paymentStatus === "review"
+                  ? "We have your receipt and are checking it."
+                  : "Waiting on your transfer."}
+            </p>
+          )}
 
           {/* Delivering to the city only. Anyone can run this lookup, so the
               street address stays on the confirmation page. */}

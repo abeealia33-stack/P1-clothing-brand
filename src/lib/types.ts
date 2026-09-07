@@ -139,19 +139,19 @@ export const paymentMethods: {
   {
     value: "bank",
     label: "Bank transfer",
-    note: "We send account details on WhatsApp after you order.",
+    note: "Account details show on the next page. Send us the receipt.",
     available: true,
   },
   {
     value: "jazzcash",
     label: "JazzCash",
-    note: "We send the transfer number on WhatsApp after you order.",
+    note: "Wallet number shows on the next page. Send us the receipt.",
     available: true,
   },
   {
     value: "easypaisa",
     label: "EasyPaisa",
-    note: "We send the transfer number on WhatsApp after you order.",
+    note: "Wallet number shows on the next page. Send us the receipt.",
     available: true,
   },
   {
@@ -164,6 +164,32 @@ export const paymentMethods: {
 
 export const paymentLabel = (value: string) =>
   paymentMethods.find((m) => m.value === value)?.label ?? value;
+
+/**
+ * The methods where the customer moves the money themselves and we have to
+ * recognise it afterwards. Cards will not belong here — a gateway confirms
+ * those without anyone looking at a screenshot.
+ */
+export const transferMethods = ["bank", "jazzcash", "easypaisa"] as const;
+
+export type TransferMethod = (typeof transferMethods)[number];
+
+export const isTransferMethod = (value: string): value is TransferMethod =>
+  (transferMethods as readonly string[]).includes(value);
+
+/** Has the money arrived — a different question from where the parcel is. */
+export type PaymentStatus = "unpaid" | "review" | "paid";
+
+export const isPaymentStatus = (value: string): value is PaymentStatus =>
+  value === "unpaid" || value === "review" || value === "paid";
+
+/* Worded from the owner's side, since that is who reads it in the admin. The
+   customer-facing wording lives on the pages themselves. */
+export const paymentStatusLabel: Record<PaymentStatus, string> = {
+  unpaid: "Awaiting payment",
+  review: "Receipt to check",
+  paid: "Payment received",
+};
 
 export type OrderStatus =
   | "new"
@@ -192,6 +218,10 @@ export type Order = {
   city: string;
   notes: string | null;
   payment: PaymentMethod;
+  paymentStatus: PaymentStatus;
+  /** URL of the transfer receipt the customer uploaded, if any. */
+  paymentProof: string | null;
+  paidAt: string | null;
   lines: OrderLine[];
   subtotal: number;
   shipping: number;
@@ -262,3 +292,56 @@ export function normaliseStatus(value: string): OrderStatus {
 
 export const isOrderStatus = (value: string): value is OrderStatus =>
   statusFlow.some((s) => s.value === value);
+
+/* -------------------------------------------------- custom design requests -- */
+
+export type CustomRequestStatus = "new" | "contacted" | "closed";
+
+export const customRequestStatusFlow: {
+  value: CustomRequestStatus;
+  label: string;
+}[] = [
+  { value: "new", label: "New" },
+  { value: "contacted", label: "Contacted" },
+  { value: "closed", label: "Closed" },
+];
+
+export const isCustomRequestStatus = (value: string): value is CustomRequestStatus =>
+  customRequestStatusFlow.some((s) => s.value === value);
+
+export type CustomMeasurements = {
+  heightCm: number;
+  weightKg: number;
+  chestIn: number;
+  waistIn: number;
+  shoulderIn: number;
+  sleeveIn: number;
+};
+
+/** Field-by-field bounds a real body could plausibly have. */
+export const measurementRanges: Record<
+  keyof CustomMeasurements,
+  { label: string; unit: string; min: number; max: number }
+> = {
+  heightCm: { label: "Height", unit: "cm", min: 100, max: 220 },
+  weightKg: { label: "Weight", unit: "kg", min: 25, max: 200 },
+  chestIn: { label: "Chest", unit: "in", min: 24, max: 70 },
+  waistIn: { label: "Waist", unit: "in", min: 20, max: 70 },
+  shoulderIn: { label: "Shoulder", unit: "in", min: 10, max: 30 },
+  sleeveIn: { label: "Sleeve length", unit: "in", min: 15, max: 40 },
+};
+
+export type CustomDesignRequest = {
+  id: string;
+  createdAt: string;
+  status: CustomRequestStatus;
+  styleProductId: string | null;
+  styleSlug: string | null;
+  styleName: string;
+  stylePhoto: string;
+  measurements: CustomMeasurements;
+  notes: string | null;
+  name: string;
+  phone: string;
+  city: string | null;
+};
