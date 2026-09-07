@@ -1,7 +1,6 @@
 import "server-only";
 
 import { PrismaClient } from "@/generated/prisma/client";
-import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 /**
@@ -24,8 +23,12 @@ function createClient(): PrismaClient {
     );
   }
 
+  /* SQLite is development-only, and better-sqlite3 is a native module that
+     cannot be compiled on Hostinger's build machine. Loading its adapter here
+     rather than at the top of the file keeps it out of production entirely,
+     where DATABASE_URL is always MySQL. */
   const adapter = url.startsWith("file:")
-    ? new PrismaBetterSqlite3({ url })
+    ? new (require("@prisma/adapter-better-sqlite3").PrismaBetterSqlite3)({ url })
     : new PrismaMariaDb(url);
 
   return new PrismaClient({
