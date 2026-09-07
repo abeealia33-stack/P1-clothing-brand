@@ -47,7 +47,8 @@ next-env.d.ts
 prisma/schema.dev.prisma
 public/uploads
 
-# Generated Prisma client
+# Generated Prisma client — built per environment by the prebuild script, since
+# the client is tied to the provider its schema names (SQLite here, MySQL live).
 src/generated
 
 # Transient tooling state
