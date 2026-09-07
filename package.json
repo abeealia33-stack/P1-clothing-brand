@@ -26,10 +26,10 @@
     "react-dom": "19.2.8"
   },
   "optionalDependencies": {
+    "@prisma/adapter-better-sqlite3": "^7.10.0",
     "better-sqlite3": "^13.0.3"
   },
   "devDependencies": {
-    "@prisma/adapter-better-sqlite3": "^7.10.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^24.13.3",
     "@types/react": "^19",
