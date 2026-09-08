@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { collections } from "@/lib/types";
+import type { ResolvedCollection } from "@/lib/types";
 import CartCount from "./CartCount";
 import { useCart } from "./useCart";
 
@@ -70,7 +70,11 @@ function CartIcon() {
 /* On phones this is a slim brand bar and nothing else — the bottom tabs do the
    navigating. From md up it takes on the collection links and the cart, since
    there is no tab bar at that width. */
-export default function SiteHeader() {
+export default function SiteHeader({
+  collections,
+}: {
+  collections: ResolvedCollection[];
+}) {
   const pathname = usePathname();
   const { count, ready } = useCart();
   const onHome = pathname === "/";
@@ -97,25 +101,34 @@ export default function SiteHeader() {
           </span>
         </Link>
 
-        <nav aria-label="Collections" className="ml-auto hidden md:block">
-          <ul className="flex items-center gap-7 text-sm">
-            {collections.map((c) => (
-              <li key={c.slug}>
-                <Link
-                  href={`/shop?collection=${c.slug}`}
-                  className="transition-colors hover:text-ink"
-                  style={{ color: "var(--color-ink-soft)" }}
-                >
-                  {c.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {/* Dropped entirely when the owner has hidden every collection, rather
+            than left as an empty list taking up the middle of the header. */}
+        {collections.length > 0 && (
+          <nav aria-label="Collections" className="ml-auto hidden md:block">
+            <ul className="flex items-center gap-7 text-sm">
+              {collections.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/shop?collection=${c.slug}`}
+                    className="transition-colors hover:text-ink"
+                    style={{ color: "var(--color-ink-soft)" }}
+                  >
+                    {c.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
 
         {/* Search, account and cart: always at the right edge, on a phone as
-            much as on desktop, everything else untouched. */}
-        <div className="ml-auto flex items-center gap-1 md:ml-0">
+            much as on desktop, everything else untouched. With no collections
+            above, this is what pushes them there on desktop too. */}
+        <div
+          className={`ml-auto flex items-center gap-1 ${
+            collections.length > 0 ? "md:ml-0" : ""
+          }`}
+        >
           <Link
             href="/search"
             aria-label="Search"

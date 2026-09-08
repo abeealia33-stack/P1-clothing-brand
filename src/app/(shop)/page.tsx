@@ -10,14 +10,20 @@ import { listReels } from "@/lib/reels";
 import { getSettings } from "@/lib/settings";
 import { rupees } from "@/lib/format";
 import { site } from "@/lib/site";
+import { navCollections, spellCount } from "@/lib/types";
 
 const DEFAULT_HERO = "/cloth/hero.svg";
 
 export default async function HomePage() {
   const newIn = await newestProducts(4);
   const reels = await listReels();
-  const { heroImages: uploadedHero, banners } = await getSettings();
+  const {
+    heroImages: uploadedHero,
+    banners,
+    collections: collectionEdits,
+  } = await getSettings();
   const heroImages = uploadedHero.length > 0 ? uploadedHero : [DEFAULT_HERO];
+  const shownCollections = navCollections(collectionEdits);
 
   return (
     <>
@@ -50,11 +56,22 @@ export default async function HomePage() {
               Cotton and khaddar you can put on without thinking about it, and
               still feel dressed in by evening.
             </p>
+            {/* Points at whichever range is shown first rather than always at
+                Rozana, so hiding it does not leave the main button leading
+                somewhere the owner has taken out of the menus. */}
             <div className="mt-6 flex flex-wrap gap-3 md:mt-7">
-              <Link href="/shop?collection=rozana" className="btn btn-ink">
-                Shop Rozana
-              </Link>
-              <Link href="/shop" className="btn btn-quiet">
+              {shownCollections[0] && (
+                <Link
+                  href={`/shop?collection=${shownCollections[0].slug}`}
+                  className="btn btn-ink"
+                >
+                  Shop {shownCollections[0].name}
+                </Link>
+              )}
+              <Link
+                href="/shop"
+                className={shownCollections[0] ? "btn btn-quiet" : "btn btn-ink"}
+              >
                 See everything
               </Link>
             </div>
@@ -92,16 +109,25 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <h2 className="text-4xl md:text-5xl">Four ways to get dressed</h2>
-          <p
-            className="measure mt-2 mb-8 text-sm"
-            style={{ color: "var(--color-ink-soft)" }}
-          >
-            Every piece belongs to one of these. Start wherever your week is.
-          </p>
-          <CollectionRail />
-        </section>
+        {/* Counted rather than fixed at four: the owner can hide the ranges
+            she is not selling yet, and the heading has to keep up. */}
+        {shownCollections.length > 0 && (
+          <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+            <h2 className="text-4xl md:text-5xl">
+              {spellCount(shownCollections.length)}{" "}
+              {shownCollections.length === 1 ? "way" : "ways"} to get dressed
+            </h2>
+            <p
+              className="measure mt-2 mb-8 text-sm"
+              style={{ color: "var(--color-ink-soft)" }}
+            >
+              {shownCollections.length === 1
+                ? "Start here."
+                : "Every piece belongs to one of these. Start wherever your week is."}
+            </p>
+            <CollectionRail collections={shownCollections} />
+          </section>
+        )}
 
         {banners[0] && <PromoBannerSection banner={banners[0]} />}
 

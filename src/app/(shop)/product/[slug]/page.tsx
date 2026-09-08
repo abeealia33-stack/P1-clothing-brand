@@ -5,7 +5,8 @@ import Gallery from "@/components/Gallery";
 import ProductBuy from "@/components/ProductBuy";
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug, relatedProducts } from "@/lib/catalogue";
-import { getCollection } from "@/lib/types";
+import { getSettings } from "@/lib/settings";
+import { resolveCollection } from "@/lib/types";
 import { priceLabel, rupees } from "@/lib/format";
 import { site, whatsappLink } from "@/lib/site";
 import { WhatsAppGlyph } from "@/components/WhatsAppButton";
@@ -43,7 +44,10 @@ export default async function ProductPage({
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const collection = getCollection(product.collection)!;
+  /* Shown whether or not the collection is in the menus: what a piece belongs
+     to is a fact about the piece, not a way of getting around the shop. */
+  const { collections: collectionEdits } = await getSettings();
+  const collection = resolveCollection(product.collection, collectionEdits)!;
   const alsoIn = await relatedProducts(product.collection, product.slug, 4);
   const shipsFree = product.price >= site.freeShippingOver;
 

@@ -251,6 +251,19 @@ export async function isSlugTaken(slug: string, exceptId?: string) {
   return row !== null && row.id !== exceptId;
 }
 
+/**
+ * Live pieces per collection, so the owner can see what hiding one would
+ * actually take off the shop.
+ */
+export async function countProductsByCollection(): Promise<Record<string, number>> {
+  const rows = await prisma.product.groupBy({
+    by: ["collection"],
+    where: { active: true },
+    _count: { _all: true },
+  });
+  return Object.fromEntries(rows.map((r) => [r.collection, r._count._all]));
+}
+
 export async function countProducts() {
   const [total, live, outOfStock] = await Promise.all([
     prisma.product.count(),

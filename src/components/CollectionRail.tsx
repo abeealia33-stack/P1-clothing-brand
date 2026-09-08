@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import ClothImage from "./ClothImage";
-import { collections } from "@/lib/types";
+import type { ResolvedCollection } from "@/lib/types";
 
 /**
  * The collection cards grow as they reach the middle of the screen.
@@ -41,7 +41,11 @@ function useCentreScale() {
   return root;
 }
 
-export default function CollectionRail() {
+export default function CollectionRail({
+  collections,
+}: {
+  collections: ResolvedCollection[];
+}) {
   const root = useCentreScale();
 
   return (

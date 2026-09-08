@@ -4,8 +4,9 @@ import ClothImage from "@/components/ClothImage";
 import { toggleActiveAction } from "./actions";
 import { requireAdmin } from "@/lib/auth";
 import { listProducts } from "@/lib/catalogue";
+import { getSettings } from "@/lib/settings";
 import { priceLabel } from "@/lib/format";
-import { collections } from "@/lib/types";
+import { resolveCollections } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Pieces" };
 export const dynamic = "force-dynamic";
@@ -18,7 +19,13 @@ export default async function AdminProductsPage({
   await requireAdmin();
 
   const { saved, deleted } = await searchParams;
-  const products = await listProducts({ includeInactive: true });
+  const [products, settings] = await Promise.all([
+    listProducts({ includeInactive: true }),
+    getSettings(),
+  ]);
+  // Every collection, hidden ones included: pieces filed under a hidden one
+  // still have to be findable here.
+  const collections = resolveCollections(settings.collections);
 
   return (
     <div className="py-8">
@@ -70,6 +77,14 @@ export default async function AdminProductsPage({
                 >
                   {inGroup.length}
                 </span>
+                {!collection.inNav && (
+                  <span
+                    className="ml-2 text-base"
+                    style={{ color: "var(--color-ink-soft)" }}
+                  >
+                    · hidden from the shop menus
+                  </span>
+                )}
               </h2>
 
               <ul className="mt-3">

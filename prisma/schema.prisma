@@ -86,6 +86,10 @@ model Settings {
   /// payment method (bank, jazzcash, easypaisa). Empty means the storefront
   /// falls back to promising the details on WhatsApp instead of showing them.
   payments   String @db.Text @default("{}")
+  /// JSON object of the owner's edits to the four fixed collections, keyed by
+  /// slug: the wording shown for each, and whether it appears in the menus.
+  /// Absent keys mean that collection still reads as it does in the code.
+  collections String @db.Text @default("{}")
   updatedAt  DateTime @updatedAt
 }
 

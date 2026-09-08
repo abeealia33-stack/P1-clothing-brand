@@ -9,7 +9,12 @@ import {
   updateProductAction,
   type ProductFormState,
 } from "@/app/admin/products/actions";
-import { collections, standardSizes, type Category, type Product } from "@/lib/types";
+import {
+  standardSizes,
+  type Category,
+  type Product,
+  type ResolvedCollection,
+} from "@/lib/types";
 
 /**
  * One form for adding and editing.
@@ -20,9 +25,12 @@ import { collections, standardSizes, type Category, type Product } from "@/lib/t
 export default function ProductForm({
   product,
   categories,
+  collections,
 }: {
   product?: Product;
   categories: Category[];
+  /** All four, hidden ones included — a piece still has to be filed somewhere. */
+  collections: ResolvedCollection[];
 }) {
   const editing = product !== undefined;
   const [state, action, pending] = useActionState<ProductFormState, FormData>(
@@ -91,6 +99,7 @@ export default function ProductForm({
           {collections.map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.name} — {c.line}
+              {c.inNav ? "" : " (hidden)"}
             </option>
           ))}
         </select>

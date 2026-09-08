@@ -3,8 +3,14 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ShopFilters from "@/components/ShopFilters";
 import { listCategories } from "@/lib/categories";
-import { listProducts } from "@/lib/catalogue";
-import { getCollection, isPriceTier, isSortOption } from "@/lib/types";
+import { countProducts, listProducts } from "@/lib/catalogue";
+import { getSettings } from "@/lib/settings";
+import {
+  isPriceTier,
+  isSortOption,
+  navCollections,
+  resolveCollection,
+} from "@/lib/types";
 
 export const metadata: Metadata = { title: "Shop" };
 
@@ -19,11 +25,14 @@ export default async function ShopPage({
   }>;
 }) {
   const { collection, category, price, sort } = await searchParams;
-  const active = collection ? getCollection(collection) : undefined;
+  const { collections: collectionEdits } = await getSettings();
+  const active = collection
+    ? resolveCollection(collection, collectionEdits)
+    : undefined;
   const priceTier = price && isPriceTier(price) ? price : undefined;
   const sortBy = sort && isSortOption(sort) ? sort : undefined;
 
-  const [list, categories] = await Promise.all([
+  const [list, categories, counts] = await Promise.all([
     listProducts({
       collection: active?.slug,
       category,
@@ -31,7 +40,15 @@ export default async function ShopPage({
       sort: sortBy,
     }),
     listCategories(),
+    countProducts(),
   ]);
+
+  /* Hidden ranges are dropped from the filter, but one being viewed through a
+     link someone still has is kept in the list — otherwise the dropdown would
+     sit there reading "All collections" over a filtered grid. */
+  const shown = navCollections(collectionEdits);
+  const filterCollections =
+    active && !shown.some((c) => c.slug === active.slug) ? [...shown, active] : shown;
 
   const activeCategory = category ? categories.find((c) => c.slug === category) : undefined;
   const hasFilters = Boolean(active || activeCategory || priceTier || sortBy);
@@ -46,10 +63,14 @@ export default async function ShopPage({
           {active.urdu}
         </p>
       ) : null}
+      {/* Counted, never claimed: the old copy promised thirteen pieces
+          whatever was actually on the shelf. */}
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         {active
           ? active.intro
-          : "Thirteen pieces, made in small runs. Filter by how you plan to wear them."}
+          : counts.live > 0
+            ? `${counts.live} ${counts.live === 1 ? "piece" : "pieces"}, made in small runs. Filter by how you plan to wear them.`
+            : "Made in small runs. New pieces go up here as they are finished."}
       </p>
 
       {/* Sticky under the header: on a long grid the filters are what you
@@ -65,6 +86,7 @@ export default async function ShopPage({
           price={priceTier}
           sort={sortBy}
           categories={categories}
+          collections={filterCollections}
         />
       </div>
 

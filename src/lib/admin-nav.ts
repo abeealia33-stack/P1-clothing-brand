@@ -11,6 +11,7 @@ export type AdminIconName =
   | "bag"
   | "shirt"
   | "tag"
+  | "layers"
   | "reel"
   | "ruler"
   | "menu"
@@ -43,6 +44,7 @@ export const adminNav: AdminNavGroup[] = [
     label: "Catalogue",
     items: [
       { label: "Products", href: "/admin/products", icon: "shirt" },
+      { label: "Collections", href: "/admin/collections", icon: "layers" },
       { label: "Categories", href: "/admin/categories", icon: "tag" },
       { label: "Reels", href: "/admin/reels", icon: "reel" },
     ],

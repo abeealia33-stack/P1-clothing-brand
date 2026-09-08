@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 import { getProductBySlug } from "@/lib/catalogue";
 import { priceLabel } from "@/lib/format";
-import { getCollection } from "@/lib/types";
+import { getSettings } from "@/lib/settings";
+import { resolveCollection } from "@/lib/types";
 import { site } from "@/lib/site";
 
 /**
@@ -38,7 +39,8 @@ export default async function Image({ params }: { params: { slug: string } }) {
     );
   }
 
-  const collection = getCollection(product.collection);
+  const { collections } = await getSettings();
+  const collection = resolveCollection(product.collection, collections);
 
   return new ImageResponse(
     (

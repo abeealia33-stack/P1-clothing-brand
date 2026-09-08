@@ -22,7 +22,7 @@ export default async function AdminCategoriesPage({
     <div className="py-8">
       <h1 className="text-4xl">Categories</h1>
       <p className="measure mt-2 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-        Your own groupings, separate from the four collections — things like
+        Your own groupings, separate from the collections — things like
         “New in” or “Sale”. Tick them on a piece from its edit page. A piece
         can carry more than one.
       </p>

@@ -6,6 +6,8 @@ import DeleteProduct from "@/components/admin/DeleteProduct";
 import { requireAdmin } from "@/lib/auth";
 import { listCategories } from "@/lib/categories";
 import { getProductById } from "@/lib/catalogue";
+import { getSettings } from "@/lib/settings";
+import { resolveCollections } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -27,9 +29,10 @@ export default async function EditProductPage({
   await requireAdmin();
 
   const { id } = await params;
-  const [product, categories] = await Promise.all([
+  const [product, categories, { collections }] = await Promise.all([
     getProductById(id),
     listCategories(),
+    getSettings(),
   ]);
   if (!product) notFound();
 
@@ -56,7 +59,11 @@ export default async function EditProductPage({
         )}
       </div>
 
-      <ProductForm product={product} categories={categories} />
+      <ProductForm
+        product={product}
+        categories={categories}
+        collections={resolveCollections(collections)}
+      />
 
       <DeleteProduct id={product.id} name={product.name} />
     </div>

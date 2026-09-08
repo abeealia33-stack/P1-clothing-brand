@@ -33,6 +33,12 @@ const paths: Record<AdminIconName, React.ReactNode> = {
       <path d="m11 12.5 4 2.2-4 2.2v-4.4Z" />
     </>
   ),
+  layers: (
+    <>
+      <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z" />
+      <path d="m4 12 8 4.5 8-4.5M4 16.5 12 21l8-4.5" />
+    </>
+  ),
   ruler: (
     <>
       <rect x="3" y="7" width="18" height="10" rx="1.5" transform="rotate(-20 12 12)" />

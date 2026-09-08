@@ -57,6 +57,65 @@ export const getCollection = (slug: string): Collection | undefined =>
 export const isCollectionSlug = (value: string): value is CollectionSlug =>
   collections.some((c) => c.slug === value);
 
+/**
+ * The owner's edits to a collection, saved from the admin.
+ *
+ * Only the wording and whether it appears in the menus: the four slugs above
+ * stay fixed, because they are what every product is filed under. A blank
+ * field means "leave it as it reads in the code" rather than an empty heading
+ * on the storefront.
+ */
+export type CollectionEdit = {
+  name?: string;
+  urdu?: string;
+  line?: string;
+  intro?: string;
+  /** Listed in the menus and on the home page. Defaults to shown. */
+  inNav?: boolean;
+};
+
+export type CollectionEdits = Partial<Record<CollectionSlug, CollectionEdit>>;
+
+/** A collection as it should read, once the owner's edits are applied. */
+export type ResolvedCollection = Collection & { inNav: boolean };
+
+const edited = (value: string | undefined, fallback: string) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+};
+
+/**
+ * The four collections as the storefront should show them. Kept here rather
+ * than in the settings module so client components can resolve them too.
+ */
+export function resolveCollections(edits: CollectionEdits): ResolvedCollection[] {
+  return collections.map((c) => {
+    const edit = edits[c.slug] ?? {};
+    return {
+      slug: c.slug,
+      name: edited(edit.name, c.name),
+      urdu: edited(edit.urdu, c.urdu),
+      line: edited(edit.line, c.line),
+      intro: edited(edit.intro, c.intro),
+      inNav: edit.inNav !== false,
+    };
+  });
+}
+
+/** Just the ones the owner is currently showing in the menus. */
+export const navCollections = (edits: CollectionEdits): ResolvedCollection[] =>
+  resolveCollections(edits).filter((c) => c.inNav);
+
+export const resolveCollection = (
+  slug: string,
+  edits: CollectionEdits
+): ResolvedCollection | undefined =>
+  resolveCollections(edits).find((c) => c.slug === slug);
+
+/** Spelled out, because "4 ways to get dressed" reads like a spec sheet. */
+export const spellCount = (n: number): string =>
+  ["No", "One", "Two", "Three", "Four"][n] ?? String(n);
+
 export type PriceTier = "under-2500" | "2500-5000" | "over-5000";
 
 export const priceTiers: { value: PriceTier; label: string }[] = [

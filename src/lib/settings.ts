@@ -1,7 +1,13 @@
 import "server-only";
 
 import { prisma } from "./prisma";
-import { transferMethods, type TransferMethod } from "./types";
+import {
+  collections,
+  transferMethods,
+  type CollectionEdit,
+  type CollectionEdits,
+  type TransferMethod,
+} from "./types";
 
 /**
  * Site-wide settings, kept as one singleton row so the owner can change them
@@ -39,6 +45,8 @@ export type SiteSettings = {
   banners: PromoBanner[];
   /** Absent keys mean that method has no account set up yet. */
   payments: PaymentAccounts;
+  /** Absent keys mean that collection reads as it does in the code. */
+  collections: CollectionEdits;
 };
 
 function parseArray<T>(raw: string): T[] {
@@ -78,6 +86,44 @@ function normaliseAccounts(value: unknown): PaymentAccounts {
   return accounts;
 }
 
+/**
+ * Only the four known slugs are kept, and only the wording — anything else in
+ * the column is ignored. Blank text is dropped rather than stored, so a
+ * cleared field goes back to reading as it does in the code instead of
+ * leaving a heading empty on the storefront.
+ */
+function normaliseCollections(value: unknown): CollectionEdits {
+  if (!value || typeof value !== "object") return {};
+
+  const source = value as Record<string, Partial<CollectionEdit> | undefined>;
+  const edits: CollectionEdits = {};
+
+  for (const { slug } of collections) {
+    const row = source[slug];
+    if (!row) continue;
+
+    const edit: CollectionEdit = {};
+    for (const field of ["name", "urdu", "line", "intro"] as const) {
+      const text = String(row[field] ?? "").trim();
+      if (text) edit[field] = text;
+    }
+    // Stored only when hidden: showing is the default, so an absent flag and a
+    // true one mean the same thing.
+    if (row.inNav === false) edit.inNav = false;
+
+    if (Object.keys(edit).length > 0) edits[slug] = edit;
+  }
+  return edits;
+}
+
+function parseCollections(raw: string): CollectionEdits {
+  try {
+    return normaliseCollections(JSON.parse(raw));
+  } catch {
+    return {};
+  }
+}
+
 function parseAccounts(raw: string): PaymentAccounts {
   try {
     return normaliseAccounts(JSON.parse(raw));
@@ -88,7 +134,7 @@ function parseAccounts(raw: string): PaymentAccounts {
 
 export async function getSettings(): Promise<SiteSettings> {
   const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
-  if (!row) return { heroImages: [], banners: [], payments: {} };
+  if (!row) return { heroImages: [], banners: [], payments: {}, collections: {} };
 
   return {
     heroImages: parseArray<string>(row.heroImages).filter((v) => typeof v === "string"),
@@ -96,10 +142,26 @@ export async function getSettings(): Promise<SiteSettings> {
       (b) => b && typeof b.image === "string" && typeof b.heading === "string"
     ),
     payments: parseAccounts(row.payments),
+    collections: parseCollections(row.collections),
   };
 }
 
-export async function saveSettings(input: SiteSettings): Promise<void> {
+/**
+ * Each admin screen writes only its own column, so saving the collections
+ * cannot blank the hero images and vice versa.
+ */
+export async function saveCollections(edits: CollectionEdits): Promise<void> {
+  const collectionsJson = JSON.stringify(normaliseCollections(edits));
+  await prisma.settings.upsert({
+    where: { id: SETTINGS_ID },
+    create: { id: SETTINGS_ID, collections: collectionsJson },
+    update: { collections: collectionsJson },
+  });
+}
+
+export async function saveSettings(
+  input: Omit<SiteSettings, "collections">
+): Promise<void> {
   const data = {
     heroImages: JSON.stringify(input.heroImages),
     banners: JSON.stringify(input.banners),

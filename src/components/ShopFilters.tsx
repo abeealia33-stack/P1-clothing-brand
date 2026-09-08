@@ -1,7 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { collections, priceTiers, sortOptions, type Category } from "@/lib/types";
+import {
+  priceTiers,
+  sortOptions,
+  type Category,
+  type ResolvedCollection,
+} from "@/lib/types";
 
 /**
  * Dropdowns instead of rows of chips — the same filters, a fraction of the
@@ -13,12 +18,14 @@ export default function ShopFilters({
   price,
   sort,
   categories,
+  collections,
 }: {
   collection?: string;
   category?: string;
   price?: string;
   sort?: string;
   categories: Category[];
+  collections: ResolvedCollection[];
 }) {
   const router = useRouter();
 
@@ -40,19 +47,21 @@ export default function ShopFilters({
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:gap-3">
-      <Dropdown
-        label="Collection"
-        value={collection ?? ""}
-        onChange={(v) => go({ collection: v || undefined })}
-        className="col-span-2 sm:w-48"
-      >
-        <option value="">All collections</option>
-        {collections.map((c) => (
-          <option key={c.slug} value={c.slug}>
-            {c.name}
-          </option>
-        ))}
-      </Dropdown>
+      {collections.length > 0 && (
+        <Dropdown
+          label="Collection"
+          value={collection ?? ""}
+          onChange={(v) => go({ collection: v || undefined })}
+          className="col-span-2 sm:w-48"
+        >
+          <option value="">All collections</option>
+          {collections.map((c) => (
+            <option key={c.slug} value={c.slug}>
+              {c.name}
+            </option>
+          ))}
+        </Dropdown>
+      )}
 
       {categories.length > 0 && (
         <Dropdown

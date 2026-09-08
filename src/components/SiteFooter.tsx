@@ -1,9 +1,13 @@
 import Link from "next/link";
-import { collections } from "@/lib/types";
+import type { ResolvedCollection } from "@/lib/types";
 import { instagramLink, site, whatsappLink } from "@/lib/site";
 import { rupees } from "@/lib/format";
 
-export default function SiteFooter() {
+export default function SiteFooter({
+  collections,
+}: {
+  collections: ResolvedCollection[];
+}) {
   return (
     <footer
       className="rule mt-24"
@@ -21,22 +25,24 @@ export default function SiteFooter() {
         </p>
 
         <div className="mt-10 grid gap-8 text-sm sm:grid-cols-3">
-          <nav aria-label="Collections">
-            <h2 className="text-xl">Collections</h2>
-            <ul className="mt-1">
-              {collections.map((c) => (
-                <li key={c.slug}>
-                  <Link
-                    href={`/shop?collection=${c.slug}`}
-                    style={{ color: "var(--color-ink-soft)" }}
-                    className="block py-2 hover:text-ink"
-                  >
-                    {c.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          {collections.length > 0 && (
+            <nav aria-label="Collections">
+              <h2 className="text-xl">Collections</h2>
+              <ul className="mt-1">
+                {collections.map((c) => (
+                  <li key={c.slug}>
+                    <Link
+                      href={`/shop?collection=${c.slug}`}
+                      style={{ color: "var(--color-ink-soft)" }}
+                      className="block py-2 hover:text-ink"
+                    >
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )}
 
           <nav aria-label="Help">
             <h2 className="text-xl">Help</h2>

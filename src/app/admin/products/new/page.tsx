@@ -3,12 +3,17 @@ import Link from "next/link";
 import ProductForm from "@/components/admin/ProductForm";
 import { requireAdmin } from "@/lib/auth";
 import { listCategories } from "@/lib/categories";
+import { getSettings } from "@/lib/settings";
+import { resolveCollections } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Add a piece" };
 
 export default async function NewProductPage() {
   await requireAdmin();
-  const categories = await listCategories();
+  const [categories, { collections }] = await Promise.all([
+    listCategories(),
+    getSettings(),
+  ]);
 
   return (
     <div className="py-8">
@@ -24,7 +29,10 @@ export default async function NewProductPage() {
         It appears in the shop as soon as you save, unless you untick the box at
         the bottom.
       </p>
-      <ProductForm categories={categories} />
+      <ProductForm
+        categories={categories}
+        collections={resolveCollections(collections)}
+      />
     </div>
   );
 }
