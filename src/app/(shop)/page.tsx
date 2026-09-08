@@ -14,6 +14,14 @@ import { navCollections, spellCount } from "@/lib/types";
 
 const DEFAULT_HERO = "/cloth/hero.svg";
 
+/**
+ * Everything on this page — the pieces, the hero, the banners, which
+ * collections show — is edited from the admin, so it cannot be cached as a
+ * page that never changes. Without this Next hands the CDN a year-long
+ * s-maxage and the owner's edits sit behind a stale copy for months.
+ */
+export const revalidate = 60;
+
 export default async function HomePage() {
   const newIn = await newestProducts(4);
   const reels = await listReels();

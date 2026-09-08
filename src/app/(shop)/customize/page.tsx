@@ -4,6 +4,10 @@ import { listProducts } from "@/lib/catalogue";
 
 export const metadata: Metadata = { title: "Custom design" };
 
+/* The styles to start from are the live catalogue, so this cannot be cached
+   as a page that never changes — see the home page for the same reason. */
+export const revalidate = 60;
+
 export default async function CustomizePage() {
   const products = await listProducts();
 
