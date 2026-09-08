@@ -131,29 +131,33 @@ export default async function HomePage() {
 
         {banners[0] && <PromoBannerSection banner={banners[0]} />}
 
-        <section className="py-12 md:py-16" style={{ background: "var(--color-khaddar)" }}>
-          <div className="mx-auto max-w-6xl px-5">
-            <div className="flex items-baseline justify-between gap-4">
-              <h2 className="text-4xl md:text-5xl">Just in</h2>
-              <Link
-                href="/shop"
-                className="shrink-0 text-sm underline underline-offset-4"
-                style={{ color: "var(--color-ink-soft)" }}
-              >
-                All pieces
-              </Link>
-            </div>
-          </div>
-
-          {/* Swipeable on phones, a plain grid once there is room for one. */}
-          <SwipeRail className="rail mt-8 gap-4 px-5 md:mx-auto md:grid md:max-w-6xl md:grid-cols-4 md:overflow-visible">
-            {newIn.map((product, i) => (
-              <div key={product.slug} className="w-[68vw] max-w-72 md:w-auto md:max-w-none">
-                <ProductCard product={product} priority={i === 0} />
+        {/* Nothing new to show until there are pieces: an empty band under a
+            "Just in" heading reads as a broken page, not an empty shop. */}
+        {newIn.length > 0 && (
+          <section className="py-12 md:py-16" style={{ background: "var(--color-khaddar)" }}>
+            <div className="mx-auto max-w-6xl px-5">
+              <div className="flex items-baseline justify-between gap-4">
+                <h2 className="text-4xl md:text-5xl">Just in</h2>
+                <Link
+                  href="/shop"
+                  className="shrink-0 text-sm underline underline-offset-4"
+                  style={{ color: "var(--color-ink-soft)" }}
+                >
+                  All pieces
+                </Link>
               </div>
-            ))}
-          </SwipeRail>
-        </section>
+            </div>
+
+            {/* Swipeable on phones, a plain grid once there is room for one. */}
+            <SwipeRail className="rail mt-8 gap-4 px-5 md:mx-auto md:grid md:max-w-6xl md:grid-cols-4 md:overflow-visible">
+              {newIn.map((product, i) => (
+                <div key={product.slug} className="w-[68vw] max-w-72 md:w-auto md:max-w-none">
+                  <ProductCard product={product} priority={i === 0} />
+                </div>
+              ))}
+            </SwipeRail>
+          </section>
+        )}
 
         {banners[1] && <PromoBannerSection banner={banners[1]} />}
 
