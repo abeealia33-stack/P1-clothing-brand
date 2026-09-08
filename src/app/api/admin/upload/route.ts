@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isSignedIn } from "@/lib/auth";
 import {
   IMAGE_TYPES,
+  isImagePurpose,
   MAX_IMAGE_BYTES,
   MAX_VIDEO_BYTES,
   storeUpload,
@@ -54,10 +55,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    /* Says how big the picture is allowed to be kept: a hero runs the width of
+       a desktop window, a product photo never does. An unrecognised value
+       falls back to the smaller of the two rather than the larger. */
+    const asked = String(form.get("purpose") ?? "");
+    const purpose = isImagePurpose(asked) ? asked : "product";
+
     const url = await storeUpload(
       file,
       isVideo ? "video" : "image",
-      isVideo ? "bilques/reels" : "bilques"
+      isVideo ? "bilques/reels" : "bilques",
+      purpose
     );
     return NextResponse.json({ url });
   } catch (error) {

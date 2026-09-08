@@ -15,9 +15,12 @@ type Photo = { url: string; uploading?: boolean; error?: string };
 export default function PhotoUploader({
   name,
   initial,
+  purpose = "product",
 }: {
   name: string;
   initial: string[];
+  /** "feature" for the pictures that run the full width of the page. */
+  purpose?: "product" | "feature";
 }) {
   const [photos, setPhotos] = useState<Photo[]>(
     initial.map((url) => ({ url }))
@@ -44,6 +47,7 @@ export default function PhotoUploader({
         const preview = pending[i].url;
         const body = new FormData();
         body.set("file", file);
+        body.set("purpose", purpose);
         try {
           const response = await fetch("/api/admin/upload", {
             method: "POST",

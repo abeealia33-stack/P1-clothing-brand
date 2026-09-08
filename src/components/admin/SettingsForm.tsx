@@ -41,7 +41,7 @@ export default function SettingsForm({
           plain default image.
         </p>
         <div className="mt-2">
-          <PhotoUploader name="heroImages" initial={heroImages} />
+          <PhotoUploader name="heroImages" initial={heroImages} purpose="feature" />
         </div>
       </div>
 

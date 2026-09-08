@@ -35,6 +35,8 @@ export default function BannerEditor({
     update(index, { uploading: true });
     const body = new FormData();
     body.set("file", file);
+    // A banner runs the full width of the page, like the hero.
+    body.set("purpose", "feature");
     try {
       const response = await fetch("/api/admin/upload", { method: "POST", body });
       const result = (await response.json()) as { url?: string; error?: string };
