@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { listProducts } from "@/lib/catalogue";
 import { listCategories } from "@/lib/categories";
-import { getSettings } from "@/lib/settings";
-import { navCollections } from "@/lib/types";
+import { getNavCollections } from "@/lib/settings";
 import { site } from "@/lib/site";
 
 /* Rebuilt hourly rather than at build time, so a piece added in the admin is
@@ -10,10 +9,10 @@ import { site } from "@/lib/site";
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [products, categories, settings] = await Promise.all([
+  const [products, categories, collections] = await Promise.all([
     listProducts(),
     listCategories(),
-    getSettings(),
+    getNavCollections(),
   ]);
   const url = (path: string) => `${site.url}${path}`;
 
@@ -30,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   /* A collection the owner has hidden still has a working page, but it is not
      one to send search engines at. */
-  for (const c of navCollections(settings.collections)) {
+  for (const c of collections) {
     pages.push({
       url: url(`/shop?collection=${c.slug}`),
       priority: 0.7,

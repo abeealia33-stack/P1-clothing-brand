@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import FormField from "@/components/FormField";
 import { useCart } from "@/components/useCart";
 import { priceLabel, rupees } from "@/lib/format";
 import { paymentMethods, type PaymentMethod } from "@/lib/types";
@@ -112,7 +113,7 @@ export default function CheckoutPage() {
           <legend className="text-2xl">Where it is going</legend>
 
           <div className="mt-5 space-y-5">
-            <Field
+            <FormField
               id="name"
               label="Your name"
               value={name}
@@ -120,7 +121,7 @@ export default function CheckoutPage() {
               error={errors.name}
               autoComplete="name"
             />
-            <Field
+            <FormField
               id="phone"
               label="Mobile number"
               hint="We send order updates on WhatsApp to this number."
@@ -132,7 +133,7 @@ export default function CheckoutPage() {
               autoComplete="tel"
               placeholder="0300 1234567"
             />
-            <Field
+            <FormField
               id="address"
               label="Delivery address"
               value={address}
@@ -142,7 +143,7 @@ export default function CheckoutPage() {
               multiline
               placeholder="House 12, Street 4, Gulberg III"
             />
-            <Field
+            <FormField
               id="city"
               label="City"
               value={city}
@@ -150,7 +151,7 @@ export default function CheckoutPage() {
               error={errors.city}
               autoComplete="address-level2"
             />
-            <Field
+            <FormField
               id="notes"
               label="Anything the courier should know"
               hint="Optional — a landmark, a gate code, a better time to call."
@@ -223,7 +224,7 @@ export default function CheckoutPage() {
           <p
             role="alert"
             className="measure mt-6 border p-4 text-sm"
-            style={{ borderColor: "#9A4A3C", color: "#9A4A3C" }}
+            style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
           >
             {errors.cart}
           </p>
@@ -236,75 +237,6 @@ export default function CheckoutPage() {
           You can cancel any time before dispatch by messaging us on WhatsApp.
         </p>
       </form>
-    </div>
-  );
-}
-
-function Field({
-  id,
-  label,
-  hint,
-  value,
-  onChange,
-  error,
-  type = "text",
-  inputMode,
-  autoComplete,
-  placeholder,
-  multiline = false,
-}: {
-  id: string;
-  label: string;
-  hint?: string;
-  value: string;
-  onChange: (v: string) => void;
-  error?: string;
-  type?: string;
-  inputMode?: "tel" | "text";
-  autoComplete?: string;
-  placeholder?: string;
-  multiline?: boolean;
-}) {
-  const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null]
-    .filter(Boolean)
-    .join(" ");
-
-  const shared = {
-    id,
-    value,
-    placeholder,
-    autoComplete,
-    "aria-invalid": error ? true : undefined,
-    "aria-describedby": describedBy || undefined,
-    "data-error": error ? "true" : undefined,
-    className: "field",
-    style: error ? { borderColor: "#9A4A3C" } : undefined,
-    onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      onChange(e.target.value),
-  };
-
-  return (
-    <div>
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-      </label>
-      {hint && (
-        <p id={`${id}-hint`} className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          {hint}
-        </p>
-      )}
-      <div className="mt-2">
-        {multiline ? (
-          <textarea {...shared} rows={3} />
-        ) : (
-          <input {...shared} type={type} inputMode={inputMode} />
-        )}
-      </div>
-      {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-sm" style={{ color: "#9A4A3C" }}>
-          {error}
-        </p>
-      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import CustomRequestRow from "@/components/admin/CustomRequestRow";
+import FilterChip from "@/components/admin/FilterChip";
 import { requireAdmin } from "@/lib/auth";
 import { listCustomRequests } from "@/lib/custom-requests-db";
 import {
@@ -39,17 +39,17 @@ export default async function AdminCustomRequestsPage({
       </p>
 
       <nav aria-label="Filter requests" className="rail -mx-4 mt-8 gap-2 px-4 sm:mx-0 sm:px-0">
-        <Chip href="/admin/custom-requests" active={!filter}>
+        <FilterChip href="/admin/custom-requests" active={!filter}>
           All
-        </Chip>
+        </FilterChip>
         {customRequestStatusFlow.map((s) => (
-          <Chip
+          <FilterChip
             key={s.value}
             href={`/admin/custom-requests?status=${s.value}`}
             active={filter === s.value}
           >
             {s.label}
-          </Chip>
+          </FilterChip>
         ))}
       </nav>
 
@@ -78,31 +78,3 @@ export default async function AdminCustomRequestsPage({
   );
 }
 
-function Chip({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "true" : undefined}
-      className="flex h-9 items-center rounded-md px-3 text-[0.8125rem] whitespace-nowrap"
-      style={
-        active
-          ? { background: "var(--color-admin-ink)", color: "#fff" }
-          : {
-              background: "var(--color-admin-card)",
-              color: "var(--color-admin-ink-soft)",
-              boxShadow: "var(--shadow-admin-card)",
-            }
-      }
-    >
-      {children}
-    </Link>
-  );
-}

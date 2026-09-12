@@ -1,23 +1,12 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { createCustomRequest } from "@/lib/custom-requests-db";
-import { createRateLimit } from "@/lib/rate-limit";
+import { checkCustomRequest } from "@/lib/custom-request";
+import { clientKey, createRateLimit } from "@/lib/rate-limit";
 import { getProductBySlug } from "@/lib/catalogue";
-import { measurementRanges } from "@/lib/types";
-import type { CustomMeasurements } from "@/lib/types";
 
 const requestLimit = createRateLimit(5, 10 * 60 * 1000);
-
-/** Best-effort client identity behind Hostinger's proxy, as in checkout. */
-async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 export type CustomRequestResult =
   | { ok: true; requestId: string }
@@ -63,30 +52,20 @@ export async function submitCustomRequestAction(input: {
   const city = input.city?.trim() ?? "";
   const notes = input.notes?.trim() ?? "";
 
-  if (name.length < 2) errors.name = "Tell us who to ask for.";
-  const digits = phone.replace(/\D/g, "");
-  if (digits.length < 10 || digits.length > 12) {
-    errors.phone = "Enter a Pakistani mobile number, like 0300 1234567.";
-  }
+  // The same rules the form applied, so a shopper is never told two different
+  // things about one field depending on which side caught it.
+  const checked = checkCustomRequest({ name, phone, measurements: input.measurements });
+  Object.assign(errors, checked.errors);
 
-  const measurements = {} as CustomMeasurements;
-  for (const field of Object.keys(measurementRanges) as (keyof CustomMeasurements)[]) {
-    const range = measurementRanges[field];
-    const value = Number(input.measurements[field]);
-    if (!Number.isFinite(value) || value < range.min || value > range.max) {
-      errors[field] = `Enter your ${range.label.toLowerCase()} in ${range.unit}, between ${range.min} and ${range.max}.`;
-    } else {
-      measurements[field] = value;
-    }
+  if (Object.keys(errors).length > 0 || !checked.measurements) {
+    return { ok: false, errors };
   }
-
-  if (Object.keys(errors).length > 0) return { ok: false, errors };
 
   const request = await createCustomRequest({
     styleProductId: style!.id,
     styleName: style!.name,
     stylePhoto: style!.photos[0] ?? "",
-    measurements,
+    measurements: checked.measurements,
     notes: notes || undefined,
     name,
     phone,

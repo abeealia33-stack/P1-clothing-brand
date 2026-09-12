@@ -24,7 +24,7 @@ export default function LoginForm() {
         className="field mt-2"
         aria-describedby={state.error ? "password-error" : undefined}
         aria-invalid={state.error ? true : undefined}
-        style={state.error ? { borderColor: "#9A4A3C" } : undefined}
+        style={state.error ? { borderColor: "var(--color-alert)" } : undefined}
       />
 
       {state.error && (
@@ -32,7 +32,7 @@ export default function LoginForm() {
           id="password-error"
           role="alert"
           className="mt-2 text-sm"
-          style={{ color: "#9A4A3C" }}
+          style={{ color: "var(--color-alert)" }}
         >
           {state.error}
         </p>

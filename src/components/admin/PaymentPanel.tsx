@@ -111,7 +111,7 @@ export default function PaymentPanel({
 
       <p role="status" aria-live="polite" className="mt-3 min-h-5 text-sm">
         {state.error ? (
-          <span style={{ color: "#9A4A3C" }}>{state.error}</span>
+          <span style={{ color: "var(--color-alert)" }}>{state.error}</span>
         ) : state.savedAt ? (
           <span style={{ color: "var(--color-sage-deep)" }}>Saved.</span>
         ) : null}

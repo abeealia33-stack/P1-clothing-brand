@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import CollectionsForm from "@/components/admin/CollectionsForm";
 import { requireAdmin } from "@/lib/auth";
-import { getSettings } from "@/lib/settings";
+import { getAllCollections } from "@/lib/settings";
 import { countProductsByCollection } from "@/lib/catalogue";
-import { resolveCollections } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Collections" };
 export const dynamic = "force-dynamic";
@@ -16,8 +15,8 @@ export default async function AdminCollectionsPage({
   await requireAdmin();
 
   const { saved } = await searchParams;
-  const [{ collections: edits }, counts] = await Promise.all([
-    getSettings(),
+  const [collections, counts] = await Promise.all([
+    getAllCollections(),
     countProductsByCollection(),
   ]);
 
@@ -40,7 +39,7 @@ export default async function AdminCollectionsPage({
         </p>
       )}
 
-      <CollectionsForm collections={resolveCollections(edits)} counts={counts} />
+      <CollectionsForm collections={collections} counts={counts} />
     </div>
   );
 }

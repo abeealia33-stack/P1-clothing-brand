@@ -123,7 +123,7 @@ export default function VideoUploader({
 
           <div>
             {state.status === "error" && (
-              <p className="text-sm" style={{ color: "#9A4A3C" }}>
+              <p className="text-sm" style={{ color: "var(--color-alert)" }}>
                 {state.message}
               </p>
             )}

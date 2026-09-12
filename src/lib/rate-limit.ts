@@ -7,7 +7,24 @@
  * shop — it is a speed bump, not a guarantee.
  */
 
+import { headers } from "next/headers";
+
 type Window = { count: number; resetAt: number };
+
+/**
+ * Who is being limited, as best as can be told behind Hostinger's proxy.
+ *
+ * Every rate limit on the site counts against this, so it lives beside them:
+ * if the proxy ever changes which header carries the caller's address, the
+ * login lockout, the order cap and the upload caps all move together rather
+ * than one of them quietly counting every visitor as the same person.
+ */
+export async function clientKey(): Promise<string> {
+  const h = await headers();
+  return (
+    h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown"
+  );
+}
 
 export type RateLimit = {
   /** Records a hit. False once the caller has spent its allowance. */

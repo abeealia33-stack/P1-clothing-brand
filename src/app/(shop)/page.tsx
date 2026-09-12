@@ -7,31 +7,23 @@ import ReelsRail from "@/components/ReelsRail";
 import SwipeRail from "@/components/SwipeRail";
 import { newestProducts } from "@/lib/catalogue";
 import { listReels } from "@/lib/reels";
-import { getSettings } from "@/lib/settings";
-import { rupees } from "@/lib/format";
+import { getNavCollections, getSettings } from "@/lib/settings";
+import { rupees, spellCount } from "@/lib/format";
 import { site } from "@/lib/site";
-import { navCollections, spellCount } from "@/lib/types";
 
 const DEFAULT_HERO = "/cloth/hero.svg";
 
-/**
- * Everything on this page — the pieces, the hero, the banners, which
- * collections show — is edited from the admin, so it cannot be cached as a
- * page that never changes. Without this Next hands the CDN a year-long
- * s-maxage and the owner's edits sit behind a stale copy for months.
- */
-export const revalidate = 60;
-
 export default async function HomePage() {
-  const newIn = await newestProducts(4);
-  const reels = await listReels();
-  const {
-    heroImages: uploadedHero,
-    banners,
-    collections: collectionEdits,
-  } = await getSettings();
+  // None of the three depends on the others, and this is the page most people
+  // land on, so they go together rather than one round trip after another.
+  const [newIn, reels, { heroImages: uploadedHero, banners }, shownCollections] =
+    await Promise.all([
+      newestProducts(4),
+      listReels(),
+      getSettings(),
+      getNavCollections(),
+    ]);
   const heroImages = uploadedHero.length > 0 ? uploadedHero : [DEFAULT_HERO];
-  const shownCollections = navCollections(collectionEdits);
 
   return (
     <>

@@ -25,7 +25,7 @@ export default function CollectionsForm({
         <p
           role="alert"
           className="mb-6 border p-4 text-sm"
-          style={{ borderColor: "#9A4A3C", color: "#9A4A3C" }}
+          style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
         >
           {state.errors.form}
         </p>

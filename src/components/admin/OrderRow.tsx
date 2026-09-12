@@ -1,25 +1,25 @@
 import Link from "next/link";
-import { priceLabel } from "@/lib/format";
-import { paymentLabel, type Order } from "@/lib/types";
-import StatusPill from "./StatusPill";
+import { ago, priceLabel } from "@/lib/format";
+import { paymentLabel, type Order, type PaymentStatus } from "@/lib/types";
+import StatusPill, { orderLooks } from "./StatusPill";
 
-/** How long ago, in the words someone would actually use. */
-function ago(iso: string): string {
-  const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
-  if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes} min ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} ${days === 1 ? "day" : "days"} ago`;
-  return new Date(iso).toLocaleDateString("en-PK", {
-    day: "numeric",
-    month: "short",
-  });
-}
+/**
+ * A receipt waiting to be checked is the one thing in this list the owner has
+ * to act on, so it is the only line that leaves the quiet secondary colour.
+ * Unpaid orders fall through to naming the method they chose.
+ */
+const paymentLook: Record<
+  PaymentStatus,
+  { color: string; weight?: number; text?: string }
+> = {
+  paid: { color: "var(--color-sage-deep)", text: "Paid" },
+  review: { color: "var(--color-ink)", weight: 500, text: "Receipt to check" },
+  unpaid: { color: "var(--color-ink-soft)" },
+};
 
 export default function OrderRow({ order }: { order: Order }) {
   const pieces = order.lines.reduce((n, l) => n + l.qty, 0);
+  const look = paymentLook[order.paymentStatus];
 
   return (
     <li className="rule">
@@ -30,7 +30,7 @@ export default function OrderRow({ order }: { order: Order }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="truncate font-medium">{order.name}</span>
-            <StatusPill status={order.status} />
+            <StatusPill look={orderLooks[order.status]} />
           </div>
           {/* Spaced columns rather than a dot-joined string: these are four
               separate facts, and they stay scannable down the list. */}
@@ -49,26 +49,8 @@ export default function OrderRow({ order }: { order: Order }) {
 
         <div className="shrink-0 text-right">
           <p className="tnum">{priceLabel(order.total)}</p>
-          {/* A receipt waiting to be checked is the one thing in this list she
-              has to act on, so it is the only line that leaves the quiet
-              secondary colour. */}
-          <p
-            className="text-xs"
-            style={{
-              color:
-                order.paymentStatus === "paid"
-                  ? "var(--color-sage-deep)"
-                  : order.paymentStatus === "review"
-                    ? "var(--color-ink)"
-                    : "var(--color-ink-soft)",
-              fontWeight: order.paymentStatus === "review" ? 500 : undefined,
-            }}
-          >
-            {order.paymentStatus === "paid"
-              ? "Paid"
-              : order.paymentStatus === "review"
-                ? "Receipt to check"
-                : paymentLabel(order.payment)}
+          <p className="text-xs" style={{ color: look.color, fontWeight: look.weight }}>
+            {look.text ?? paymentLabel(order.payment)}
           </p>
         </div>
       </Link>

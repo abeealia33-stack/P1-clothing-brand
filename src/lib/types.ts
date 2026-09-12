@@ -15,7 +15,11 @@ export type Collection = {
   intro: string;
 };
 
-/** Fixed by the brand, not owner-editable — four collections, always. */
+/**
+ * Four collections, always — the slugs are what every product is filed under
+ * and never change. The wording below is where each one starts; the owner can
+ * rewrite it, and hide any of them, from the admin. See `resolveCollections`.
+ */
 export const collections: Collection[] = [
   {
     slug: "rozana",
@@ -102,19 +106,25 @@ export function resolveCollections(edits: CollectionEdits): ResolvedCollection[]
   });
 }
 
-/** Just the ones the owner is currently showing in the menus. */
-export const navCollections = (edits: CollectionEdits): ResolvedCollection[] =>
-  resolveCollections(edits).filter((c) => c.inNav);
+/**
+ * Just the ones the owner is currently showing in the menus.
+ *
+ * `include` keeps one hidden collection in the list: a filter control has to
+ * be able to show the collection it is currently set to, even one taken out of
+ * the menus, or it would sit there reading "All collections" over a filtered
+ * grid. It comes back in brand order rather than appended to the end.
+ */
+export const navCollections = (
+  edits: CollectionEdits,
+  include?: string
+): ResolvedCollection[] =>
+  resolveCollections(edits).filter((c) => c.inNav || c.slug === include);
 
 export const resolveCollection = (
   slug: string,
   edits: CollectionEdits
 ): ResolvedCollection | undefined =>
   resolveCollections(edits).find((c) => c.slug === slug);
-
-/** Spelled out, because "4 ways to get dressed" reads like a spec sheet. */
-export const spellCount = (n: number): string =>
-  ["No", "One", "Two", "Three", "Four"][n] ?? String(n);
 
 export type PriceTier = "under-2500" | "2500-5000" | "over-5000";
 
@@ -367,6 +377,16 @@ export const customRequestStatusFlow: {
 
 export const isCustomRequestStatus = (value: string): value is CustomRequestStatus =>
   customRequestStatusFlow.some((s) => s.value === value);
+
+/** The stages in order, derived so the two can never disagree. */
+export const customRequestStatusOrder: CustomRequestStatus[] =
+  customRequestStatusFlow.map((s) => s.value);
+
+/** What the button says when moving a request on to that stage. */
+export const customRequestAdvanceLabel: Partial<Record<CustomRequestStatus, string>> = {
+  contacted: "Mark as contacted",
+  closed: "Close request",
+};
 
 export type CustomMeasurements = {
   heightCm: number;

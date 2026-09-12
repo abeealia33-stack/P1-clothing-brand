@@ -110,7 +110,3 @@ export async function getCustomRequest(id: string): Promise<CustomDesignRequest 
 export async function setCustomRequestStatus(id: string, status: CustomRequestStatus) {
   await prisma.customDesignRequest.update({ where: { id }, data: { status } });
 }
-
-export async function countNewCustomRequests(): Promise<number> {
-  return prisma.customDesignRequest.count({ where: { status: "new" } });
-}

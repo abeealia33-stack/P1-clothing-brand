@@ -59,6 +59,9 @@ export default async function ConfirmedPage({
   /* Bank and wallet orders are only half done at this point — the money has
      not moved yet — so the accounts to send it to come along with the page. */
   const transfer = isTransferMethod(order.payment);
+  /* Called again rather than reusing `transfer` above: this one narrows the
+     payment method to the three that have an account, which is what lets it
+     index the accounts at all. */
   const account = isTransferMethod(order.payment)
     ? ((await getSettings()).payments[order.payment] ?? null)
     : null;

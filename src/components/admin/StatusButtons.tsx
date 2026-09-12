@@ -65,7 +65,7 @@ export default function StatusButtons({
                 borderColor: "var(--color-line)",
                 color:
                   s.value === "cancelled"
-                    ? "#9A4A3C"
+                    ? "var(--color-alert)"
                     : "var(--color-ink-soft)",
               }}
             >
@@ -77,7 +77,7 @@ export default function StatusButtons({
 
       <p role="status" aria-live="polite" className="mt-3 min-h-5 text-sm">
         {state.error ? (
-          <span style={{ color: "#9A4A3C" }}>{state.error}</span>
+          <span style={{ color: "var(--color-alert)" }}>{state.error}</span>
         ) : state.savedAt ? (
           <span style={{ color: "var(--color-sage-deep)" }}>Saved.</span>
         ) : null}

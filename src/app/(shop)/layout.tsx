@@ -2,8 +2,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import TabBar from "@/components/TabBar";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { getSettings } from "@/lib/settings";
-import { navCollections } from "@/lib/types";
+import { getNavCollections } from "@/lib/settings";
 
 /**
  * Everything a customer sees. The admin sits outside this group so it gets
@@ -12,13 +11,20 @@ import { navCollections } from "@/lib/types";
  * The collections are read once here and handed to the header and footer,
  * which are client components and cannot reach the database themselves.
  */
+
+/* Every page in here is built from things the owner edits — the pieces, the
+   hero, the banners, the collections in these menus — so none of them may be
+   cached as a page that never changes. Set on the layout rather than page by
+   page: the shortest revalidate across a layout and its page wins, so this
+   covers a new storefront page the day it is added. */
+export const revalidate = 60;
+
 export default async function ShopLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { collections } = await getSettings();
-  const shown = navCollections(collections);
+  const shown = await getNavCollections();
 
   return (
     <>

@@ -15,12 +15,12 @@ export default function DeleteReel({ id }: { id: string }) {
           type="button"
           onClick={() => setAsking(true)}
           className="mt-4 h-12 border px-4 text-sm"
-          style={{ borderColor: "#9A4A3C", color: "#9A4A3C" }}
+          style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
         >
           Delete this reel
         </button>
       ) : (
-        <div className="mt-3 border p-4" style={{ borderColor: "#9A4A3C" }}>
+        <div className="mt-3 border p-4" style={{ borderColor: "var(--color-alert)" }}>
           <p className="measure text-sm">
             Delete this reel for good? The video comes off the home page
             immediately and cannot be brought back.
@@ -31,7 +31,7 @@ export default function DeleteReel({ id }: { id: string }) {
               <button
                 type="submit"
                 className="h-12 px-4 text-sm text-white"
-                style={{ background: "#9A4A3C" }}
+                style={{ background: "var(--color-alert)" }}
               >
                 Yes, delete it
               </button>

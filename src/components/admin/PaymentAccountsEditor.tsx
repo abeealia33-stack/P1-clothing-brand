@@ -13,8 +13,6 @@ import { paymentLabel, transferMethods, type TransferMethod } from "@/lib/types"
  * the same way the banner editor works.
  */
 
-const bankOnly = new Set<TransferMethod>(["bank"]);
-
 export default function PaymentAccountsEditor({
   name,
   initial,
@@ -47,7 +45,7 @@ export default function PaymentAccountsEditor({
       <div className="space-y-6">
         {transferMethods.map((method) => {
           const account = accounts[method];
-          const showBankFields = bankOnly.has(method);
+          const showBankFields = method === "bank";
 
           return (
             <fieldset key={method} className="border-0 p-0">

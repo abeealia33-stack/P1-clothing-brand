@@ -1,24 +1,14 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { createOrder, OutOfStockError } from "@/lib/orders-db";
-import { createRateLimit } from "@/lib/rate-limit";
+import { clientKey, createRateLimit } from "@/lib/rate-limit";
 import { getProductBySlug } from "@/lib/catalogue";
 import { paymentMethods, type PaymentMethod } from "@/lib/types";
 import { shippingFor } from "@/lib/shipping";
 import { orderableQty } from "@/lib/stock";
 
 const orderLimit = createRateLimit(5, 10 * 60 * 1000);
-
-/** Best-effort client identity behind Hostinger's proxy, as in the admin. */
-async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 export type CheckoutResult =
   | { ok: true; orderId: string }

@@ -3,14 +3,9 @@ import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import ShopFilters from "@/components/ShopFilters";
 import { listCategories } from "@/lib/categories";
-import { countProducts, listProducts } from "@/lib/catalogue";
-import { getSettings } from "@/lib/settings";
-import {
-  isPriceTier,
-  isSortOption,
-  navCollections,
-  resolveCollection,
-} from "@/lib/types";
+import { countLiveProducts, listProducts } from "@/lib/catalogue";
+import { getNavCollections, getSettings } from "@/lib/settings";
+import { isPriceTier, isSortOption, resolveCollection } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Shop" };
 
@@ -32,7 +27,7 @@ export default async function ShopPage({
   const priceTier = price && isPriceTier(price) ? price : undefined;
   const sortBy = sort && isSortOption(sort) ? sort : undefined;
 
-  const [list, categories, counts] = await Promise.all([
+  const [list, categories, liveCount, filterCollections] = await Promise.all([
     listProducts({
       collection: active?.slug,
       category,
@@ -40,15 +35,13 @@ export default async function ShopPage({
       sort: sortBy,
     }),
     listCategories(),
-    countProducts(),
+    // Only the unfiltered view quotes a total, so a filtered one does not pay
+    // for a count it will not print.
+    active ? 0 : countLiveProducts(),
+    // A hidden range still shows in the filter while it is the one being
+    // viewed, so the control matches the grid under it.
+    getNavCollections(active?.slug),
   ]);
-
-  /* Hidden ranges are dropped from the filter, but one being viewed through a
-     link someone still has is kept in the list — otherwise the dropdown would
-     sit there reading "All collections" over a filtered grid. */
-  const shown = navCollections(collectionEdits);
-  const filterCollections =
-    active && !shown.some((c) => c.slug === active.slug) ? [...shown, active] : shown;
 
   const activeCategory = category ? categories.find((c) => c.slug === category) : undefined;
   const hasFilters = Boolean(active || activeCategory || priceTier || sortBy);
@@ -68,8 +61,8 @@ export default async function ShopPage({
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         {active
           ? active.intro
-          : counts.live > 0
-            ? `${counts.live} ${counts.live === 1 ? "piece" : "pieces"}, made in small runs. Filter by how you plan to wear them.`
+          : liveCount > 0
+            ? `${liveCount} ${liveCount === 1 ? "piece" : "pieces"}, made in small runs. Filter by how you plan to wear them.`
             : "Made in small runs. New pieces go up here as they are finished."}
       </p>
 

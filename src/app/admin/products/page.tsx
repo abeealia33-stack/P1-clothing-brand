@@ -4,9 +4,8 @@ import ClothImage from "@/components/ClothImage";
 import { toggleActiveAction } from "./actions";
 import { requireAdmin } from "@/lib/auth";
 import { listProducts } from "@/lib/catalogue";
-import { getSettings } from "@/lib/settings";
+import { getAllCollections } from "@/lib/settings";
 import { priceLabel } from "@/lib/format";
-import { resolveCollections } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Pieces" };
 export const dynamic = "force-dynamic";
@@ -19,13 +18,12 @@ export default async function AdminProductsPage({
   await requireAdmin();
 
   const { saved, deleted } = await searchParams;
-  const [products, settings] = await Promise.all([
-    listProducts({ includeInactive: true }),
-    getSettings(),
-  ]);
   // Every collection, hidden ones included: pieces filed under a hidden one
   // still have to be findable here.
-  const collections = resolveCollections(settings.collections);
+  const [products, collections] = await Promise.all([
+    listProducts({ includeInactive: true }),
+    getAllCollections(),
+  ]);
 
   return (
     <div className="py-8">
@@ -117,7 +115,7 @@ export default async function AdminProductsPage({
                         {product.active && product.stock === 0 && (
                           <span
                             className="shrink-0 px-1.5 py-0.5 text-[0.6875rem] text-white"
-                            style={{ background: "#9A4A3C" }}
+                            style={{ background: "var(--color-alert)" }}
                           >
                             Sold out
                           </span>

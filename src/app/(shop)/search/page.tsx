@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { searchProducts } from "@/lib/catalogue";
-import { getSettings } from "@/lib/settings";
-import { navCollections } from "@/lib/types";
+import { getNavCollections } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Search" };
 
@@ -13,10 +12,11 @@ export default async function SearchPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q = "" } = await searchParams;
-  const results = await searchProducts(q);
+  const [results, collections] = await Promise.all([
+    searchProducts(q),
+    getNavCollections(),
+  ]);
   const searched = q.trim().length > 0;
-  const { collections: collectionEdits } = await getSettings();
-  const collections = navCollections(collectionEdits);
 
   return (
     <div className="mx-auto max-w-6xl px-5 py-10 md:py-14">

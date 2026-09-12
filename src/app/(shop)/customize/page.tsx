@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
 import CustomizeForm from "@/components/CustomizeForm";
-import { listProducts } from "@/lib/catalogue";
+import { listProductChoices } from "@/lib/catalogue";
 
 export const metadata: Metadata = { title: "Custom design" };
 
-/* The styles to start from are the live catalogue, so this cannot be cached
-   as a page that never changes — see the home page for the same reason. */
-export const revalidate = 60;
-
 export default async function CustomizePage() {
-  const products = await listProducts();
+  const products = await listProductChoices();
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">

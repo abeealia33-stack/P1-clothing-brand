@@ -46,9 +46,11 @@ export default async function ProductPage({
 
   /* Shown whether or not the collection is in the menus: what a piece belongs
      to is a fact about the piece, not a way of getting around the shop. */
-  const { collections: collectionEdits } = await getSettings();
+  const [{ collections: collectionEdits }, alsoIn] = await Promise.all([
+    getSettings(),
+    relatedProducts(product.collection, product.slug, 4),
+  ]);
   const collection = resolveCollection(product.collection, collectionEdits)!;
-  const alsoIn = await relatedProducts(product.collection, product.slug, 4);
   const shipsFree = product.price >= site.freeShippingOver;
 
   return (

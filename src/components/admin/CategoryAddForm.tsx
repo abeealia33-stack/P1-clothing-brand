@@ -24,7 +24,7 @@ export default function CategoryAddForm() {
           required
         />
         {state.errors?.name && (
-          <p role="alert" className="mt-1.5 text-sm" style={{ color: "#9A4A3C" }}>
+          <p role="alert" className="mt-1.5 text-sm" style={{ color: "var(--color-alert)" }}>
             {state.errors.name}
           </p>
         )}

@@ -180,7 +180,7 @@ export default function PaymentTransfer({
         />
 
         <p role="status" aria-live="polite" className="mt-2 min-h-5 text-sm">
-          {error && <span style={{ color: "#9A4A3C" }}>{error}</span>}
+          {error && <span style={{ color: "var(--color-alert)" }}>{error}</span>}
         </p>
 
         <a

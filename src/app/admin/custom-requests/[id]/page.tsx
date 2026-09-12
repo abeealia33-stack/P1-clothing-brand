@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ClothImage from "@/components/ClothImage";
-import CustomRequestStatusPill from "@/components/admin/CustomRequestStatusPill";
+import StatusPill, { customRequestLooks } from "@/components/admin/StatusPill";
 import CustomRequestStatusButtons from "@/components/admin/CustomRequestStatusButtons";
 import { requireAdmin } from "@/lib/auth";
 import { getCustomRequest } from "@/lib/custom-requests-db";
 import { measurementRanges } from "@/lib/types";
+import { dateTimeLabel } from "@/lib/format";
 import { whatsappLink } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -45,16 +46,11 @@ export default async function AdminCustomRequestPage({
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <h1 className="text-4xl">{request.name}</h1>
-        <CustomRequestStatusPill status={request.status} />
+        <StatusPill look={customRequestLooks[request.status]} />
       </div>
       <p className="mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
         Sent in{" "}
-        {new Date(request.createdAt).toLocaleString("en-PK", {
-          day: "numeric",
-          month: "long",
-          hour: "numeric",
-          minute: "2-digit",
-        })}
+        {dateTimeLabel(request.createdAt)}
       </p>
 
       <CustomRequestStatusButtons requestId={request.id} status={request.status} />

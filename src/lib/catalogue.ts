@@ -264,6 +264,30 @@ export async function countProductsByCollection(): Promise<Record<string, number
   return Object.fromEntries(rows.map((r) => [r.collection, r._count._all]));
 }
 
+/** Just the number the shop quotes, without the admin's other two counts. */
+export const countLiveProducts = () => prisma.product.count({ where: { active: true } });
+
+/** The name and one photograph — all a picker needs, and all it should send. */
+export type ProductChoice = { slug: string; name: string; photo: string };
+
+/**
+ * For choosing a piece rather than reading about one. A full `Product` carries
+ * the description, the details and every colour, parsed out of JSON columns
+ * and then shipped to the phone; a picker shows a photograph and a name.
+ */
+export async function listProductChoices(): Promise<ProductChoice[]> {
+  const rows = await prisma.product.findMany({
+    where: { active: true },
+    orderBy: order,
+    select: { slug: true, name: true, photos: true },
+  });
+  return rows.map((row) => ({
+    slug: row.slug,
+    name: row.name,
+    photo: parseList<string>(row.photos, [])[0] ?? "",
+  }));
+}
+
 export async function countProducts() {
   const [total, live, outOfStock] = await Promise.all([
     prisma.product.count(),

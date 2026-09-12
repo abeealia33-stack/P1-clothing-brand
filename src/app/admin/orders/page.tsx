@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import OrderRow from "@/components/admin/OrderRow";
+import FilterChip from "@/components/admin/FilterChip";
 import { requireAdmin } from "@/lib/auth";
 import { listOrders, orderSummary } from "@/lib/orders-db";
 import { countProducts } from "@/lib/catalogue";
@@ -59,17 +60,17 @@ export default async function AdminOrdersPage({
       )}
 
       <nav aria-label="Filter orders" className="rail -mx-4 mt-8 gap-2 px-4 sm:mx-0 sm:px-0">
-        <Chip href="/admin/orders" active={!filter}>
+        <FilterChip href="/admin/orders" active={!filter}>
           All
-        </Chip>
+        </FilterChip>
         {statusFlow.map((s) => (
-          <Chip
+          <FilterChip
             key={s.value}
             href={`/admin/orders?status=${s.value}`}
             active={filter === s.value}
           >
             {s.label}
-          </Chip>
+          </FilterChip>
         ))}
       </nav>
 
@@ -125,31 +126,3 @@ function Stat({
   );
 }
 
-function Chip({
-  href,
-  active,
-  children,
-}: {
-  href: string;
-  active: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      aria-current={active ? "true" : undefined}
-      className="flex h-9 items-center rounded-md px-3 text-[0.8125rem] whitespace-nowrap"
-      style={
-        active
-          ? { background: "var(--color-admin-ink)", color: "#fff" }
-          : {
-              background: "var(--color-admin-card)",
-              color: "var(--color-admin-ink-soft)",
-              boxShadow: "var(--shadow-admin-card)",
-            }
-      }
-    >
-      {children}
-    </Link>
-  );
-}

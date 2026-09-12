@@ -198,7 +198,7 @@ export default function PhotoUploader({
                 </div>
 
                 {photo.error ? (
-                  <p className="mt-1 text-xs" style={{ color: "#9A4A3C" }}>
+                  <p className="mt-1 text-xs" style={{ color: "var(--color-alert)" }}>
                     {photo.error}
                   </p>
                 ) : (

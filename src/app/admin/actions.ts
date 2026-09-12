@@ -1,6 +1,5 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   attemptsRemaining,
@@ -10,18 +9,9 @@ import {
   destroySession,
   recordFailure,
 } from "@/lib/auth";
+import { clientKey } from "@/lib/rate-limit";
 
 export type SignInState = { error?: string };
-
-/** Best-effort client identity behind Hostinger's proxy, for rate limiting. */
-async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 export async function signInAction(
   _previous: SignInState,

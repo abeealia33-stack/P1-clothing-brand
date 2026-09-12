@@ -4,7 +4,6 @@ import {
   navCollections,
   resolveCollection,
   resolveCollections,
-  spellCount,
 } from "./types";
 
 /**
@@ -60,6 +59,20 @@ describe("navCollections", () => {
     expect(shown.map((c) => c.slug)).toEqual(["rozana", "bundles"]);
   });
 
+  it("keeps the one being viewed, in brand order rather than tacked on the end", () => {
+    const shown = navCollections({ ghar: { inNav: false }, azad: { inNav: false } }, "ghar");
+    expect(shown.map((c) => c.slug)).toEqual(["rozana", "ghar", "bundles"]);
+  });
+
+  it("ignores an include that is already showing, or is not a collection", () => {
+    expect(navCollections({}, "rozana")).toHaveLength(collections.length);
+    expect(navCollections({ ghar: { inNav: false } }, "party").map((c) => c.slug)).toEqual([
+      "rozana",
+      "azad",
+      "bundles",
+    ]);
+  });
+
   it("can be empty when everything is hidden", () => {
     const edits = Object.fromEntries(
       collections.map((c) => [c.slug, { inNav: false }])
@@ -80,9 +93,3 @@ describe("resolveCollection", () => {
   });
 });
 
-describe("spellCount", () => {
-  it("spells the counts a heading can actually have", () => {
-    expect(spellCount(1)).toBe("One");
-    expect(spellCount(4)).toBe("Four");
-  });
-});

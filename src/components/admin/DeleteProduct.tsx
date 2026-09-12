@@ -30,13 +30,13 @@ export default function DeleteProduct({
             type="button"
             onClick={() => setAsking(true)}
             className="mt-4 h-12 border px-4 text-sm"
-            style={{ borderColor: "#9A4A3C", color: "#9A4A3C" }}
+            style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
           >
             Delete {name}
           </button>
         </>
       ) : (
-        <div className="mt-3 border p-4" style={{ borderColor: "#9A4A3C" }}>
+        <div className="mt-3 border p-4" style={{ borderColor: "var(--color-alert)" }}>
           <p className="measure text-sm">
             Delete <strong>{name}</strong> for good? Past orders keep their own
             record of it, so your order history stays correct — but the piece
@@ -48,7 +48,7 @@ export default function DeleteProduct({
               <button
                 type="submit"
                 className="h-12 px-4 text-sm text-white"
-                style={{ background: "#9A4A3C" }}
+                style={{ background: "var(--color-alert)" }}
               >
                 Yes, delete it
               </button>

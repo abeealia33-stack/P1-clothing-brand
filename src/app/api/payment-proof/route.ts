@@ -1,7 +1,7 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { attachPaymentProof, getOrder } from "@/lib/orders-db";
-import { createRateLimit } from "@/lib/rate-limit";
+import { clientKey, createRateLimit } from "@/lib/rate-limit";
 import { isTransferMethod } from "@/lib/types";
 import {
   IMAGE_TYPES,
@@ -21,15 +21,6 @@ import {
  */
 
 const proofLimit = createRateLimit(6, 10 * 60 * 1000);
-
-async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    h.get("x-real-ip") ||
-    "unknown"
-  );
-}
 
 export async function POST(request: Request) {
   if (!proofLimit.take(await clientKey())) {

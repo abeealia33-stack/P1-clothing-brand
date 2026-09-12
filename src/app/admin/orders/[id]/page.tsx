@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import ClothImage from "@/components/ClothImage";
-import StatusPill from "@/components/admin/StatusPill";
+import StatusPill, { orderLooks } from "@/components/admin/StatusPill";
 import StatusButtons from "@/components/admin/StatusButtons";
 import PaymentPanel from "@/components/admin/PaymentPanel";
 import { requireAdmin } from "@/lib/auth";
 import { getOrder } from "@/lib/orders-db";
-import { priceLabel } from "@/lib/format";
+import { dateTimeLabel, priceLabel } from "@/lib/format";
 import { whatsappLink } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -47,16 +47,11 @@ export default async function AdminOrderPage({
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <h1 className="tnum text-4xl">{order.id}</h1>
-        <StatusPill status={order.status} />
+        <StatusPill look={orderLooks[order.status]} />
       </div>
       <p className="mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
         Placed{" "}
-        {new Date(order.createdAt).toLocaleString("en-PK", {
-          day: "numeric",
-          month: "long",
-          hour: "numeric",
-          minute: "2-digit",
-        })}
+        {dateTimeLabel(order.createdAt)}
       </p>
 
       <StatusButtons orderId={order.id} status={order.status} />

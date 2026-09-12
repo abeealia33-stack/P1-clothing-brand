@@ -1,11 +1,15 @@
 import "server-only";
 
+import { cache } from "react";
 import { prisma } from "./prisma";
 import {
   collections,
+  navCollections,
+  resolveCollections,
   transferMethods,
   type CollectionEdit,
   type CollectionEdits,
+  type ResolvedCollection,
   type TransferMethod,
 } from "./types";
 
@@ -116,23 +120,24 @@ function normaliseCollections(value: unknown): CollectionEdits {
   return edits;
 }
 
-function parseCollections(raw: string): CollectionEdits {
+/** A column that will not parse is treated as one nobody has filled in yet. */
+function parseJson<T>(raw: string, normalise: (value: unknown) => T, fallback: T): T {
   try {
-    return normaliseCollections(JSON.parse(raw));
+    return normalise(JSON.parse(raw));
   } catch {
-    return {};
+    return fallback;
   }
 }
 
-function parseAccounts(raw: string): PaymentAccounts {
-  try {
-    return normaliseAccounts(JSON.parse(raw));
-  } catch {
-    return {};
-  }
-}
-
-export async function getSettings(): Promise<SiteSettings> {
+/**
+ * Read once per request.
+ *
+ * The shop layout needs the collections for its menus and the page inside it
+ * usually needs them too, so without this every storefront page would ask the
+ * database for the same single row twice — which on a shared host with a
+ * connection limit is worth avoiding for a value that cannot change mid-render.
+ */
+export const getSettings = cache(async (): Promise<SiteSettings> => {
   const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
   if (!row) return { heroImages: [], banners: [], payments: {}, collections: {} };
 
@@ -141,10 +146,26 @@ export async function getSettings(): Promise<SiteSettings> {
     banners: parseArray<PromoBanner>(row.banners).filter(
       (b) => b && typeof b.image === "string" && typeof b.heading === "string"
     ),
-    payments: parseAccounts(row.payments),
-    collections: parseCollections(row.collections),
+    payments: parseJson(row.payments, normaliseAccounts, {}),
+    collections: parseJson(row.collections, normaliseCollections, {}),
   };
-}
+});
+
+/**
+ * The collections as the storefront should show them, already resolved.
+ *
+ * Callers wanted the pair of these every time — read the settings, then apply
+ * the owner's edits — and going through here means a page cannot accidentally
+ * list a collection the owner has hidden by reaching for the wrong one.
+ */
+export const getNavCollections = async (
+  include?: string
+): Promise<ResolvedCollection[]> =>
+  navCollections((await getSettings()).collections, include);
+
+/** All four, hidden ones included. For the admin, and for naming a piece. */
+export const getAllCollections = async (): Promise<ResolvedCollection[]> =>
+  resolveCollections((await getSettings()).collections);
 
 /**
  * Each admin screen writes only its own column, so saving the collections

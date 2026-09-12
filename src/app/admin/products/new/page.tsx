@@ -3,16 +3,15 @@ import Link from "next/link";
 import ProductForm from "@/components/admin/ProductForm";
 import { requireAdmin } from "@/lib/auth";
 import { listCategories } from "@/lib/categories";
-import { getSettings } from "@/lib/settings";
-import { resolveCollections } from "@/lib/types";
+import { getAllCollections } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Add a piece" };
 
 export default async function NewProductPage() {
   await requireAdmin();
-  const [categories, { collections }] = await Promise.all([
+  const [categories, collections] = await Promise.all([
     listCategories(),
-    getSettings(),
+    getAllCollections(),
   ]);
 
   return (
@@ -31,7 +30,7 @@ export default async function NewProductPage() {
       </p>
       <ProductForm
         categories={categories}
-        collections={resolveCollections(collections)}
+        collections={collections}
       />
     </div>
   );

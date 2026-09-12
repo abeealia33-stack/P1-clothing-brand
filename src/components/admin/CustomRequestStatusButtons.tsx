@@ -5,9 +5,12 @@ import {
   setCustomRequestStatusAction,
   type StatusState,
 } from "@/app/admin/custom-requests/actions";
-import { customRequestStatusFlow, type CustomRequestStatus } from "@/lib/types";
-
-const order: CustomRequestStatus[] = ["new", "contacted", "closed"];
+import {
+  customRequestAdvanceLabel,
+  customRequestStatusFlow,
+  customRequestStatusOrder as order,
+  type CustomRequestStatus,
+} from "@/lib/types";
 
 export default function CustomRequestStatusButtons({
   requestId,
@@ -40,11 +43,7 @@ export default function CustomRequestStatusButtons({
             disabled={pending}
             className="btn btn-ink w-full sm:w-auto"
           >
-            {pending
-              ? "Saving"
-              : next === "contacted"
-                ? "Mark as contacted"
-                : "Close request"}
+            {pending ? "Saving" : customRequestAdvanceLabel[next]}
           </button>
         )}
 
@@ -67,7 +66,7 @@ export default function CustomRequestStatusButtons({
 
       <p role="status" aria-live="polite" className="mt-3 min-h-5 text-sm">
         {state.error ? (
-          <span style={{ color: "#9A4A3C" }}>{state.error}</span>
+          <span style={{ color: "var(--color-alert)" }}>{state.error}</span>
         ) : state.savedAt ? (
           <span style={{ color: "var(--color-sage-deep)" }}>Saved.</span>
         ) : null}

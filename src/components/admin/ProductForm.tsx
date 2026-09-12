@@ -63,7 +63,7 @@ export default function ProductForm({
         <p
           role="alert"
           className="mb-6 border p-4 text-sm"
-          style={{ borderColor: "#9A4A3C", color: "#9A4A3C" }}
+          style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
         >
           {errors.form}
         </p>
@@ -300,7 +300,7 @@ function Field({
       )}
       <div className="mt-2">{children}</div>
       {error && (
-        <p role="alert" className="mt-1.5 text-sm" style={{ color: "#9A4A3C" }}>
+        <p role="alert" className="mt-1.5 text-sm" style={{ color: "var(--color-alert)" }}>
           {error}
         </p>
       )}

@@ -17,6 +17,9 @@
   --color-ink-soft: #6b6055;
 
   --color-line: #ddd3c6;
+  /* The one alarm colour: wrong passwords, failed uploads, a field that needs
+     fixing, cancelling an order. Nothing decorative is ever this colour. */
+  --color-alert: #9a4a3c;
 
   --font-display: var(--font-cormorant), Georgia, "Times New Roman", serif;
   --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
