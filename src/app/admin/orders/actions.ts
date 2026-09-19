@@ -25,7 +25,8 @@ export async function setStatusAction(
 
   try {
     await setOrderStatus(id, status);
-  } catch {
+  } catch (error) {
+    console.error("Could not set an order's status", error);
     return { error: "Could not save that. Check your connection and try again." };
   }
 
@@ -56,7 +57,8 @@ export async function setPaymentStatusAction(
 
   try {
     await setPaymentStatus(id, paymentStatus);
-  } catch {
+  } catch (error) {
+    console.error("Could not set an order's payment status", error);
     return { error: "Could not save that. Check your connection and try again." };
   }
 

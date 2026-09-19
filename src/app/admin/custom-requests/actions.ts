@@ -21,7 +21,8 @@ export async function setCustomRequestStatusAction(
 
   try {
     await setCustomRequestStatus(id, status);
-  } catch {
+  } catch (error) {
+    console.error("Could not set a custom request's status", error);
     return { error: "Could not save that. Check your connection and try again." };
   }
 

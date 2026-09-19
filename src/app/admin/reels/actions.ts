@@ -62,7 +62,8 @@ export async function createReelAction(
 
   try {
     await createReel(input);
-  } catch {
+  } catch (error) {
+    console.error("Could not add a reel", error);
     return { errors: { form: "Could not save that reel. Try again." } };
   }
 
@@ -84,7 +85,8 @@ export async function updateReelAction(
 
   try {
     await updateReel(id, input);
-  } catch {
+  } catch (error) {
+    console.error("Could not save a reel", error);
     return { errors: { form: "Could not save that reel. Try again." } };
   }
 

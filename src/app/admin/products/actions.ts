@@ -146,16 +146,28 @@ export async function createProductAction(
 ): Promise<ProductFormState> {
   await requireAdmin();
 
-  const { input, errors } = await readForm(formData);
-  if (!input) return { errors, values: formValues(formData) };
-
+  let slug: string;
+  /* Reading the form talks to the database too — it checks the web address is
+     free — so it belongs inside the same guard as the write. Outside it, a
+     database that is briefly unreachable threw straight out of the action and
+     the owner saw the button do nothing at all. */
   try {
+    const { input, errors } = await readForm(formData);
+    if (!input) return { errors, values: formValues(formData) };
+
     await createProduct(input);
-  } catch {
-    return { errors: { form: "Could not save that piece. Try again." } };
+    slug = input.slug;
+  } catch (error) {
+    // The owner gets a sentence; the log gets what actually happened, because
+    // there is nowhere else to find it on the server.
+    console.error("Could not add a piece", error);
+    return {
+      errors: { form: "Could not save that piece. Try again." },
+      values: formValues(formData),
+    };
   }
 
-  refreshShop(input.slug);
+  refreshShop(slug);
   redirect("/admin/products?saved=1");
 }
 
@@ -168,21 +180,30 @@ export async function updateProductAction(
   const id = String(formData.get("id") ?? "");
   if (!id) return { errors: { form: "Missing piece." } };
 
-  const existing = await getProductById(id);
-  if (!existing) return { errors: { form: "That piece no longer exists." } };
-
-  const { input, errors } = await readForm(formData, id);
-  if (!input) return { errors, values: formValues(formData) };
-
+  let slug: string;
+  let previousSlug: string;
+  // Guarded as one piece of work, for the reason given in the action above.
   try {
+    const existing = await getProductById(id);
+    if (!existing) return { errors: { form: "That piece no longer exists." } };
+
+    const { input, errors } = await readForm(formData, id);
+    if (!input) return { errors, values: formValues(formData) };
+
     await updateProduct(id, input);
-  } catch {
-    return { errors: { form: "Could not save that piece. Try again." } };
+    slug = input.slug;
+    previousSlug = existing.slug;
+  } catch (error) {
+    console.error("Could not save a piece", error);
+    return {
+      errors: { form: "Could not save that piece. Try again." },
+      values: formValues(formData),
+    };
   }
 
-  refreshShop(input.slug);
+  refreshShop(slug);
   // The URL changes with the name, so refresh the old address too.
-  if (existing.slug !== input.slug) refreshShop(existing.slug);
+  if (previousSlug !== slug) refreshShop(previousSlug);
   redirect("/admin/products?saved=1");
 }
 

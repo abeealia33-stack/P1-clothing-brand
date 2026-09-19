@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import AdminField from "./AdminField";
+import FormErrors from "./FormErrors";
 import VideoUploader from "./VideoUploader";
 import {
   createReelAction,
@@ -10,6 +12,13 @@ import {
 } from "@/app/admin/reels/actions";
 import type { Product } from "@/lib/types";
 import type { Reel } from "@/lib/reels";
+
+/** Field id -> its label, so the summary at the top can name what to fix. */
+const fieldLabels: Record<string, string> = {
+  video: "Video",
+  productId: "Which piece is this?",
+  caption: "Caption",
+};
 
 export default function ReelForm({
   reel,
@@ -29,23 +38,16 @@ export default function ReelForm({
     <form action={action} className="mt-8 max-w-xl">
       {editing && <input type="hidden" name="id" value={reel.id} />}
 
-      {errors.form && (
-        <p
-          role="alert"
-          className="mb-6 border p-4 text-sm"
-          style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
-        >
-          {errors.form}
-        </p>
-      )}
+      <FormErrors errors={state.errors} labels={fieldLabels} />
 
-      <Field id="video" label="Video" error={errors.video}>
+      <AdminField id="video" label="Video" required error={errors.video}>
         <VideoUploader name="video" initial={reel?.video ?? null} />
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="productId"
         label="Which piece is this?"
+        required
         hint="Tapping the reel takes shoppers straight to this piece."
         error={errors.productId}
       >
@@ -64,9 +66,9 @@ export default function ReelForm({
             </option>
           ))}
         </select>
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="caption"
         label="Caption (optional)"
         hint="A short line shown with the video, if you want one."
@@ -77,7 +79,7 @@ export default function ReelForm({
           defaultValue={reel?.caption ?? ""}
           className="field"
         />
-      </Field>
+      </AdminField>
 
       <label className="mt-6 flex cursor-pointer items-start gap-3">
         <input
@@ -103,38 +105,5 @@ export default function ReelForm({
         </Link>
       </div>
     </form>
-  );
-}
-
-function Field({
-  id,
-  label,
-  hint,
-  error,
-  children,
-}: {
-  id: string;
-  label: string;
-  hint?: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-6">
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-      </label>
-      {hint && (
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          {hint}
-        </p>
-      )}
-      <div className="mt-2">{children}</div>
-      {error && (
-        <p role="alert" className="mt-1.5 text-sm" style={{ color: "var(--color-alert)" }}>
-          {error}
-        </p>
-      )}
-    </div>
   );
 }

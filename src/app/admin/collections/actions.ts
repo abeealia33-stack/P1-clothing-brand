@@ -34,7 +34,8 @@ export async function saveCollectionsAction(
 
   try {
     await saveCollections(edits);
-  } catch {
+  } catch (error) {
+    console.error("Could not save the collections", error);
     return { errors: { form: "Could not save. Try again." } };
   }
 

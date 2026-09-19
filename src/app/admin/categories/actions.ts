@@ -42,11 +42,20 @@ export async function createCategoryAction(
 
   const slug = slugify(name);
   if (!slug) return { errors: { name: "That name cannot be turned into a link. Try another." } };
-  if (await isCategorySlugTaken(slug)) {
-    return { errors: { name: "A category with that name already exists." } };
+
+  /* Both the check and the write talk to the database, so both sit inside the
+     guard: unguarded, a database that is briefly unreachable threw straight
+     out of the action and the owner saw the button do nothing at all. */
+  try {
+    if (await isCategorySlugTaken(slug)) {
+      return { errors: { name: "A category with that name already exists." } };
+    }
+    await createCategory(name, slug);
+  } catch (error) {
+    console.error("Could not add a category", error);
+    return { errors: { name: "Could not save that category. Try again." } };
   }
 
-  await createCategory(name, slug);
   refresh();
   redirect("/admin/categories?saved=1");
 }

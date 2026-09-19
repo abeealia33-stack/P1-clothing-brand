@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import AdminField from "./AdminField";
 import ColorEditor from "./ColorEditor";
+import FormErrors from "./FormErrors";
 import PhotoUploader from "./PhotoUploader";
 import {
   createProductAction,
@@ -15,6 +17,21 @@ import {
   type Product,
   type ResolvedCollection,
 } from "@/lib/types";
+
+/** Field id -> its label, so the summary at the top can name what to fix. */
+const fieldLabels: Record<string, string> = {
+  name: "Name",
+  collection: "Collection",
+  categoryIds: "Categories",
+  price: "Price",
+  stock: "How many you have",
+  description: "Description",
+  details: "The details",
+  sizes: "Sizes",
+  colors: "Colours",
+  photos: "Photos",
+  urdu: "Urdu name",
+};
 
 /**
  * One form for adding and editing.
@@ -59,17 +76,9 @@ export default function ProductForm({
     <form action={action} className="mt-8 max-w-2xl">
       {editing && <input type="hidden" name="id" value={product.id} />}
 
-      {errors.form && (
-        <p
-          role="alert"
-          className="mb-6 border p-4 text-sm"
-          style={{ borderColor: "var(--color-alert)", color: "var(--color-alert)" }}
-        >
-          {errors.form}
-        </p>
-      )}
+      <FormErrors errors={state.errors} labels={fieldLabels} />
 
-      <Field
+      <AdminField
         id="name"
         label="Name"
         hint="What it is called in the shop, like “Dhoop kurta”."
@@ -82,9 +91,9 @@ export default function ProductForm({
           className="field"
           required
         />
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="collection"
         label="Collection"
         hint="Which part of the shop it belongs in."
@@ -103,9 +112,9 @@ export default function ProductForm({
             </option>
           ))}
         </select>
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="categoryIds"
         label="Categories"
         hint={
@@ -129,10 +138,10 @@ export default function ProductForm({
             </label>
           ))}
         </div>
-      </Field>
+      </AdminField>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field
+        <AdminField
           id="price"
           label="Price in rupees"
           hint="Whole rupees, no commas."
@@ -149,9 +158,9 @@ export default function ProductForm({
             className="field tnum"
             required
           />
-        </Field>
+        </AdminField>
 
-        <Field
+        <AdminField
           id="stock"
           label="How many do you have?"
           hint="At zero it shows as sold out."
@@ -168,10 +177,10 @@ export default function ProductForm({
             className="field tnum"
             required
           />
-        </Field>
+        </AdminField>
       </div>
 
-      <Field
+      <AdminField
         id="description"
         label="Description"
         hint="A line or two, the way you would describe it to a customer."
@@ -185,9 +194,9 @@ export default function ProductForm({
           className="field"
           required
         />
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="details"
         label="The details"
         hint="One per line — fabric, length, washing. These appear as a list."
@@ -201,11 +210,12 @@ export default function ProductForm({
           placeholder={"100% cotton, pre-washed\nLength 42 inches\nMachine wash cold"}
           className="field"
         />
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="sizes"
         label="Sizes"
+        required
         hint="Tick the sizes you have. Customers only see the ones ticked here."
         error={errors.sizes}
       >
@@ -223,17 +233,29 @@ export default function ProductForm({
             </label>
           ))}
         </div>
-      </Field>
+      </AdminField>
 
-      <Field id="colors" label="Colours" error={errors.colors}>
+      <AdminField
+        id="colors"
+        label="Colours"
+        required
+        hint="At least one. The shop shows a dot for each colour a piece comes in."
+        error={errors.colors}
+      >
         <ColorEditor name="colors" initial={product?.colors ?? []} />
-      </Field>
+      </AdminField>
 
-      <Field id="photos" label="Photos" error={errors.photos}>
+      <AdminField
+        id="photos"
+        label="Photos"
+        required
+        hint="At least one. The first is the one shoppers see first."
+        error={errors.photos}
+      >
         <PhotoUploader name="photos" initial={product?.photos ?? []} />
-      </Field>
+      </AdminField>
 
-      <Field
+      <AdminField
         id="urdu"
         label="Urdu name (optional)"
         hint="Shown as a flourish under the name. Leave empty if unsure."
@@ -246,7 +268,7 @@ export default function ProductForm({
           defaultValue={value("urdu", product?.urdu ?? "")}
           className="field urdu"
         />
-      </Field>
+      </AdminField>
 
       <label className="mt-6 flex cursor-pointer items-start gap-3">
         <input
@@ -272,38 +294,5 @@ export default function ProductForm({
         </Link>
       </div>
     </form>
-  );
-}
-
-function Field({
-  id,
-  label,
-  hint,
-  error,
-  children,
-}: {
-  id: string;
-  label: string;
-  hint?: string;
-  error?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="mt-6">
-      <label htmlFor={id} className="block text-sm font-medium">
-        {label}
-      </label>
-      {hint && (
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          {hint}
-        </p>
-      )}
-      <div className="mt-2">{children}</div>
-      {error && (
-        <p role="alert" className="mt-1.5 text-sm" style={{ color: "var(--color-alert)" }}>
-          {error}
-        </p>
-      )}
-    </div>
   );
 }

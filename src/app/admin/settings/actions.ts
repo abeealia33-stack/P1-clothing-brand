@@ -54,7 +54,8 @@ export async function saveSettingsAction(
 
   try {
     await saveSettings({ heroImages, banners, payments });
-  } catch {
+  } catch (error) {
+    console.error("Could not save the settings", error);
     return { errors: { form: "Could not save. Try again." } };
   }
 
