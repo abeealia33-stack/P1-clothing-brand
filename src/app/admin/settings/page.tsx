@@ -14,13 +14,14 @@ export default async function AdminSettingsPage({
   await requireAdmin();
 
   const { saved } = await searchParams;
-  const { heroImages, banners, payments } = await getSettings();
+  const { heroImages, payments } = await getSettings();
 
   return (
     <div className="py-8">
       <h1 className="text-4xl">Settings</h1>
       <p className="measure mt-2 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-        The home page banner, and the accounts customers pay into.
+        The photo at the top of the home page, and the accounts customers
+        pay into. The banners further down have their own page.
       </p>
 
       {saved && (
@@ -33,7 +34,7 @@ export default async function AdminSettingsPage({
         </p>
       )}
 
-      <SettingsForm heroImages={heroImages} banners={banners} payments={payments} />
+      <SettingsForm heroImages={heroImages} payments={payments} />
     </div>
   );
 }

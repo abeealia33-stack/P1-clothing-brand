@@ -82,3 +82,28 @@ describe("createProduct", () => {
     expect(await catalogue.isSlugTaken("probe-never-used")).toBe(false);
   });
 });
+
+describe("liveProductSlugs", () => {
+  it("gives the current address of each live piece asked for", async () => {
+    const piece = await catalogue.createProduct(draft("probe-linked"));
+    const slugs = await catalogue.liveProductSlugs([piece.id]);
+    expect(slugs.get(piece.id)).toBe("probe-linked");
+  });
+
+  it("follows a piece to its new address after it is renamed", async () => {
+    const piece = await catalogue.createProduct(draft("probe-before"));
+    await catalogue.updateProduct(piece.id, { ...draft("probe-after") });
+    const slugs = await catalogue.liveProductSlugs([piece.id]);
+    expect(slugs.get(piece.id)).toBe("probe-after");
+  });
+
+  it("leaves out a piece that is hidden or gone", async () => {
+    const hidden = await catalogue.createProduct({ ...draft("probe-hidden"), active: false });
+    const slugs = await catalogue.liveProductSlugs([hidden.id, "no-such-piece"]);
+    expect(slugs.size).toBe(0);
+  });
+
+  it("does not ask the database anything when there is nothing to look up", async () => {
+    expect((await catalogue.liveProductSlugs([])).size).toBe(0);
+  });
+});

@@ -3,11 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
-import {
-  saveSettings,
-  type PaymentAccounts,
-  type PromoBanner,
-} from "@/lib/settings";
+import { saveSettings, type PaymentAccounts } from "@/lib/settings";
 
 export type SettingsFormState = { errors?: Record<string, string> };
 
@@ -30,18 +26,6 @@ export async function saveSettingsAction(
     (v) => typeof v === "string"
   );
 
-  // Half-filled banner rows (e.g. a photo dropped but no heading typed yet)
-  // are dropped rather than shown broken on the storefront.
-  const banners = parseJsonArray<PromoBanner>(String(formData.get("banners") ?? "[]"))
-    .map((b) => ({
-      image: String(b.image ?? "").trim(),
-      heading: String(b.heading ?? "").trim(),
-      subtext: String(b.subtext ?? "").trim(),
-      buttonLabel: String(b.buttonLabel ?? "").trim() || "Shop now",
-      href: String(b.href ?? "").trim() || "/shop",
-    }))
-    .filter((b) => b.image && b.heading);
-
   /* Only the shape is checked here; saveSettings drops any account missing a
      title or a number, so a half-typed row never reaches a customer. */
   let payments: PaymentAccounts = {};
@@ -53,7 +37,7 @@ export async function saveSettingsAction(
   }
 
   try {
-    await saveSettings({ heroImages, banners, payments });
+    await saveSettings({ heroImages, payments });
   } catch (error) {
     console.error("Could not save the settings", error);
     return { errors: { form: "Could not save. Try again." } };

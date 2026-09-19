@@ -33,6 +33,13 @@ const paths: Record<AdminIconName, React.ReactNode> = {
       <path d="m11 12.5 4 2.2-4 2.2v-4.4Z" />
     </>
   ),
+  image: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2.5" />
+      <circle cx="9" cy="9.5" r="1.6" />
+      <path d="m21 16-5.2-5.2a1.5 1.5 0 0 0-2.1 0L5 19.5" />
+    </>
+  ),
   layers: (
     <>
       <path d="m12 3 8 4.5-8 4.5-8-4.5L12 3Z" />

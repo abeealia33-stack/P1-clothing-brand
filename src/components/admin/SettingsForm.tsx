@@ -1,19 +1,16 @@
 "use client";
 
 import { useActionState } from "react";
-import BannerEditor from "./BannerEditor";
 import PaymentAccountsEditor from "./PaymentAccountsEditor";
 import PhotoUploader from "./PhotoUploader";
 import { saveSettingsAction, type SettingsFormState } from "@/app/admin/settings/actions";
-import type { PaymentAccounts, PromoBanner } from "@/lib/settings";
+import type { PaymentAccounts } from "@/lib/settings";
 
 export default function SettingsForm({
   heroImages,
-  banners,
   payments,
 }: {
   heroImages: string[];
-  banners: PromoBanner[];
   payments: PaymentAccounts;
 }) {
   const [state, action, pending] = useActionState<SettingsFormState, FormData>(
@@ -42,16 +39,6 @@ export default function SettingsForm({
         </p>
         <div className="mt-2">
           <PhotoUploader name="heroImages" initial={heroImages} purpose="feature" />
-        </div>
-      </div>
-
-      <div className="rule mt-8 pt-6">
-        <label className="block text-sm font-medium">Promo banners</label>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Shown further down the home page. Two or three works best.
-        </p>
-        <div className="mt-3">
-          <BannerEditor name="banners" initial={banners} />
         </div>
       </div>
 

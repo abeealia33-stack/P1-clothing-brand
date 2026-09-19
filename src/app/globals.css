@@ -392,6 +392,113 @@
     }
   }
 
+  /* ---------------------------------------------------------------------------
+     The home page banners (PromoStrip.tsx, SplitBanner.tsx).
+
+     Each section is one Reveal with lift={false}: nothing moves until it is
+     on screen, then every part arrives on its own beat. A card's beat is set
+     on it as --beat, so the stagger lives in the markup where the order is.
+
+     Entrance and hover sit on different elements on purpose. A
+     transition-delay applies to every change of that property, so a card
+     that waited 380ms to arrive would also wait 380ms to lift under the
+     pointer — the outer element arrives, the inner one responds.
+  --------------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .banner-heading {
+      opacity: 0;
+      transform: translateY(26px);
+      transition:
+        opacity 0.7s ease,
+        transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .banner-grid {
+      transform: translateY(30px);
+      transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) 0.1s;
+    }
+    /* Arrives slightly dull and settles into full colour, so the photograph
+       reads as coming into focus rather than just appearing. */
+    .banner-item {
+      opacity: 0;
+      transform: translateY(34px) scale(0.985);
+      filter: saturate(0.55) brightness(0.92);
+      transition:
+        opacity 0.8s ease var(--beat, 0ms),
+        transform 0.9s cubic-bezier(0.22, 0.61, 0.36, 1) var(--beat, 0ms),
+        filter 1s ease var(--beat, 0ms);
+    }
+    .banner-zoom {
+      transform: scale(1.08);
+      transition: transform 1.2s cubic-bezier(0.22, 0.61, 0.36, 1) var(--beat, 0ms);
+    }
+    .banner-cta {
+      opacity: 0;
+      transform: translateY(18px);
+      transition:
+        opacity 0.6s ease calc(var(--beat, 0ms) + 340ms),
+        transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) calc(var(--beat, 0ms) + 340ms);
+    }
+
+    .is-visible .banner-heading,
+    .is-visible .banner-cta {
+      opacity: 1;
+      transform: none;
+    }
+    .is-visible .banner-grid,
+    .is-visible .banner-zoom {
+      transform: none;
+    }
+    .is-visible .banner-item {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+
+    /* The response to the pointer, with no delay of its own. */
+    .banner-card {
+      transition:
+        transform 0.35s ease,
+        box-shadow 0.35s ease;
+    }
+    .banner-photo {
+      transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .banner-button {
+      transition:
+        transform 0.25s ease,
+        background-color 0.25s ease;
+    }
+    /* Keyboard focus gets the same answer as the pointer. */
+    .banner-card:focus-visible .banner-photo {
+      transform: scale(1.03);
+    }
+    .banner-card:focus-visible .banner-button {
+      transform: translateY(-2px);
+      background: #fff;
+    }
+    @media (hover: hover) {
+      .banner-card:hover .banner-photo {
+        transform: scale(1.03);
+      }
+      .banner-card:hover .banner-button {
+        transform: translateY(-2px);
+        background: #fff;
+      }
+      /* Only the cards in the strip lift; the split panels stay put and let
+         the photograph do the moving. */
+      .banner-lifts:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 26px 48px -20px rgba(44, 44, 44, 0.55);
+      }
+    }
+  }
+
+  /* At rest, so there is a shadow to deepen. Outside the motion block: a
+     shadow is not movement. */
+  .banner-lifts {
+    box-shadow: 0 12px 28px -20px rgba(44, 44, 44, 0.4);
+  }
+
   /* Search/account icons in the header: a proper tap target on a phone, and
      a soft tint on hover rather than the plain colour-swap text links use —
      an icon with nothing but colour change to show for a hover reads as

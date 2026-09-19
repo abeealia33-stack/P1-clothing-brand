@@ -2,10 +2,12 @@ import Link from "next/link";
 import CollectionRail from "@/components/CollectionRail";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import ProductCard from "@/components/ProductCard";
-import PromoBannerSection from "@/components/PromoBannerSection";
+import PromoStrip from "@/components/PromoStrip";
 import ReelsRail from "@/components/ReelsRail";
+import SplitBanner from "@/components/SplitBanner";
 import SwipeRail from "@/components/SwipeRail";
-import { newestProducts } from "@/lib/catalogue";
+import { linkedProductIds, resolveHomeBanners } from "@/lib/banners";
+import { liveProductSlugs, newestProducts } from "@/lib/catalogue";
 import { listReels } from "@/lib/reels";
 import { getNavCollections, getSettings } from "@/lib/settings";
 import { rupees, spellCount } from "@/lib/format";
@@ -24,6 +26,13 @@ export default async function HomePage() {
       getNavCollections(),
     ]);
   const heroImages = uploadedHero.length > 0 ? uploadedHero : [DEFAULT_HERO];
+
+  // A banner pointing at a piece stores its id, not its address, so the
+  // addresses are looked up here — all of them in one query.
+  const { strip, split } = resolveHomeBanners(
+    banners,
+    await liveProductSlugs(linkedProductIds(banners))
+  );
 
   return (
     <>
@@ -129,7 +138,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {banners[0] && <PromoBannerSection banner={banners[0]} />}
+        {split && <SplitBanner panels={split.panels} />}
 
         {/* Nothing new to show until there are pieces: an empty band under a
             "Just in" heading reads as a broken page, not an empty shop. */}
@@ -159,7 +168,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {banners[1] && <PromoBannerSection banner={banners[1]} />}
+        {strip && <PromoStrip heading={strip.heading} cards={strip.cards} />}
 
         {reels.length > 0 && (
           <section className="py-12 md:py-16">
@@ -175,8 +184,6 @@ export default async function HomePage() {
             <ReelsRail reels={reels} />
           </section>
         )}
-
-        {banners[2] && <PromoBannerSection banner={banners[2]} />}
 
         <section className="mx-auto max-w-6xl px-5 py-16 md:py-20">
           {/* A hairline over each promise, so the three read as a set of

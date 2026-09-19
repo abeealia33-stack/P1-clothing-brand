@@ -267,8 +267,12 @@ export async function countProductsByCollection(): Promise<Record<string, number
 /** Just the number the shop quotes, without the admin's other two counts. */
 export const countLiveProducts = () => prisma.product.count({ where: { active: true } });
 
-/** The name and one photograph — all a picker needs, and all it should send. */
-export type ProductChoice = { slug: string; name: string; photo: string };
+/**
+ * The name and one photograph — all a picker needs, and all it should send.
+ * The id is for pickers that store their choice, which have to survive the
+ * piece being renamed; the slug is for ones that only link to it.
+ */
+export type ProductChoice = { id: string; slug: string; name: string; photo: string };
 
 /**
  * For choosing a piece rather than reading about one. A full `Product` carries
@@ -279,13 +283,30 @@ export async function listProductChoices(): Promise<ProductChoice[]> {
   const rows = await prisma.product.findMany({
     where: { active: true },
     orderBy: order,
-    select: { slug: true, name: true, photos: true },
+    select: { id: true, slug: true, name: true, photos: true },
   });
   return rows.map((row) => ({
+    id: row.id,
     slug: row.slug,
     name: row.name,
     photo: parseList<string>(row.photos, [])[0] ?? "",
   }));
+}
+
+/**
+ * The current address of each live piece in `ids`, keyed by id.
+ *
+ * Home page banners store the piece they point at by id, because a piece's
+ * address is made from its name and changes when it is renamed. Hidden and
+ * deleted pieces are simply absent, so a banner can tell it has nowhere to go.
+ */
+export async function liveProductSlugs(ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+  const rows = await prisma.product.findMany({
+    where: { id: { in: ids }, active: true },
+    select: { id: true, slug: true },
+  });
+  return new Map(rows.map((row) => [row.id, row.slug]));
 }
 
 export async function countProducts() {

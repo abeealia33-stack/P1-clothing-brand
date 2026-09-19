@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import { normaliseHomeBanners, emptyHomeBanners, type HomeBanners } from "./banners";
 import { prisma } from "./prisma";
 import {
   collections,
@@ -21,14 +22,6 @@ import {
 
 const SETTINGS_ID = "site";
 
-export type PromoBanner = {
-  image: string;
-  heading: string;
-  subtext: string;
-  buttonLabel: string;
-  href: string;
-};
-
 /**
  * One account a customer can send money to. `bank` and `iban` only mean
  * anything for a bank transfer; a wallet has a number and nothing else.
@@ -46,7 +39,8 @@ export type PaymentAccounts = Partial<Record<TransferMethod, PaymentAccount>>;
 
 export type SiteSettings = {
   heroImages: string[];
-  banners: PromoBanner[];
+  /** The strip of three cards and the pair of photos. See banners.ts. */
+  banners: HomeBanners;
   /** Absent keys mean that method has no account set up yet. */
   payments: PaymentAccounts;
   /** Absent keys mean that collection reads as it does in the code. */
@@ -139,13 +133,13 @@ function parseJson<T>(raw: string, normalise: (value: unknown) => T, fallback: T
  */
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
-  if (!row) return { heroImages: [], banners: [], payments: {}, collections: {} };
+  if (!row) {
+    return { heroImages: [], banners: emptyHomeBanners(), payments: {}, collections: {} };
+  }
 
   return {
     heroImages: parseArray<string>(row.heroImages).filter((v) => typeof v === "string"),
-    banners: parseArray<PromoBanner>(row.banners).filter(
-      (b) => b && typeof b.image === "string" && typeof b.heading === "string"
-    ),
+    banners: parseJson(row.banners, normaliseHomeBanners, emptyHomeBanners()),
     payments: parseJson(row.payments, normaliseAccounts, {}),
     collections: parseJson(row.collections, normaliseCollections, {}),
   };
@@ -180,12 +174,22 @@ export async function saveCollections(edits: CollectionEdits): Promise<void> {
   });
 }
 
+/** The home page banners, which have their own admin screen. */
+export async function saveHomeBanners(banners: HomeBanners): Promise<void> {
+  const bannersJson = JSON.stringify(normaliseHomeBanners(banners));
+  await prisma.settings.upsert({
+    where: { id: SETTINGS_ID },
+    create: { id: SETTINGS_ID, banners: bannersJson },
+    update: { banners: bannersJson },
+  });
+}
+
+/** The hero and the payment accounts — the Site settings screen. */
 export async function saveSettings(
-  input: Omit<SiteSettings, "collections">
+  input: Pick<SiteSettings, "heroImages" | "payments">
 ): Promise<void> {
   const data = {
     heroImages: JSON.stringify(input.heroImages),
-    banners: JSON.stringify(input.banners),
     // Normalised on the way in as well as out: the admin form is not the only
     // thing that could ever call this.
     payments: JSON.stringify(normaliseAccounts(input.payments)),

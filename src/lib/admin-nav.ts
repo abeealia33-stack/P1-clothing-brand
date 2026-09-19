@@ -1,9 +1,8 @@
 /**
  * Single source of truth for the admin sidebar. Kept to routes that
- * actually exist today, plus Dashboard/Orders/Products/Categories and the
- * one settings page that already edits what's live on the storefront (the
- * hero images and promo banners) — nothing links to a feature that isn't
- * built yet.
+ * actually exist today — nothing links to a feature that isn't built yet.
+ * The two that edit what's live on the home page sit together under Site:
+ * the banners further down it, and the settings that hold the hero.
  */
 
 export type AdminIconName =
@@ -16,6 +15,7 @@ export type AdminIconName =
   | "ruler"
   | "menu"
   | "settings"
+  | "image"
   /* Dashboard stat cards only — not sidebar entries. */
   | "banknote"
   | "users";
@@ -51,6 +51,9 @@ export const adminNav: AdminNavGroup[] = [
   },
   {
     label: "Site",
-    items: [{ label: "Site settings", href: "/admin/settings", icon: "settings" }],
+    items: [
+      { label: "Home banners", href: "/admin/banners", icon: "image" },
+      { label: "Site settings", href: "/admin/settings", icon: "settings" },
+    ],
   },
 ];
