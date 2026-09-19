@@ -39,7 +39,30 @@ export type BannerSlot = {
 /** One square in the carousel: a photograph with its name under it. */
 export type BannerTile = { image: string; label: string; link: BannerLink };
 
+/**
+ * The parts of the home page the owner can put in whatever order she likes.
+ *
+ * The hero, the opening line, the made-to-fit band and the promises at the
+ * bottom are not here: they are the page's frame rather than its contents,
+ * and a shop whose first screen can be moved below the fold is a shop with a
+ * broken front door.
+ */
+export const homeBlocks = ["collections", "pair", "newIn", "carousel", "reels"] as const;
+
+export type HomeBlock = (typeof homeBlocks)[number];
+
+/** What each block is called in the admin, in the words on the page itself. */
+export const homeBlockLabels: Record<HomeBlock, string> = {
+  collections: "Ways to get dressed",
+  pair: "The pair (two photos)",
+  newIn: "Just in",
+  carousel: "The carousel",
+  reels: "See it worn (reels)",
+};
+
 export type HomeBanners = {
+  /** The order the blocks above are drawn in, top to bottom. */
+  order: HomeBlock[];
   /**
    * A panel of words beside a carousel of tiles — the shop's ranges, laid
    * out the way a lookbook contents page is.
@@ -78,6 +101,7 @@ const emptyTile = (): BannerTile => ({ image: "", label: "", link: { kind: "shop
 
 /** Both sections switched on and waiting for photos. */
 export const emptyHomeBanners = (): HomeBanners => ({
+  order: [...homeBlocks],
   strip: {
     show: true,
     eyebrow: "",
@@ -165,6 +189,7 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
   const split = record(source.split);
 
   return {
+    order: normaliseHomeOrder(source.order),
     strip: {
       show: strip.show !== false,
       eyebrow: text(strip.eyebrow),
@@ -179,6 +204,23 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
       panels: slots(split.panels, SPLIT_PANELS),
     },
   };
+}
+
+/**
+ * Every block exactly once, in the order stored.
+ *
+ * Anything unknown is dropped and anything missing is put back at the end, so
+ * a block added to the site later appears on every shop without the owner
+ * having to notice, and one removed from the code cannot leave a gap.
+ */
+export function normaliseHomeOrder(value: unknown): HomeBlock[] {
+  const stored = Array.isArray(value) ? value : [];
+  const known = stored.filter(
+    (entry): entry is HomeBlock =>
+      typeof entry === "string" && (homeBlocks as readonly string[]).includes(entry)
+  );
+  const unique = [...new Set(known)];
+  return [...unique, ...homeBlocks.filter((block) => !unique.includes(block))];
 }
 
 /** Every piece a banner points at, once — to look their addresses up together. */

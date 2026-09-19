@@ -5,6 +5,7 @@ import BannerLinkPicker from "./BannerLinkPicker";
 import BannerSlotEditor from "./BannerSlotEditor";
 import BannerTileEditor from "./BannerTileEditor";
 import FormErrors from "./FormErrors";
+import HomeOrderEditor from "./HomeOrderEditor";
 import { saveBannersAction, type BannersFormState } from "@/app/admin/banners/actions";
 import {
   MAX_TILES,
@@ -107,6 +108,19 @@ export default function BannersForm({
       <FormErrors errors={state.errors} />
 
       <fieldset className="border-0 p-0">
+        <legend className="text-2xl">Order on the home page</legend>
+        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          Top to bottom, under the opening lines. A section with nothing in it
+          is skipped rather than leaving a gap, so an empty one can sit
+          anywhere until you fill it.
+        </p>
+        <HomeOrderEditor
+          order={banners.order}
+          onChange={(order) => setBanners((b) => ({ ...b, order }))}
+        />
+      </fieldset>
+
+      <fieldset className="rule mt-10 border-0 p-0 pt-8">
         <legend className="text-2xl">The carousel</legend>
         <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
           A panel of words with a row of photos beside it, under &ldquo;Just

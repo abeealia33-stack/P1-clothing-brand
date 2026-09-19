@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Fragment } from "react";
 import CollectionRail from "@/components/CollectionRail";
 import HeroSlideshow from "@/components/HeroSlideshow";
 import ProductCard from "@/components/ProductCard";
@@ -6,11 +7,16 @@ import PromoStrip from "@/components/PromoStrip";
 import ReelsRail from "@/components/ReelsRail";
 import SplitBanner from "@/components/SplitBanner";
 import SwipeRail from "@/components/SwipeRail";
-import { linkedProductIds, resolveHomeBanners } from "@/lib/banners";
+import {
+  linkedProductIds,
+  resolveHomeBanners,
+  type HomeBlock,
+} from "@/lib/banners";
 import { liveProductSlugs, newestProducts } from "@/lib/catalogue";
-import { listReels } from "@/lib/reels";
+import { listReels, type Reel } from "@/lib/reels";
 import { getNavCollections, getSettings } from "@/lib/settings";
 import { rupees, spellCount } from "@/lib/format";
+import type { Product, ResolvedCollection } from "@/lib/types";
 import { site } from "@/lib/site";
 
 const DEFAULT_HERO = "/cloth/hero.svg";
@@ -27,12 +33,29 @@ export default async function HomePage() {
     ]);
   const heroImages = uploadedHero.length > 0 ? uploadedHero : [DEFAULT_HERO];
 
+  const { order } = banners;
+
   // A banner pointing at a piece stores its id, not its address, so the
   // addresses are looked up here — all of them in one query.
   const { strip, split } = resolveHomeBanners(
     banners,
     await liveProductSlugs(linkedProductIds(banners))
   );
+
+  /*
+   * The middle of the page, in whatever order the owner has put it.
+   *
+   * Each entry draws nothing when it has nothing to show, so an empty one
+   * leaves no gap and simply gives up its turn. The hero above and the
+   * promises below are the page's frame and stay where they are.
+   */
+  const blocks: Record<HomeBlock, React.ReactNode> = {
+    collections: <CollectionsBlock shownCollections={shownCollections} />,
+    pair: split && <SplitBanner panels={split.panels} />,
+    newIn: <NewInBlock newIn={newIn} />,
+    carousel: strip && <PromoStrip strip={strip} />,
+    reels: <ReelsBlock reels={reels} />,
+  };
 
   return (
     <>
@@ -118,72 +141,9 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Counted rather than fixed at four: the owner can hide the ranges
-            she is not selling yet, and the heading has to keep up. */}
-        {shownCollections.length > 0 && (
-          <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-            <h2 className="text-4xl md:text-5xl">
-              {spellCount(shownCollections.length)}{" "}
-              {shownCollections.length === 1 ? "way" : "ways"} to get dressed
-            </h2>
-            <p
-              className="measure mt-2 mb-8 text-sm"
-              style={{ color: "var(--color-ink-soft)" }}
-            >
-              {shownCollections.length === 1
-                ? "Start here."
-                : "Every piece belongs to one of these. Start wherever your week is."}
-            </p>
-            <CollectionRail collections={shownCollections} />
-          </section>
-        )}
-
-        {split && <SplitBanner panels={split.panels} />}
-
-        {/* Nothing new to show until there are pieces: an empty band under a
-            "Just in" heading reads as a broken page, not an empty shop. */}
-        {newIn.length > 0 && (
-          <section className="py-12 md:py-16" style={{ background: "var(--color-khaddar)" }}>
-            <div className="mx-auto max-w-6xl px-5">
-              <div className="flex items-baseline justify-between gap-4">
-                <h2 className="text-4xl md:text-5xl">Just in</h2>
-                <Link
-                  href="/shop"
-                  className="shrink-0 text-sm underline underline-offset-4"
-                  style={{ color: "var(--color-ink-soft)" }}
-                >
-                  All pieces
-                </Link>
-              </div>
-            </div>
-
-            {/* Swipeable on phones, a plain grid once there is room for one. */}
-            <SwipeRail className="rail mt-8 gap-4 px-5 md:mx-auto md:grid md:max-w-6xl md:grid-cols-4 md:overflow-visible">
-              {newIn.map((product, i) => (
-                <div key={product.slug} className="w-[68vw] max-w-72 md:w-auto md:max-w-none">
-                  <ProductCard product={product} priority={i === 0} />
-                </div>
-              ))}
-            </SwipeRail>
-          </section>
-        )}
-
-        {strip && <PromoStrip strip={strip} />}
-
-        {reels.length > 0 && (
-          <section className="py-12 md:py-16">
-            <div className="mx-auto max-w-6xl px-5">
-              <h2 className="text-4xl md:text-5xl">See it worn</h2>
-              <p
-                className="measure mt-2 mb-8 text-sm"
-                style={{ color: "var(--color-ink-soft)" }}
-              >
-                Short clips of real pieces. Tap one to shop it.
-              </p>
-            </div>
-            <ReelsRail reels={reels} />
-          </section>
-        )}
+        {order.map((block) => (
+          <Fragment key={block}>{blocks[block]}</Fragment>
+        ))}
 
         <section className="mx-auto max-w-6xl px-5 py-16 md:py-20">
           {/* A hairline over each promise, so the three read as a set of
@@ -219,5 +179,87 @@ export default async function HomePage() {
         </section>
       </div>
     </>
+  );
+}
+
+/* Everything below is one block of the orderable middle. Kept out of the
+   page above so the frame — hero, opening line, made-to-fit band, promises —
+   reads as the fixed thing it is. */
+
+function CollectionsBlock({
+  shownCollections,
+}: {
+  shownCollections: ResolvedCollection[];
+}) {
+  return (
+    <>
+      {/* Counted rather than fixed at four: the owner can hide the ranges
+          she is not selling yet, and the heading has to keep up. */}
+      {shownCollections.length > 0 && (
+        <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+          <h2 className="text-4xl md:text-5xl">
+            {spellCount(shownCollections.length)}{" "}
+            {shownCollections.length === 1 ? "way" : "ways"} to get dressed
+          </h2>
+          <p
+            className="measure mt-2 mb-8 text-sm"
+            style={{ color: "var(--color-ink-soft)" }}
+          >
+            {shownCollections.length === 1
+              ? "Start here."
+              : "Every piece belongs to one of these. Start wherever your week is."}
+          </p>
+          <CollectionRail collections={shownCollections} />
+        </section>
+      )}
+    </>
+  );
+}
+
+/* Nothing new to show until there are pieces: an empty band under a "Just in"
+   heading reads as a broken page, not an empty shop. */
+function NewInBlock({ newIn }: { newIn: Product[] }) {
+  if (newIn.length === 0) return null;
+
+  return (
+    <section className="py-12 md:py-16" style={{ background: "var(--color-khaddar)" }}>
+      <div className="mx-auto max-w-6xl px-5">
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="text-4xl md:text-5xl">Just in</h2>
+          <Link
+            href="/shop"
+            className="shrink-0 text-sm underline underline-offset-4"
+            style={{ color: "var(--color-ink-soft)" }}
+          >
+            All pieces
+          </Link>
+        </div>
+      </div>
+
+      {/* Swipeable on phones, a plain grid once there is room for one. */}
+      <SwipeRail className="rail mt-8 gap-4 px-5 md:mx-auto md:grid md:max-w-6xl md:grid-cols-4 md:overflow-visible">
+        {newIn.map((product, i) => (
+          <div key={product.slug} className="w-[68vw] max-w-72 md:w-auto md:max-w-none">
+            <ProductCard product={product} priority={i === 0} />
+          </div>
+        ))}
+      </SwipeRail>
+    </section>
+  );
+}
+
+function ReelsBlock({ reels }: { reels: Reel[] }) {
+  if (reels.length === 0) return null;
+
+  return (
+    <section className="py-12 md:py-16">
+      <div className="mx-auto max-w-6xl px-5">
+        <h2 className="text-4xl md:text-5xl">See it worn</h2>
+        <p className="measure mt-2 mb-8 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          Short clips of real pieces. Tap one to shop it.
+        </p>
+      </div>
+      <ReelsRail reels={reels} />
+    </section>
   );
 }

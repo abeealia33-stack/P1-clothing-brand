@@ -25,8 +25,8 @@ export default async function AdminBannersPage({
     <div className="py-8">
       <h1 className="text-4xl">Home banners</h1>
       <p className="measure mt-2 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-        The two photo sections further down the home page. Each photo can lead
-        to a collection, a piece, or the whole shop.
+        The order of the home page, and the two photo sections on it. Each
+        photo can lead to a collection, a piece, or the whole shop.
       </p>
 
       {saved && (

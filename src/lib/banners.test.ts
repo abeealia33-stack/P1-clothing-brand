@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   bannerHref,
+  homeBlocks,
+  normaliseHomeOrder,
   DEFAULT_BUTTON_LABEL,
   DEFAULT_CTA_LABEL,
   DEFAULT_STRIP_HEADING,
@@ -80,6 +82,11 @@ describe("normaliseHomeBanners", () => {
     expect(banners.strip.tiles[0].label).toBe("Lawn");
   });
 
+  it("carries the order of the page", () => {
+    expect(normaliseHomeBanners({}).order).toEqual([...homeBlocks]);
+    expect(normaliseHomeBanners({ order: ["reels"] }).order[0]).toBe("reels");
+  });
+
   it("shows a section unless it was switched off", () => {
     expect(normaliseHomeBanners({}).strip.show).toBe(true);
     expect(normaliseHomeBanners({ strip: { show: false } }).strip.show).toBe(false);
@@ -115,6 +122,38 @@ describe("normaliseHomeBanners", () => {
     expect(banners.split.panels.map((p) => p.link)).toEqual([
       { kind: "collection", slug: "ghar" },
       { kind: "product", id: "p1" },
+    ]);
+  });
+});
+
+describe("normaliseHomeOrder", () => {
+  it("uses the order the page is written in when nothing is stored", () => {
+    expect(normaliseHomeOrder(undefined)).toEqual([...homeBlocks]);
+    expect(normaliseHomeOrder("nonsense")).toEqual([...homeBlocks]);
+  });
+
+  it("keeps the owner's order", () => {
+    const moved = ["carousel", "newIn", "pair", "reels", "collections"];
+    expect(normaliseHomeOrder(moved)).toEqual(moved);
+  });
+
+  it("puts back a block that is missing, at the end", () => {
+    expect(normaliseHomeOrder(["reels", "pair"])).toEqual([
+      "reels",
+      "pair",
+      "collections",
+      "newIn",
+      "carousel",
+    ]);
+  });
+
+  it("drops anything it does not know, and any repeat", () => {
+    expect(normaliseHomeOrder(["reels", "reels", "footer", 7, "pair"])).toEqual([
+      "reels",
+      "pair",
+      "collections",
+      "newIn",
+      "carousel",
     ]);
   });
 });
