@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   bannerHref,
   DEFAULT_BUTTON_LABEL,
+  DEFAULT_CTA_LABEL,
   DEFAULT_STRIP_HEADING,
   emptyHomeBanners,
   linkedProductIds,
@@ -17,12 +18,16 @@ import {
  * that a link never leads to a page that is not there.
  */
 
-const slot = (image: string, link: HomeBanners["strip"]["cards"][number]["link"] = { kind: "shop" }) => ({
+type Link = HomeBanners["strip"]["link"];
+
+const slot = (image: string, link: Link = { kind: "shop" }) => ({
   image,
   heading: "",
   buttonLabel: "Explore Now",
   link,
 });
+
+const tile = (image: string, link: Link = { kind: "shop" }) => ({ image, label: "", link });
 
 describe("normaliseHomeBanners", () => {
   it("reads the old list of single banners as nothing set up yet", () => {
@@ -35,33 +40,44 @@ describe("normaliseHomeBanners", () => {
     expect(normaliseHomeBanners("banners")).toEqual(emptyHomeBanners());
   });
 
-  it("always has three cards and two panels, however many were stored", () => {
+  it("keeps however many tiles were stored, and always two panels", () => {
     const banners = normaliseHomeBanners({
-      strip: { cards: [slot("/1.jpg")] },
+      strip: { tiles: [tile("/1.jpg"), tile("/2.jpg"), tile("/3.jpg"), tile("/4.jpg")] },
       split: { panels: [slot("/a.jpg"), slot("/b.jpg"), slot("/c.jpg")] },
     });
-    expect(banners.strip.cards).toHaveLength(3);
+    expect(banners.strip.tiles).toHaveLength(4);
     expect(banners.split.panels).toHaveLength(2);
-    expect(banners.strip.cards[0].image).toBe("/1.jpg");
-    expect(banners.strip.cards[1].image).toBe("");
     expect(banners.split.panels.map((p) => p.image)).toEqual(["/a.jpg", "/b.jpg"]);
+  });
+
+  it("will not take more tiles than the carousel can show", () => {
+    const many = Array.from({ length: 20 }, () => tile("/x.jpg"));
+    expect(normaliseHomeBanners({ strip: { tiles: many } }).strip.tiles).toHaveLength(12);
   });
 
   it("puts the wording back when a field is cleared", () => {
     const banners = normaliseHomeBanners({
-      strip: { heading: "   ", cards: [{ ...slot("/1.jpg"), buttonLabel: "" }] },
+      strip: { heading: "   ", buttonLabel: "" },
+      split: { panels: [{ ...slot("/a.jpg"), buttonLabel: "" }] },
     });
     expect(banners.strip.heading).toBe(DEFAULT_STRIP_HEADING);
-    expect(banners.strip.cards[0].buttonLabel).toBe(DEFAULT_BUTTON_LABEL);
+    expect(banners.strip.buttonLabel).toBe(DEFAULT_CTA_LABEL);
+    expect(banners.split.panels[0].buttonLabel).toBe(DEFAULT_BUTTON_LABEL);
   });
 
   it("keeps the owner's own wording, trimmed", () => {
     const banners = normaliseHomeBanners({
-      strip: { heading: "  Eid edit ", cards: [{ ...slot("/1.jpg"), heading: " Lawn ", buttonLabel: " See it " }] },
+      strip: {
+        eyebrow: " 24 pieces ",
+        heading: "  Eid edit ",
+        text: "  Lawn, ready to wear.  ",
+        tiles: [{ ...tile("/1.jpg"), label: " Lawn " }],
+      },
     });
+    expect(banners.strip.eyebrow).toBe("24 pieces");
     expect(banners.strip.heading).toBe("Eid edit");
-    expect(banners.strip.cards[0].heading).toBe("Lawn");
-    expect(banners.strip.cards[0].buttonLabel).toBe("See it");
+    expect(banners.strip.text).toBe("Lawn, ready to wear.");
+    expect(banners.strip.tiles[0].label).toBe("Lawn");
   });
 
   it("shows a section unless it was switched off", () => {
@@ -73,14 +89,14 @@ describe("normaliseHomeBanners", () => {
   it("turns a link it cannot follow into a link to the shop", () => {
     const banners = normaliseHomeBanners({
       strip: {
-        cards: [
-          slot("/1.jpg", { kind: "collection", slug: "not-a-collection" } as never),
-          slot("/2.jpg", { kind: "product", id: "" }),
-          slot("/3.jpg", { kind: "somewhere" } as never),
+        tiles: [
+          tile("/1.jpg", { kind: "collection", slug: "not-a-collection" } as never),
+          tile("/2.jpg", { kind: "product", id: "" }),
+          tile("/3.jpg", { kind: "somewhere" } as never),
         ],
       },
     });
-    expect(banners.strip.cards.map((c) => c.link)).toEqual([
+    expect(banners.strip.tiles.map((c) => c.link)).toEqual([
       { kind: "shop" },
       { kind: "shop" },
       { kind: "shop" },
@@ -126,7 +142,10 @@ describe("bannerHref", () => {
 describe("linkedProductIds", () => {
   it("collects each product a banner points at, once", () => {
     const banners = normaliseHomeBanners({
-      strip: { cards: [slot("/1.jpg", { kind: "product", id: "p1" }), slot("/2.jpg", { kind: "product", id: "p1" })] },
+      strip: {
+        link: { kind: "product", id: "p1" },
+        tiles: [tile("/1.jpg", { kind: "product", id: "p1" })],
+      },
       split: { panels: [slot("/a.jpg", { kind: "product", id: "p2" }), slot("/b.jpg")] },
     });
     expect(linkedProductIds(banners).sort()).toEqual(["p1", "p2"]);
@@ -140,30 +159,47 @@ describe("resolveHomeBanners", () => {
     expect(resolveHomeBanners(emptyHomeBanners(), none)).toEqual({ strip: null, split: null });
   });
 
-  it("holds a section back until every one of its photos is in", () => {
+  it("holds the carousel back until three tiles have photos, and the pair until both do", () => {
     const banners = normaliseHomeBanners({
-      strip: { cards: [slot("/1.jpg"), slot("/2.jpg")] },
+      strip: { tiles: [tile("/1.jpg"), tile("/2.jpg"), tile("")] },
       split: { panels: [slot("/a.jpg")] },
     });
     expect(resolveHomeBanners(banners, none)).toEqual({ strip: null, split: null });
   });
 
+  it("leaves out a tile with no photo and shows the rest", () => {
+    const banners = normaliseHomeBanners({
+      strip: { tiles: [tile("/1.jpg"), tile(""), tile("/3.jpg"), tile("/4.jpg")] },
+    });
+    expect(resolveHomeBanners(banners, none).strip?.tiles.map((t) => t.image)).toEqual([
+      "/1.jpg",
+      "/3.jpg",
+      "/4.jpg",
+    ]);
+  });
+
   it("shows a complete section with each link worked out", () => {
     const banners = normaliseHomeBanners({
       strip: {
-        cards: [slot("/1.jpg", { kind: "collection", slug: "rozana" }), slot("/2.jpg"), slot("/3.jpg")],
+        link: { kind: "collection", slug: "azad" },
+        tiles: [tile("/1.jpg", { kind: "collection", slug: "rozana" }), tile("/2.jpg"), tile("/3.jpg")],
       },
       split: { panels: [slot("/a.jpg"), slot("/b.jpg")] },
     });
     const shown = resolveHomeBanners(banners, none);
     expect(shown.strip?.heading).toBe(DEFAULT_STRIP_HEADING);
-    expect(shown.strip?.cards.map((c) => c.href)).toEqual(["/shop?collection=rozana", "/shop", "/shop"]);
+    expect(shown.strip?.href).toBe("/shop?collection=azad");
+    expect(shown.strip?.tiles.map((t) => t.href)).toEqual([
+      "/shop?collection=rozana",
+      "/shop",
+      "/shop",
+    ]);
     expect(shown.split?.panels).toHaveLength(2);
   });
 
   it("leaves out a complete section that was switched off", () => {
     const banners = normaliseHomeBanners({
-      strip: { show: false, cards: [slot("/1.jpg"), slot("/2.jpg"), slot("/3.jpg")] },
+      strip: { show: false, tiles: [tile("/1.jpg"), tile("/2.jpg"), tile("/3.jpg")] },
     });
     expect(resolveHomeBanners(banners, none).strip).toBeNull();
   });

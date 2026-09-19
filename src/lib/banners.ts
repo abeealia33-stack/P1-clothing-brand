@@ -36,15 +36,36 @@ export type BannerSlot = {
   link: BannerLink;
 };
 
+/** One square in the carousel: a photograph with its name under it. */
+export type BannerTile = { image: string; label: string; link: BannerLink };
+
 export type HomeBanners = {
-  strip: { show: boolean; heading: string; cards: BannerSlot[] };
+  /**
+   * A panel of words beside a carousel of tiles — the shop's ranges, laid
+   * out the way a lookbook contents page is.
+   */
+  strip: {
+    show: boolean;
+    /** Small line over the heading, e.g. "NEW THIS WEEK". Optional. */
+    eyebrow: string;
+    heading: string;
+    /** A sentence or two under the heading. Optional. */
+    text: string;
+    buttonLabel: string;
+    link: BannerLink;
+    tiles: BannerTile[];
+  };
   split: { show: boolean; panels: BannerSlot[] };
 };
 
-export const STRIP_CARDS = 3;
 export const SPLIT_PANELS = 2;
+/** Three abreast on a desktop, so fewer than three is a row, not a carousel. */
+export const MIN_TILES = 3;
+/** Past this the dots become a smear and nobody reaches the end. */
+export const MAX_TILES = 12;
 export const DEFAULT_STRIP_HEADING = "Promotional Moments";
 export const DEFAULT_BUTTON_LABEL = "Explore Now";
+export const DEFAULT_CTA_LABEL = "Shop now";
 
 const emptySlot = (): BannerSlot => ({
   image: "",
@@ -53,12 +74,18 @@ const emptySlot = (): BannerSlot => ({
   link: { kind: "shop" },
 });
 
+const emptyTile = (): BannerTile => ({ image: "", label: "", link: { kind: "shop" } });
+
 /** Both sections switched on and waiting for photos. */
 export const emptyHomeBanners = (): HomeBanners => ({
   strip: {
     show: true,
+    eyebrow: "",
     heading: DEFAULT_STRIP_HEADING,
-    cards: Array.from({ length: STRIP_CARDS }, emptySlot),
+    text: "",
+    buttonLabel: DEFAULT_CTA_LABEL,
+    link: { kind: "shop" },
+    tiles: Array.from({ length: MIN_TILES }, emptyTile),
   },
   split: {
     show: true,
@@ -96,6 +123,23 @@ function normaliseSlot(value: unknown): BannerSlot {
   };
 }
 
+/**
+ * The tiles as stored: however many there are, up to the cap. Unlike the
+ * pair these are a list the owner adds to, so nothing is padded — an empty
+ * one is a row she has not filled in yet, and is dropped when drawn.
+ */
+function tiles(value: unknown): BannerTile[] {
+  const list = Array.isArray(value) ? value : [];
+  return list.slice(0, MAX_TILES).map((entry) => {
+    const tile = record(entry);
+    return {
+      image: text(tile.image),
+      label: text(tile.label),
+      link: normaliseLink(tile.link),
+    };
+  });
+}
+
 /** Exactly `count` slots, padding with empty ones or dropping extras. */
 function slots(value: unknown, count: number): BannerSlot[] {
   const list = Array.isArray(value) ? value : [];
@@ -109,9 +153,12 @@ function slots(value: unknown, count: number): BannerSlot[] {
  * and nothing that reads it has to guard against a half-formed one.
  */
 export function normaliseHomeBanners(value: unknown): HomeBanners {
-  // The old list of single banners was an array; it is not this, so it
-  // reads as nothing set up rather than being guessed into cards.
-  if (Array.isArray(value)) return emptyHomeBanners();
+  /* Anything that is not the shape below — the old list of single banners,
+     which was an array, or a column that would not parse — reads as nothing
+     set up yet rather than being guessed at. */
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return emptyHomeBanners();
+  }
 
   const source = record(value);
   const strip = record(source.strip);
@@ -120,8 +167,12 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
   return {
     strip: {
       show: strip.show !== false,
+      eyebrow: text(strip.eyebrow),
       heading: text(strip.heading) || DEFAULT_STRIP_HEADING,
-      cards: slots(strip.cards, STRIP_CARDS),
+      text: text(strip.text),
+      buttonLabel: text(strip.buttonLabel) || DEFAULT_CTA_LABEL,
+      link: normaliseLink(strip.link),
+      tiles: tiles(strip.tiles),
     },
     split: {
       show: split.show !== false,
@@ -132,9 +183,11 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
 
 /** Every piece a banner points at, once — to look their addresses up together. */
 export function linkedProductIds(banners: HomeBanners): string[] {
-  const ids = [...banners.strip.cards, ...banners.split.panels].flatMap((slot) =>
-    slot.link.kind === "product" ? [slot.link.id] : []
-  );
+  const ids = [
+    banners.strip.link,
+    ...banners.strip.tiles.map((t) => t.link),
+    ...banners.split.panels.map((p) => p.link),
+  ].flatMap((link) => (link.kind === "product" ? [link.id] : []));
   return [...new Set(ids)];
 }
 
@@ -161,6 +214,19 @@ export function bannerHref(link: BannerLink, productSlugs: ReadonlyMap<string, s
 /** A slot as the storefront draws it: the link already worked out. */
 export type ShownSlot = { image: string; heading: string; buttonLabel: string; href: string };
 
+/** A tile as the storefront draws it. */
+export type ShownTile = { image: string; label: string; href: string };
+
+/** The panel of words beside the carousel, and the carousel. */
+export type ShownStrip = {
+  eyebrow: string;
+  heading: string;
+  text: string;
+  buttonLabel: string;
+  href: string;
+  tiles: ShownTile[];
+};
+
 const show = (slot: BannerSlot, productSlugs: ReadonlyMap<string, string>): ShownSlot => ({
   image: slot.image,
   heading: slot.heading,
@@ -171,28 +237,38 @@ const show = (slot: BannerSlot, productSlugs: ReadonlyMap<string, string>): Show
 /**
  * What the home page draws, or null for a section it should leave out.
  *
- * A section appears only once every one of its photos is in. Two cards in a
- * row built for three, or one half of a pair, reads as a broken page rather
- * than a smaller promotion — so a half-finished section waits in the admin
- * instead of going live.
+ * The pair appears only once both of its photos are in — one half of a pair
+ * reads as a broken page rather than a smaller promotion. The carousel drops
+ * the tiles with no photograph and appears once three are left, which is a
+ * row on a desktop: fewer would be a carousel with nothing to scroll.
  */
 export function resolveHomeBanners(
   banners: HomeBanners,
   productSlugs: ReadonlyMap<string, string>
-): {
-  strip: { heading: string; cards: ShownSlot[] } | null;
-  split: { panels: ShownSlot[] } | null;
-} {
-  const complete = (list: BannerSlot[]) => list.every((slot) => slot.image);
+): { strip: ShownStrip | null; split: { panels: ShownSlot[] } | null } {
   const { strip, split } = banners;
+  const shownTiles = strip.tiles
+    .filter((tile) => tile.image)
+    .map((tile) => ({
+      image: tile.image,
+      label: tile.label,
+      href: bannerHref(tile.link, productSlugs),
+    }));
 
   return {
     strip:
-      strip.show && complete(strip.cards)
-        ? { heading: strip.heading, cards: strip.cards.map((c) => show(c, productSlugs)) }
+      strip.show && shownTiles.length >= MIN_TILES
+        ? {
+            eyebrow: strip.eyebrow,
+            heading: strip.heading,
+            text: strip.text,
+            buttonLabel: strip.buttonLabel,
+            href: bannerHref(strip.link, productSlugs),
+            tiles: shownTiles,
+          }
         : null,
     split:
-      split.show && complete(split.panels)
+      split.show && split.panels.every((panel) => panel.image)
         ? { panels: split.panels.map((p) => show(p, productSlugs)) }
         : null,
   };

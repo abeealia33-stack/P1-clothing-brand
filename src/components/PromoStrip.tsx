@@ -1,78 +1,49 @@
 import Link from "next/link";
-import ClothImage from "./ClothImage";
 import Reveal from "./Reveal";
-import SwipeRail from "./SwipeRail";
-import type { ShownSlot } from "@/lib/banners";
-
-/** When each card starts, after the section comes on screen. */
-const BEATS = ["180ms", "280ms", "380ms"];
+import TileCarousel from "./TileCarousel";
+import type { ShownStrip } from "@/lib/banners";
 
 /**
- * Three tall photographs under one heading — the owner's current promotions.
+ * A panel of words with a carousel of ranges beside it — the way a lookbook
+ * lays out its contents: one column saying what this is, the rest of the
+ * spread showing it.
+ *
+ * The panel sits above the tiles on a phone, where there is no room beside
+ * them, and the tiles keep their own scrolling.
  *
  * The entrance is set out in globals.css under "The home page banners": the
- * heading rises first, then each card on its own beat, arriving slightly dull
+ * panel rises first, then each tile on its own beat, arriving slightly dull
  * and settling into colour while its photograph eases back from 108%.
- *
- * Three abreast on a phone would be three slivers, so there it swipes like
- * "Just in" does, and becomes a row of three once there is room.
  */
-export default function PromoStrip({
-  heading,
-  cards,
-}: {
-  heading: string;
-  cards: ShownSlot[];
-}) {
+export default function PromoStrip({ strip }: { strip: ShownStrip }) {
   return (
-    <section className="py-12 md:py-16">
+    <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
       <Reveal lift={false} threshold={0.12} rootMargin="0px">
-        <h2 className="banner-heading mx-auto max-w-6xl px-5 text-4xl md:text-5xl">
-          {heading}
-        </h2>
-
-        {/* The vertical padding is room for the resting shadow and the lift:
-            the rail scrolls sideways, which clips anything past its edges. */}
-        <SwipeRail className="banner-grid rail mt-8 gap-4 px-5 py-3 md:mx-auto md:grid md:max-w-6xl md:grid-cols-3 md:gap-5 md:overflow-visible">
-          {cards.map((card, i) => (
-            <div
-              key={i}
-              className="banner-item w-[72vw] max-w-80 md:w-auto md:max-w-none"
-              style={{ "--beat": BEATS[i] } as React.CSSProperties}
-            >
-              <Link
-                href={card.href}
-                className="banner-card banner-lifts relative block aspect-[3/4] overflow-hidden"
+        <div className="grid gap-8 md:grid-cols-[20rem_minmax(0,1fr)] md:items-center md:gap-12">
+          <div className="banner-heading">
+            {strip.eyebrow && (
+              <span
+                className="block text-xs tracking-[0.18em] uppercase"
+                style={{ color: "var(--color-sage-deep)" }}
               >
-                <div className="banner-zoom absolute inset-0">
-                  <ClothImage src={card.image} alt="" className="banner-photo" />
-                </div>
-                <div
-                  className="absolute inset-x-0 bottom-0 h-1/2"
-                  style={{
-                    background:
-                      "linear-gradient(to top, rgba(28,26,23,.62) 0%, rgba(28,26,23,0) 100%)",
-                  }}
-                />
-                <div className="absolute inset-x-0 bottom-0 p-5">
-                  {card.heading && (
-                    <h3 className="text-2xl leading-tight text-white md:text-3xl">
-                      {card.heading}
-                    </h3>
-                  )}
-                  <span className="banner-cta mt-3 inline-block">
-                    <span
-                      className="banner-button btn"
-                      style={{ background: "var(--color-paper)", color: "var(--color-ink)" }}
-                    >
-                      {card.buttonLabel}
-                    </span>
-                  </span>
-                </div>
+                {strip.eyebrow}
+              </span>
+            )}
+            <h2 className="mt-2 text-4xl md:text-5xl">{strip.heading}</h2>
+            {strip.text && (
+              <p className="measure mt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+                {strip.text}
+              </p>
+            )}
+            <span className="banner-cta mt-6 inline-block">
+              <Link href={strip.href} className="btn btn-ink">
+                {strip.buttonLabel}
               </Link>
-            </div>
-          ))}
-        </SwipeRail>
+            </span>
+          </div>
+
+          <TileCarousel tiles={strip.tiles} />
+        </div>
       </Reveal>
     </section>
   );

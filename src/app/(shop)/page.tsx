@@ -168,7 +168,7 @@ export default async function HomePage() {
           </section>
         )}
 
-        {strip && <PromoStrip heading={strip.heading} cards={strip.cards} />}
+        {strip && <PromoStrip strip={strip} />}
 
         {reels.length > 0 && (
           <section className="py-12 md:py-16">
