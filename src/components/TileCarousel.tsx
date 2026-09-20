@@ -116,21 +116,24 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
       onFocusCapture={() => setHeld(true)}
       onBlurCapture={() => setHeld(false)}
     >
-      <div ref={rail} className="rail gap-4">
+      {/* A hairline apart, not a margin: the three photographs should read as
+          one strip of cloth cut into three, which is what the gap being
+          almost nothing does. */}
+      <div ref={rail} className="rail gap-1.5">
         {tiles.map((tile, i) => (
           <div
             key={i}
-            className="banner-item w-[42%] md:w-[calc((100%-2rem)/3)]"
+            className="banner-item w-[44%] md:w-[calc((100%-0.75rem)/3)]"
             style={{ "--beat": `${180 + i * 100}ms` } as React.CSSProperties}
           >
             <Link href={tile.href} className="banner-card block">
-              <div className="relative aspect-[3/4] overflow-hidden">
+              <div className="relative aspect-[4/5] overflow-hidden">
                 <div className="banner-zoom absolute inset-0">
                   <ClothImage src={tile.image} alt="" className="banner-photo" />
                 </div>
               </div>
               {tile.label && (
-                <h3 className="mt-3 text-center text-xs tracking-[0.14em] uppercase md:text-sm">
+                <h3 className="mt-5 text-center text-sm tracking-[0.18em] uppercase md:text-base">
                   {tile.label}
                 </h3>
               )}

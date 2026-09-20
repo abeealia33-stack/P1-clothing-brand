@@ -24,19 +24,25 @@ export default function PromoStrip({ strip }: { strip: ShownStrip }) {
             {strip.eyebrow && (
               <span
                 className="block text-xs tracking-[0.18em] uppercase"
-                style={{ color: "var(--color-sage-deep)" }}
+                style={{ color: "var(--color-ink-soft)" }}
               >
                 {strip.eyebrow}
               </span>
             )}
             <h2 className="mt-2 text-4xl md:text-5xl">{strip.heading}</h2>
             {strip.text && (
-              <p className="measure mt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+              <p className="measure mt-4 text-sm" style={{ color: "var(--color-ink-soft)" }}>
                 {strip.text}
               </p>
             )}
-            <span className="banner-cta mt-6 inline-block">
-              <Link href={strip.href} className="btn btn-ink">
+            {/* An underlined word rather than a filled button: beside three
+                full-height photographs a solid block of ink competes with
+                them, and this section is the photographs. */}
+            <span className="banner-cta mt-7 inline-block">
+              <Link
+                href={strip.href}
+                className="text-sm tracking-[0.14em] uppercase underline underline-offset-[6px]"
+              >
                 {strip.buttonLabel}
               </Link>
             </span>
