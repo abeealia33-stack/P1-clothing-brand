@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import WishlistButton from "./WishlistButton";
 import { useCart } from "./useCart";
 import type { Product } from "@/lib/types";
 import { priceLabel } from "@/lib/format";
@@ -150,6 +151,10 @@ export default function ProductBuy({ product }: { product: Product }) {
                   ? "Added"
                   : "Add to cart"}
           </button>
+
+          {/* Saving needs no size, so it stays available on a piece that is
+              sold out — which is the moment someone most wants to keep it. */}
+          <WishlistButton product={product} variant="full" className="shrink-0" />
         </div>
 
         {added && (

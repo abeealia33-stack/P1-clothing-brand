@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import type { ResolvedCollection } from "@/lib/types";
 import CartCount from "./CartCount";
 import { useCart } from "./useCart";
+import { useWishlist } from "./useWishlist";
 
 /* Same hairline weight and paths as the icons in TabBar, so the search and
    account marks read as one icon language whether they turn up at the top of
@@ -47,6 +48,25 @@ function AccountIcon() {
   );
 }
 
+/* Same hairline weight as the rest of the header marks. */
+function HeartIcon() {
+  return (
+    <svg
+      width="19"
+      height="19"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.3}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M12 20.3s-7.5-4.6-7.5-9.4A4.4 4.4 0 0 1 12 8a4.4 4.4 0 0 1 7.5 2.9c0 4.8-7.5 9.4-7.5 9.4Z" />
+    </svg>
+  );
+}
+
 function CartIcon() {
   return (
     <svg
@@ -77,6 +97,7 @@ export default function SiteHeader({
 }) {
   const pathname = usePathname();
   const { count, ready } = useCart();
+  const { count: saved, ready: savedReady } = useWishlist();
   const onHome = pathname === "/";
 
   return (
@@ -136,6 +157,20 @@ export default function SiteHeader({
             style={{ color: "var(--color-ink-soft)" }}
           >
             <SearchIcon />
+          </Link>
+          <Link
+            href="/wishlist"
+            aria-label={`Saved${savedReady && saved > 0 ? `, ${saved} piece${saved === 1 ? "" : "s"}` : ""}`}
+            className="icon-tap relative flex items-center justify-center rounded-full transition-colors hover:text-ink"
+            style={{ color: "var(--color-ink-soft)" }}
+          >
+            <HeartIcon />
+            {savedReady && saved > 0 && (
+              <CartCount
+                count={saved}
+                className="absolute top-0.5 right-0.5 min-w-4 rounded-full px-1 text-[0.625rem] leading-4 text-white"
+              />
+            )}
           </Link>
           <Link
             href="/account"
