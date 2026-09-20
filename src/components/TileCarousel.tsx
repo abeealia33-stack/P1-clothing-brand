@@ -5,12 +5,17 @@ import { useEffect, useRef, useState } from "react";
 import ClothImage from "./ClothImage";
 import type { ShownTile } from "@/lib/banners";
 
-/** How long each page of tiles holds before the next slides in. */
+/** How long each tile holds before the strip steps along by one. */
 const AUTOPLAY_MS = 4000;
+
+/* eslint-disable react-hooks/exhaustive-deps -- goTo reads the rail through
+   a ref, so it is stable in every way that matters here; listing it would
+   restart the timer on each render and the carousel would never advance. */
 
 /**
  * The tiles beside the panel: three abreast on a desktop, two and a glimpse
- * of the next on a phone, moving on by themselves every four seconds.
+ * of the next on a phone, stepping along one tile every four seconds — one
+ * leaves on the left as one arrives on the right.
  *
  * Built on the rail the rest of the site uses — a scroll-snapping strip —
  * rather than a track pushed about by script. That keeps the thing a phone
@@ -25,11 +30,27 @@ const AUTOPLAY_MS = 4000;
  */
 export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
   const rail = useRef<HTMLDivElement>(null);
-  const [page, setPage] = useState(0);
-  const [pages, setPages] = useState(1);
+  const [stop, setStop] = useState(0);
+  const [stops, setStops] = useState(1);
   /* Nothing should slide out from under a pointer that is on it, or from
      under someone tabbing through the links. */
   const [held, setHeld] = useState(false);
+
+  /**
+   * One tile's worth of travel, gap included.
+   *
+   * The carousel moves a tile at a time, not a screenful: one leaves on the
+   * left and one arrives on the right, which is what makes it read as a strip
+   * being drawn past rather than pages being turned.
+   */
+  const step = () => {
+    const el = rail.current;
+    if (!el) return 0;
+    const first = el.firstElementChild as HTMLElement | null;
+    if (!first) return el.clientWidth;
+    const gap = Number.parseFloat(getComputedStyle(el).columnGap) || 0;
+    return first.offsetWidth + gap;
+  };
 
   useEffect(() => {
     const el = rail.current;
@@ -38,8 +59,12 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
     let frame = 0;
     const measure = () => {
       if (el.clientWidth === 0) return;
-      setPages(Math.max(1, Math.round(el.scrollWidth / el.clientWidth)));
-      setPage(Math.round(el.scrollLeft / el.clientWidth));
+      const travel = step();
+      if (travel === 0) return;
+      /* Stops, not screenfuls: how many tiles it can come to rest on before
+         the last one is up against the right edge. */
+      setStops(Math.max(1, Math.round((el.scrollWidth - el.clientWidth) / travel) + 1));
+      setStop(Math.round(el.scrollLeft / travel));
     };
     const onScroll = () => {
       cancelAnimationFrame(frame);
@@ -61,11 +86,11 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
   const goTo = (next: number) => {
     const el = rail.current;
     if (!el) return;
-    el.scrollTo({ left: next * el.clientWidth, behavior: "smooth" });
+    el.scrollTo({ left: next * step(), behavior: "smooth" });
   };
 
   useEffect(() => {
-    if (held || pages < 2) return;
+    if (held || stops < 2) return;
     // Moving on its own is the one thing that cannot ask first, so under
     // reduce it simply does not: the tiles sit still and are swiped.
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -73,11 +98,13 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
     const id = setInterval(() => {
       const el = rail.current;
       if (!el) return;
-      const current = Math.round(el.scrollLeft / el.clientWidth);
-      goTo(current + 1 >= pages ? 0 : current + 1);
+      const travel = step();
+      if (travel === 0) return;
+      const current = Math.round(el.scrollLeft / travel);
+      goTo(current + 1 >= stops ? 0 : current + 1);
     }, AUTOPLAY_MS);
     return () => clearInterval(id);
-  }, [held, pages]);
+  }, [held, stops]);
 
   return (
     <div
@@ -112,15 +139,15 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
         ))}
       </div>
 
-      {pages > 1 && (
+      {stops > 1 && (
         <div className="mt-6 flex justify-center gap-2">
-          {Array.from({ length: pages }, (_, i) => (
+          {Array.from({ length: stops }, (_, i) => (
             <button
               key={i}
               type="button"
               onClick={() => goTo(i)}
-              aria-label={`Show ${i + 1} of ${pages}`}
-              aria-current={i === page ? "true" : undefined}
+              aria-label={`Show ${i + 1} of ${stops}`}
+              aria-current={i === stop ? "true" : undefined}
               /* The dot is small; the tap target around it is not. */
               className="flex h-8 w-8 items-center justify-center"
             >
@@ -128,7 +155,7 @@ export default function TileCarousel({ tiles }: { tiles: ShownTile[] }) {
                 className="block h-1.5 w-1.5 rounded-full transition-colors"
                 style={{
                   background:
-                    i === page ? "var(--color-sage-deep)" : "var(--color-line)",
+                    i === stop ? "var(--color-sage-deep)" : "var(--color-line)",
                 }}
               />
             </button>
