@@ -3,22 +3,36 @@
 import { redirect } from "next/navigation";
 import {
   attemptsRemaining,
+  beginTotpChallenge,
   checkPassword,
+  checkTotpCode,
   clearFailures,
+  clearTotpChallenge,
   createSession,
   destroySession,
+  isPendingTotp,
   recordFailure,
 } from "@/lib/auth";
 import { clientKey } from "@/lib/rate-limit";
 
-export type SignInState = { error?: string };
+export type SignInState = { stage?: "password" | "code"; error?: string };
 
 export async function signInAction(
-  _previous: SignInState,
+  previous: SignInState,
   formData: FormData
 ): Promise<SignInState> {
   const key = await clientKey();
 
+  if (previous.stage === "code") {
+    return verifyCodeStep(key, formData);
+  }
+  return verifyPasswordStep(key, formData);
+}
+
+async function verifyPasswordStep(
+  key: string,
+  formData: FormData
+): Promise<SignInState> {
   if (attemptsRemaining(key) <= 0) {
     return {
       error: "Too many tries. Wait ten minutes and try again.",
@@ -52,6 +66,56 @@ export async function signInAction(
   }
 
   clearFailures(key);
+  await beginTotpChallenge();
+  return { stage: "code" };
+}
+
+async function verifyCodeStep(
+  key: string,
+  formData: FormData
+): Promise<SignInState> {
+  if (!(await isPendingTotp())) {
+    return {
+      stage: "password",
+      error: "That took too long. Enter your password again.",
+    };
+  }
+
+  const totpKey = `${key}:totp`;
+  if (attemptsRemaining(totpKey) <= 0) {
+    return {
+      stage: "code",
+      error: "Too many tries. Wait ten minutes and try again.",
+    };
+  }
+
+  const code = String(formData.get("code") ?? "");
+
+  let ok = false;
+  try {
+    ok = checkTotpCode(code);
+  } catch {
+    return {
+      stage: "code",
+      error:
+        "The authenticator app is not set up yet. Add TOTP_SECRET to your .env file.",
+    };
+  }
+
+  if (!ok) {
+    recordFailure(totpKey);
+    const left = attemptsRemaining(totpKey);
+    return {
+      stage: "code",
+      error:
+        left > 0
+          ? `That code is not right. ${left} ${left === 1 ? "try" : "tries"} left.`
+          : "Too many tries. Wait ten minutes and try again.",
+    };
+  }
+
+  clearFailures(totpKey);
+  await clearTotpChallenge();
   await createSession();
   redirect("/admin");
 }

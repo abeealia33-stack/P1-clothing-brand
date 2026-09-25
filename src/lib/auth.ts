@@ -3,9 +3,10 @@ import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
+import { verifyTotpCode } from "./totp";
 
 /**
- * One owner, one password, one cookie.
+ * One owner, one password, one authenticator app, one cookie.
  *
  * The spec calls for a single password-protected /admin with a cookie session
  * and no user accounts, so that is exactly what this is. The cookie holds an
@@ -15,6 +16,12 @@ import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 
 const COOKIE = "bilques_admin";
 const MAX_AGE_SECONDS = 60 * 60 * 12; // A working day, then log in again.
+
+/* A second, short-lived cookie marks "password checked, TOTP code pending".
+   It is signed the same way as the session cookie but named and scoped
+   separately so it never satisfies proxy.ts's admin check by itself. */
+const PENDING_COOKIE = "bilques_admin_pending";
+const PENDING_MAX_AGE_SECONDS = 5 * 60;
 
 function secret(): string {
   const value = process.env.SESSION_SECRET;
@@ -42,12 +49,34 @@ function safeEqual(a: string, b: string): boolean {
   return timingSafeEqual(left, right);
 }
 
+/** `payload.signature`, for values that go into a signed cookie. */
+function pack(payload: string): string {
+  return `${payload}.${sign(payload)}`;
+}
+
+/** Verifies and strips the signature. Returns the payload, or null if forged/malformed. */
+function unpack(raw: string): string | null {
+  const cut = raw.lastIndexOf(".");
+  if (cut < 1) return null;
+  const payload = raw.slice(0, cut);
+  const signature = raw.slice(cut + 1);
+  return safeEqual(signature, sign(payload)) ? payload : null;
+}
+
 export function checkPassword(attempt: string): boolean {
   const expected = process.env.ADMIN_PASSWORD;
   if (!expected) {
     throw new Error("ADMIN_PASSWORD is not set. Add it to .env");
   }
   return safeEqual(attempt, expected);
+}
+
+export function checkTotpCode(code: string): boolean {
+  const secret = process.env.TOTP_SECRET;
+  if (!secret) {
+    throw new Error("TOTP_SECRET is not set. Add it to .env");
+  }
+  return verifyTotpCode(secret, code);
 }
 
 /* A password with no rate limit is a password with a lot of guesses. This is
@@ -83,7 +112,7 @@ export async function createSession(): Promise<void> {
   // cannot be undone by replaying an identical older cookie value.
   const payload = `${expires}.${randomBytes(12).toString("hex")}`;
   const store = await cookies();
-  store.set(COOKIE, `${payload}.${sign(payload)}`, {
+  store.set(COOKIE, pack(payload), {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
@@ -95,6 +124,7 @@ export async function createSession(): Promise<void> {
 export async function destroySession(): Promise<void> {
   const store = await cookies();
   store.delete(COOKIE);
+  store.delete(PENDING_COOKIE);
 }
 
 /** True when the request carries a cookie we signed that has not expired. */
@@ -103,15 +133,42 @@ export async function isSignedIn(): Promise<boolean> {
   const raw = store.get(COOKIE)?.value;
   if (!raw) return false;
 
-  const cut = raw.lastIndexOf(".");
-  if (cut < 1) return false;
-  const payload = raw.slice(0, cut);
-  const signature = raw.slice(cut + 1);
-
-  if (!safeEqual(signature, sign(payload))) return false;
+  const payload = unpack(raw);
+  if (!payload) return false;
 
   const expires = Number(payload.split(".")[0]);
   return Number.isFinite(expires) && expires > Date.now();
+}
+
+/** Marks "password accepted" while the authenticator code is still owed. */
+export async function beginTotpChallenge(): Promise<void> {
+  const expires = Date.now() + PENDING_MAX_AGE_SECONDS * 1000;
+  const store = await cookies();
+  store.set(PENDING_COOKIE, pack(`${expires}`), {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: PENDING_MAX_AGE_SECONDS,
+  });
+}
+
+/** True when a password was accepted in the last five minutes and no code yet. */
+export async function isPendingTotp(): Promise<boolean> {
+  const store = await cookies();
+  const raw = store.get(PENDING_COOKIE)?.value;
+  if (!raw) return false;
+
+  const payload = unpack(raw);
+  if (!payload) return false;
+
+  const expires = Number(payload);
+  return Number.isFinite(expires) && expires > Date.now();
+}
+
+export async function clearTotpChallenge(): Promise<void> {
+  const store = await cookies();
+  store.delete(PENDING_COOKIE);
 }
 
 /**

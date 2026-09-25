@@ -18,11 +18,14 @@ npm install
 cp .env.example .env      # then open .env and set ADMIN_PASSWORD
 npm run db:push:dev       # creates the local database file
 npm run db:seed           # fills it with the 13 starting pieces
+npm run auth:totp-setup   # scan the QR code, save TOTP_SECRET into .env
 npm run dev               # http://localhost:3000
 ```
 
-The admin panel is at **http://localhost:3000/admin**, and the password is
-whatever you put in `ADMIN_PASSWORD`.
+The admin panel is at **http://localhost:3000/admin**. Signing in takes two
+steps: your `ADMIN_PASSWORD`, then the current 6-digit code from whatever
+authenticator app (Google Authenticator, Authy, etc.) you scanned the QR code
+with during `auth:totp-setup`.
 
 Useful extras:
 
@@ -95,10 +98,17 @@ Everything you save shows up in the shop immediately.
    DATABASE_URL="mysql://USER:PASSWORD@localhost:3306/DATABASE_NAME"
    ADMIN_PASSWORD="a password only you know"
    SESSION_SECRET="a long random string"
+   TOTP_SECRET="from npm run auth:totp-setup, see below"
    ```
 
-   Generate the secret with:
+   Generate `SESSION_SECRET` with:
    `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
+
+   Generate `TOTP_SECRET` by running `npm run auth:totp-setup` on your own
+   computer (not on the server) — it prints a QR code to scan with Google
+   Authenticator and the value to paste in here. Run it once; running it
+   again makes a new secret and invalidates the old one, so you'd need to
+   re-scan.
 
 3. **Set it up and start it:**
 
@@ -124,9 +134,9 @@ Reel videos are the heaviest thing on the site. Cloudinary is worth setting up
 before pushing many of them, both for the transcoding and to keep them off the
 Hostinger disk.
 
-**Before going live:** change `ADMIN_PASSWORD`, set a real `SESSION_SECRET`,
-and update the WhatsApp number, Instagram handle and email in
-[src/lib/site.ts](src/lib/site.ts).
+**Before going live:** change `ADMIN_PASSWORD`, set a real `SESSION_SECRET`
+and `TOTP_SECRET`, and update the WhatsApp number, Instagram handle and email
+in [src/lib/site.ts](src/lib/site.ts).
 
 ---
 
@@ -148,9 +158,12 @@ deleting a piece can never rewrite what someone already bought.
 re-reads every item from the database and recalculates the subtotal, shipping
 and total before saving the order.
 
-**Signing in.** One password, one cookie. The cookie carries an expiry and an
-HMAC signature — readable by anyone, forgeable by nobody without
-`SESSION_SECRET`, and good for twelve hours. Wrong guesses are rate limited.
+**Signing in.** Password, then a 6-digit authenticator code, then a session
+cookie. The password step sets a short-lived (5 minute) cookie marking "code
+still owed"; the code step checks it and, on success, sets the real session
+cookie. Both cookies carry an expiry and an HMAC signature — readable by
+anyone, forgeable by nobody without `SESSION_SECRET` — and the session is good
+for twelve hours. Wrong guesses at either step are rate limited separately.
 [src/proxy.ts](src/proxy.ts) redirects signed-out visitors away from `/admin`,
 but that is only a convenience: every admin page, every server action and the
 upload endpoint check the session themselves, because a server action answers
