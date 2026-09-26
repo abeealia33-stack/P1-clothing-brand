@@ -246,13 +246,17 @@
   }
 
   /* The hero's one button: paper on the photo, square, capitals. */
+  /* Outlined rather than filled: the photograph shows through, and the rule
+     holds the shape. Ink on the pale cottons this shop photographs; the
+     scrim under it in HeroBanner is what keeps it readable. */
   .hero-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     height: 52px;
     padding: 0 2rem;
-    background: var(--color-paper);
+    background: transparent;
+    border: 1px solid var(--color-ink);
     color: var(--color-ink);
     font-size: 0.8125rem;
     font-weight: 500;
