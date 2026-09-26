@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import type { ResolvedCollection } from "@/lib/types";
 import CartCount from "./CartCount";
 import { useCart } from "./useCart";
@@ -99,12 +100,19 @@ export default function SiteHeader({
   const { count, ready } = useCart();
   const { count: saved, ready: savedReady } = useWishlist();
   const onHome = pathname === "/";
+  const bar = useRef<HTMLElement>(null);
+  const overHero = useOverHero(onHome, bar);
 
   return (
+    /* Over the hero the bar is nothing but its words and marks, so the
+       photograph runs the full height of the screen behind them. It takes on
+       paper and its hairline the moment the page body rises to meet it —
+       without that, everything scrolling underneath would read through it. */
     <header
-      className={`sticky top-0 z-40 border-b border-line ${
-        onHome ? "bg-paper/80 backdrop-blur-md" : "bg-paper"
-      }`}
+      ref={bar}
+      className={`sticky top-0 z-40 transition-colors duration-200 ${
+        overHero ? "" : "border-b border-line"
+      } ${onHome ? (overHero ? "" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-5 md:px-16 md:h-16">
         <Link href="/" className="flex items-baseline gap-2.5">
@@ -198,4 +206,39 @@ export default function SiteHeader({
       </div>
     </header>
   );
+}
+
+/**
+ * True while the home page's hero is still behind the bar.
+ *
+ * Measured against the hero's own height rather than a fixed distance, so it
+ * holds whatever the photograph is cropped to and wherever the bar sits —
+ * and it is simply false on every other page, which has no hero to sit over.
+ */
+function useOverHero(onHome: boolean, bar: React.RefObject<HTMLElement | null>) {
+  // Tracked rather than derived so leaving the home page needs no reset:
+  // the answer below is only ever true while the hero is there to sit over.
+  const [pastHero, setPastHero] = useState(false);
+
+  useEffect(() => {
+    if (!onHome) return;
+
+    const hero = document.querySelector<HTMLElement>(".fold-hero");
+    if (!hero) return;
+
+    const check = () => {
+      const reach = hero.offsetHeight - (bar.current?.offsetHeight ?? 0);
+      setPastHero(window.scrollY >= reach);
+    };
+
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, [onHome, bar]);
+
+  return onHome && !pastHero;
 }
