@@ -875,3 +875,187 @@
     color: var(--color-sage-deep);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The footer
+
+   Four columns on a desktop, the brand half again as wide as the rest. On a
+   phone the three link columns fold into accordions, because nine links
+   stacked open push the legal line most of a screen away.
+--------------------------------------------------------------------------- */
+@layer components {
+  .footer {
+    background: var(--color-khaddar);
+    padding-block: 4.5rem 6rem;
+  }
+  @media (min-width: 768px) {
+    .footer {
+      padding-block: 4.5rem 2rem;
+    }
+  }
+
+  .footer-grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  @media (min-width: 768px) {
+    .footer-grid {
+      grid-template-columns: 1.5fr 1fr 1fr 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .footer-blurb {
+    max-width: 30rem;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-soft);
+  }
+
+  /* One heading, twice: a button while the column folds, plain text once it
+     cannot. Each is hidden from the accessibility tree at the other width. */
+  .footer-heading {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .footer-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 44px;
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+    color: inherit;
+    cursor: pointer;
+  }
+  .footer-chevron {
+    transition: transform 0.15s ease;
+  }
+  .footer-toggle[aria-expanded="true"] .footer-chevron {
+    transform: rotate(180deg);
+  }
+
+  .footer-links {
+    display: none;
+    padding-bottom: 0.75rem;
+  }
+  .footer-links.is-open {
+    display: block;
+  }
+  .footer-link {
+    display: block;
+    padding-block: 0.375rem;
+    min-height: 44px;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--color-ink-soft);
+    transition: color 0.15s ease;
+  }
+  .footer-link:hover,
+  .footer-link:focus-visible {
+    color: var(--color-sage-deep);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* A folded column needs a rule to sit against; side by side they do not. */
+  .footer-col + .footer-col {
+    border-top: 1px solid var(--color-line);
+  }
+
+  @media (min-width: 768px) {
+    .footer-links,
+    .footer-links.is-open {
+      display: block;
+      padding-bottom: 0;
+    }
+    .footer-col + .footer-col {
+      border-top: 0;
+    }
+    .footer-heading {
+      margin-bottom: 1.25rem;
+    }
+    .footer-link {
+      min-height: 0;
+      padding-block: 0;
+      margin-bottom: 0.75rem;
+    }
+  }
+
+  .footer-bottom {
+    margin-top: 3.5rem;
+    border-top: 1px solid var(--color-line);
+    padding-block: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    font-size: 0.75rem;
+    color: var(--color-ink-soft);
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+      gap: 1.5rem;
+    }
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem 0.75rem;
+  }
+  .footer-legal a {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-ink-soft);
+    transition: color 0.15s ease;
+  }
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible {
+    color: var(--color-sage-deep);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  @media (min-width: 768px) {
+    .footer-legal a {
+      min-height: 0;
+    }
+  }
+
+  .footer-social {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .footer-social a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--color-ink-soft);
+    transition: color 0.15s ease;
+  }
+  .footer-social a:hover,
+  .footer-social a:focus-visible {
+    color: var(--color-sage-deep);
+  }
+  @media (min-width: 768px) {
+    .footer-social a {
+      min-width: 0;
+      min-height: 0;
+    }
+  }
+}
