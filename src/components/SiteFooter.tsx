@@ -83,6 +83,20 @@ export default function SiteFooter({
             © {new Date().getFullYear()} {site.name} · Lahore, Pakistan
           </p>
 
+          <ul className="footer-legal">
+            <li>
+              <Link href="/privacy">Privacy</Link>
+            </li>
+            <li aria-hidden="true">·</li>
+            <li>
+              <Link href="/terms">Terms</Link>
+            </li>
+            <li aria-hidden="true">·</li>
+            <li>
+              <Link href="/shipping#returns">Refund policy</Link>
+            </li>
+          </ul>
+
           <ul className="footer-social">
             {SOCIALS.map((social) => (
               <li key={social.href}>

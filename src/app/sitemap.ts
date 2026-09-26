@@ -24,6 +24,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url("/about"), priority: 0.5 },
     { url: url("/contact"), priority: 0.5 },
     { url: url("/shipping"), priority: 0.5 },
+    { url: url("/privacy"), priority: 0.3 },
+    { url: url("/terms"), priority: 0.3 },
     { url: url("/track"), priority: 0.3 },
   ];
 

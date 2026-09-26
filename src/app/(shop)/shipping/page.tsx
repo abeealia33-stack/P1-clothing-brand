@@ -74,7 +74,7 @@ export default function ShippingPage() {
         </p>
       </section>
 
-      <section className="rule mt-8 pt-8">
+      <section id="returns" className="rule mt-8 scroll-mt-24 pt-8">
         <h2 className="text-3xl">Exchanges and returns</h2>
         <div className="measure mt-4 space-y-4 text-[1.0625rem] leading-[1.7]">
           <p>
