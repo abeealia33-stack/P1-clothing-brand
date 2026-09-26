@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import CollectionRail from "@/components/CollectionRail";
+import GroupOrdersSection from "@/components/GroupOrdersSection";
 import HeroSlideshow from "@/components/HeroSlideshow";
+import MadeToFitSection from "@/components/MadeToFitSection";
 import ProductCard from "@/components/ProductCard";
 import PromoStrip from "@/components/PromoStrip";
 import ReelsRail from "@/components/ReelsRail";
@@ -50,10 +52,12 @@ export default async function HomePage() {
    * promises below are the page's frame and stay where they are.
    */
   const blocks: Record<HomeBlock, React.ReactNode> = {
+    madeToFit: <MadeToFitSection />,
     collections: <CollectionsBlock shownCollections={shownCollections} />,
     pair: split && <SplitBanner panels={split.panels} />,
     newIn: <NewInBlock newIn={newIn} />,
     carousel: strip && <PromoStrip strip={strip} />,
+    groupOrders: <GroupOrdersSection />,
     reels: <ReelsBlock reels={reels} />,
   };
 
@@ -112,35 +116,6 @@ export default async function HomePage() {
       </section>
 
       <div className="fold-body">
-        <section className="mx-auto max-w-6xl px-5 pt-16 pb-4 md:pt-24">
-          <p className="measure text-2xl leading-[1.35] md:text-[1.75rem]" style={{ fontFamily: "var(--font-display)" }}>
-            Bilques makes a small number of pieces in cotton, lawn and khaddar —
-            cut loose, sewn properly, and priced so you can own more than one.
-          </p>
-        </section>
-
-        <section className="mx-auto max-w-6xl px-5 pt-4 pb-8">
-          <div
-            className="flex flex-col items-start gap-5 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8"
-            style={{ background: "var(--color-khaddar)" }}
-          >
-            <div>
-              <h2 className="text-3xl md:text-4xl">Want it made to fit you?</h2>
-              <p
-                className="measure mt-2 text-sm"
-                style={{ color: "var(--color-ink-soft)" }}
-              >
-                Pick a piece as your starting point, send us your
-                measurements, and we will call to agree a price before
-                anything is cut.
-              </p>
-            </div>
-            <Link href="/customize" className="btn btn-ink shrink-0">
-              Start designing
-            </Link>
-          </div>
-        </section>
-
         {order.map((block) => (
           <Fragment key={block}>{blocks[block]}</Fragment>
         ))}
@@ -183,8 +158,8 @@ export default async function HomePage() {
 }
 
 /* Everything below is one block of the orderable middle. Kept out of the
-   page above so the frame — hero, opening line, made-to-fit band, promises —
-   reads as the fixed thing it is. */
+   page above so the frame — the hero and the promises — reads as the fixed
+   thing it is. */
 
 function CollectionsBlock({
   shownCollections,

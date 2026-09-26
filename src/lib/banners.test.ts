@@ -133,17 +133,32 @@ describe("normaliseHomeOrder", () => {
   });
 
   it("keeps the owner's order", () => {
-    const moved = ["carousel", "newIn", "pair", "reels", "collections"];
+    const moved = [
+      "groupOrders",
+      "carousel",
+      "newIn",
+      "pair",
+      "reels",
+      "madeToFit",
+      "collections",
+    ];
     expect(normaliseHomeOrder(moved)).toEqual(moved);
+  });
+
+  it("adds the sections that did not exist when an order was saved, at the end", () => {
+    const savedBefore = ["collections", "pair", "newIn", "carousel", "reels"];
+    expect(normaliseHomeOrder(savedBefore)).toEqual([...savedBefore, "madeToFit", "groupOrders"]);
   });
 
   it("puts back a block that is missing, at the end", () => {
     expect(normaliseHomeOrder(["reels", "pair"])).toEqual([
       "reels",
       "pair",
+      "madeToFit",
       "collections",
       "newIn",
       "carousel",
+      "groupOrders",
     ]);
   });
 
@@ -151,9 +166,11 @@ describe("normaliseHomeOrder", () => {
     expect(normaliseHomeOrder(["reels", "reels", "footer", 7, "pair"])).toEqual([
       "reels",
       "pair",
+      "madeToFit",
       "collections",
       "newIn",
       "carousel",
+      "groupOrders",
     ]);
   });
 });

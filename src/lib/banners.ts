@@ -42,21 +42,30 @@ export type BannerTile = { image: string; label: string; link: BannerLink };
 /**
  * The parts of the home page the owner can put in whatever order she likes.
  *
- * The hero, the opening line, the made-to-fit band and the promises at the
- * bottom are not here: they are the page's frame rather than its contents,
- * and a shop whose first screen can be moved below the fold is a shop with a
- * broken front door.
+ * The hero and the promises at the bottom are not here: they are the page's
+ * frame rather than its contents, and a shop whose first screen can be moved
+ * below the fold is a shop with a broken front door.
  */
-export const homeBlocks = ["collections", "pair", "newIn", "carousel", "reels"] as const;
+export const homeBlocks = [
+  "madeToFit",
+  "collections",
+  "pair",
+  "newIn",
+  "carousel",
+  "groupOrders",
+  "reels",
+] as const;
 
 export type HomeBlock = (typeof homeBlocks)[number];
 
 /** What each block is called in the admin, in the words on the page itself. */
 export const homeBlockLabels: Record<HomeBlock, string> = {
+  madeToFit: "Made to fit you",
   collections: "Ways to get dressed",
   pair: "The pair (two photos)",
   newIn: "Just in",
   carousel: "The carousel",
+  groupOrders: "Made to match (group orders)",
   reels: "See it worn (reels)",
 };
 

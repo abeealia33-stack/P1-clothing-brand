@@ -5,7 +5,7 @@ import { homeBlockLabels, type HomeBlock } from "@/lib/banners";
 /**
  * The order of the home page, as a list you move things up and down in.
  *
- * Arrows rather than dragging: this is five rows, dragging needs a pointer
+ * Arrows rather than dragging: this is a handful of rows, dragging needs a pointer
  * that can hold something steady, and the owner is as likely to be doing
  * this on a phone as at a desk.
  */
