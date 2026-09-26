@@ -11,7 +11,7 @@ export const site = {
   whatsapp: "923124433199",
   whatsappDisplay: "0312 4433199",
   instagram: "bilques.pk",
-  email: "salam@bilques.pk",
+  email: "admin@bilques.com",
   freeShippingOver: 3000,
   shipping: {
     majorCities: "2–4 days",
