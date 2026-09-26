@@ -2,7 +2,7 @@ import Link from "next/link";
 import ClothImage from "./ClothImage";
 import WishlistButton from "./WishlistButton";
 import type { Product } from "@/lib/types";
-import { priceLabel } from "@/lib/format";
+import { photoAlt, priceLabel } from "@/lib/format";
 
 /**
  * No card container, no border, no radius, no shadow: the photograph is the
@@ -25,8 +25,8 @@ export default function ProductCard({
       <Link href={`/product/${product.slug}`} className="group block">
         <div className="relative aspect-[3/4] overflow-hidden">
           <ClothImage
-            src={product.photos[0]}
-            alt={`${product.name} in ${product.colors[0].name}`}
+            src={product.photos[0] ?? ""}
+            alt={photoAlt(product)}
             priority={priority}
             className="transition-transform duration-500 group-hover:scale-[1.03]"
           />
@@ -60,7 +60,7 @@ export default function ProductCard({
         <p className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
           {product.colors.length > 1
             ? `${product.colors.length} colours`
-            : product.colors[0].name}
+            : (product.colors[0]?.name ?? "")}
         </p>
       </Link>
 

@@ -14,7 +14,7 @@ import { priceLabel } from "@/lib/format";
  */
 export default function ProductBuy({ product }: { product: Product }) {
   const { add } = useCart();
-  const [color, setColor] = useState(product.colors[0].name);
+  const [color, setColor] = useState(product.colors[0]?.name ?? "");
   const [size, setSize] = useState<string | null>(
     product.sizes.length === 1 ? product.sizes[0] : null
   );
@@ -38,7 +38,7 @@ export default function ProductBuy({ product }: { product: Product }) {
       price: product.price,
       size,
       color,
-      photo: product.photos[0],
+      photo: product.photos[0] ?? "",
       qty: 1,
     });
     setAdded(true);

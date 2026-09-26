@@ -7,7 +7,7 @@ import ProductCard from "@/components/ProductCard";
 import { getProductBySlug, relatedProducts } from "@/lib/catalogue";
 import { getSettings } from "@/lib/settings";
 import { resolveCollection } from "@/lib/types";
-import { priceLabel, rupees } from "@/lib/format";
+import { photoAlt, priceLabel, rupees } from "@/lib/format";
 import { site, whatsappLink } from "@/lib/site";
 import { WhatsAppGlyph } from "@/components/WhatsAppButton";
 
@@ -59,7 +59,7 @@ export default async function ProductPage({
         <div className="md:sticky md:top-24 md:self-start">
           <Gallery
             photos={product.photos}
-            alt={`${product.name} in ${product.colors[0].name}`}
+            alt={photoAlt(product)}
           />
         </div>
 

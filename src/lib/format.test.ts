@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ago } from "./format";
+import { ago, photoAlt } from "./format";
 
 describe("ago", () => {
   const minutesAgo = (n: number) => new Date(Date.now() - n * 60_000).toISOString();
@@ -17,5 +17,17 @@ describe("ago", () => {
   it("gives a date once a week has passed, rather than counting on", () => {
     expect(ago(minutesAgo(60 * 24 * 30))).toMatch(/\d/);
     expect(ago(minutesAgo(60 * 24 * 30))).not.toContain("ago");
+  });
+});
+
+describe("photoAlt", () => {
+  const piece = { name: "Suti kurta", colors: [{ name: "Undyed", hex: "#eee" }] };
+
+  it("names the colour it is photographed in", () => {
+    expect(photoAlt(piece)).toBe("Suti kurta in Undyed");
+  });
+
+  it("falls back to the name alone when a piece has no colours to read", () => {
+    expect(photoAlt({ ...piece, colors: [] })).toBe("Suti kurta");
   });
 });
