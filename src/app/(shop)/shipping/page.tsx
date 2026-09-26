@@ -101,7 +101,7 @@ export default function ShippingPage() {
           cut loose over these — Azad pieces run two sizes wider on purpose.
         </p>
 
-        <div className="rail mt-5 -mx-5 px-5">
+        <div className="rail mt-5 -mx-5 px-5 sm:mx-0 sm:px-0">
           <table className="tnum w-full min-w-80 text-left text-sm">
             <thead>
               <tr className="rule">

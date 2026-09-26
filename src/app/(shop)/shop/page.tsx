@@ -48,7 +48,7 @@ export default async function ShopPage({
   const hasFilters = Boolean(active || activeCategory || priceTier || sortBy);
 
   return (
-    <div className="mx-auto max-w-7xl px-5 md:px-16 py-10 md:py-14">
+    <div className="mx-auto max-w-7xl px-5 py-10 md:px-16 md:py-14">
       {/* A collection's own photo strip, when the owner has uploaded one. */}
       {active?.banner && (
         <div className="relative -mx-5 -mt-10 mb-8 aspect-[2/1] overflow-hidden md:mx-0 md:-mt-4 md:aspect-[4/1]">
@@ -77,7 +77,7 @@ export default async function ShopPage({
           reach for next, and scrolling back up to find them is the whole
           friction. */}
       <div
-        className="sticky top-14 z-20 -mx-5 mt-8 px-5 py-3 md:top-16"
+        className="sticky top-14 z-20 -mx-5 mt-8 px-5 py-3 md:top-16 md:mx-0 md:px-0"
         style={{ background: "var(--color-paper)" }}
       >
         <ShopFilters
