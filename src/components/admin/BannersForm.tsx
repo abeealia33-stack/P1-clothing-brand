@@ -2,12 +2,15 @@
 
 import { useActionState, useState } from "react";
 import BannerLinkPicker from "./BannerLinkPicker";
+import BannerPhoto from "./BannerPhoto";
 import BannerSlotEditor from "./BannerSlotEditor";
 import BannerTileEditor from "./BannerTileEditor";
+import DayPicksEditor from "./DayPicksEditor";
 import FormErrors from "./FormErrors";
 import HomeOrderEditor from "./HomeOrderEditor";
 import { saveBannersAction, type BannersFormState } from "@/app/admin/banners/actions";
 import {
+  DAY_PIECES,
   MAX_TILES,
   MIN_TILES,
   type BannerSlot,
@@ -15,6 +18,7 @@ import {
   type HomeBanners,
 } from "@/lib/banners";
 import type { ProductChoice } from "@/lib/catalogue";
+import { MIN_SIZES } from "@/lib/image-size";
 import type { ResolvedCollection } from "@/lib/types";
 
 /**
@@ -110,7 +114,7 @@ export default function BannersForm({
       <fieldset className="border-0 p-0">
         <legend className="text-2xl">Order on the home page</legend>
         <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Top to bottom, under the opening lines. A section with nothing in it
+          Top to bottom, under the photo and the promises strip. A section with nothing in it
           is skipped rather than leaving a gap, so an empty one can sit
           anywhere until you fill it.
         </p>
@@ -118,6 +122,50 @@ export default function BannersForm({
           order={banners.order}
           onChange={(order) => setBanners((b) => ({ ...b, order }))}
         />
+      </fieldset>
+
+      <fieldset className="rule mt-10 border-0 p-0 pt-8">
+        <legend className="text-2xl">Aaj ka din kaisa hai?</legend>
+        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          Shoppers tap what their day looks like and the pieces under it
+          change. Choose up to {DAY_PIECES} pieces for each day. The section
+          appears once any day has a piece.
+        </p>
+        <DayPicksEditor
+          days={banners.days}
+          onChange={(days) => setBanners((b) => ({ ...b, days }))}
+          products={products}
+        />
+      </fieldset>
+
+      <fieldset className="rule mt-10 border-0 p-0 pt-8">
+        <legend className="text-2xl">Made to match (group orders)</legend>
+        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          A wide photo of a group in matching outfits. Without one, the section
+          shows a drawn illustration instead. On a phone the photo is cropped
+          to portrait, so keep the people near the middle.
+        </p>
+        <div className="mt-4 max-w-xl">
+          <BannerPhoto
+            image={banners.groupImage}
+            onUploaded={(groupImage) => setBanners((b) => ({ ...b, groupImage }))}
+            onBusyChange={onBusyChange}
+            purpose="feature"
+            frame="aspect-[12/5]"
+            sizeHint="2400 × 1000 px (12:5), under 350 KB."
+            minSize={MIN_SIZES.groupBanner}
+          />
+          {banners.groupImage && (
+            <button
+              type="button"
+              onClick={() => setBanners((b) => ({ ...b, groupImage: "" }))}
+              className="mt-1 text-xs underline underline-offset-4"
+              style={{ color: "var(--color-ink-soft)" }}
+            >
+              Remove photo — use the illustration
+            </button>
+          )}
+        </div>
       </fieldset>
 
       <fieldset className="rule mt-10 border-0 p-0 pt-8">
@@ -157,7 +205,7 @@ export default function BannersForm({
 
           <div>
             <label htmlFor="strip-heading" className="block text-sm font-medium">
-              Heading
+              Heading (optional)
             </label>
             <input
               id="strip-heading"

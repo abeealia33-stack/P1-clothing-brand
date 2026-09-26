@@ -76,8 +76,9 @@ model Category {
 model Settings {
   /// Always "site" — a singleton row, not a real identity.
   id String @id @default("site")
-  /// JSON array of image URLs shown in the home page hero. Empty/absent
-  /// means the storefront uses its placeholder image instead.
+  /// JSON object for the home page hero: desktop and mobile photos, button
+  /// text and link, button position, focal point (see src/lib/hero.ts).
+  /// Older rows hold a JSON array of slideshow images; the first is kept.
   heroImages String @db.Text @default("[]")
   /// JSON array of promo banners (image, heading, subtext, button label,
   /// link) shown between sections of the home page. Empty means none show.

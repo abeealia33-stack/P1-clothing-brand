@@ -17,7 +17,7 @@ import type { ShownStrip } from "@/lib/banners";
  */
 export default function PromoStrip({ strip }: { strip: ShownStrip }) {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
+    <section className="home-section mx-auto max-w-7xl px-5 md:px-16">
       <Reveal lift={false} threshold={0.12} rootMargin="0px">
         <div className="grid gap-8 md:grid-cols-[20rem_minmax(0,1fr)] md:items-center md:gap-12">
           <div className="banner-heading">
@@ -29,7 +29,7 @@ export default function PromoStrip({ strip }: { strip: ShownStrip }) {
                 {strip.eyebrow}
               </span>
             )}
-            <h2 className="mt-2 text-4xl md:text-5xl">{strip.heading}</h2>
+            {strip.heading && <h2 className="home-h2 mt-2">{strip.heading}</h2>}
             {strip.text && (
               <p className="measure mt-4 text-sm" style={{ color: "var(--color-ink-soft)" }}>
                 {strip.text}

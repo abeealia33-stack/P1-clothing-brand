@@ -8,10 +8,17 @@ import { checkCustomRequest, measurementFields } from "@/lib/custom-request";
 import { measurementRanges, type CustomMeasurements } from "@/lib/types";
 import type { ProductChoice } from "@/lib/catalogue";
 import { submitCustomRequestAction } from "@/app/(shop)/customize/actions";
+import { whatsappLink } from "@/lib/site";
 
 type Errors = Partial<
   Record<keyof CustomMeasurements | "style" | "name" | "phone" | "form", string>
 >;
+
+const STEPS = ["Pick a piece", "Measurements", "Your details"] as const;
+
+/** Which step each field is asked on, so an error can send you back to it. */
+const stepOf = (field: string): number =>
+  field === "style" ? 0 : field === "name" || field === "phone" ? 2 : field === "form" ? 2 : 1;
 
 export default function CustomizeForm({ products }: { products: ProductChoice[] }) {
   const router = useRouter();
@@ -24,6 +31,7 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
   const [city, setCity] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
+  const [step, setStep] = useState(0);
 
   if (products.length === 0) {
     return (
@@ -44,14 +52,36 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
     };
   };
 
+  /* Errors are checked a step at a time, and a problem found at the end
+     takes you back to the step it belongs to rather than a field you cannot
+     see. */
+  const showErrors = (found: Errors) => {
+    setErrors(found);
+    const first = Object.keys(found)[0];
+    if (!first) return false;
+    setStep(Math.min(...Object.keys(found).map(stepOf)));
+    requestAnimationFrame(() =>
+      document.querySelector<HTMLElement>("[data-error='true']")?.focus()
+    );
+    return true;
+  };
+
+  const next = () => {
+    const found = Object.fromEntries(
+      Object.entries(validate()).filter(([field]) => stepOf(field) <= step)
+    ) as Errors;
+    if (showErrors(found)) return;
+    setStep((s) => s + 1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
-    const found = validate();
-    setErrors(found);
-    if (Object.keys(found).length > 0) {
-      document.querySelector<HTMLElement>("[data-error='true']")?.focus();
+    if (step < STEPS.length - 1) {
+      next();
       return;
     }
+    if (showErrors(validate())) return;
 
     setSubmitting(true);
     const result = await submitCustomRequestAction({
@@ -65,8 +95,7 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
 
     if (!result.ok) {
       setSubmitting(false);
-      setErrors(result.errors);
-      document.querySelector<HTMLElement>("[data-error='true']")?.focus();
+      showErrors(result.errors);
       return;
     }
 
@@ -75,7 +104,24 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
 
   return (
     <form onSubmit={submit} noValidate className="mt-9">
-      <fieldset className="border-0 p-0">
+      <ol className="grid grid-cols-3 gap-2" aria-label="Steps">
+        {STEPS.map((label, i) => (
+          <li key={label} aria-current={i === step ? "step" : undefined}>
+            <div
+              className="h-0.5 transition-colors"
+              style={{ background: i <= step ? "var(--color-ink)" : "var(--color-line)" }}
+            />
+            <p
+              className="mt-2 text-xs"
+              style={{ color: i === step ? "var(--color-ink)" : "var(--color-ink-soft)" }}
+            >
+              {i + 1}. {label}
+            </p>
+          </li>
+        ))}
+      </ol>
+
+      <fieldset className="mt-8 border-0 p-0" hidden={step !== 0}>
         <legend className="text-2xl">Start from a piece</legend>
         <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {products.map((product) => {
@@ -109,9 +155,10 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
         )}
       </fieldset>
 
-      <fieldset className="rule mt-9 border-0 p-0 pt-7">
+      <fieldset className="mt-8 border-0 p-0" hidden={step !== 1}>
         <legend className="text-2xl">Your measurements</legend>
-        <div className="mt-5 grid grid-cols-2 gap-5">
+        <MeasureGuide />
+        <div className="mt-6 grid grid-cols-2 gap-5">
           {measurementFields.map((field) => (
             <MeasurementField
               key={field}
@@ -124,8 +171,8 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
         </div>
       </fieldset>
 
-      <fieldset className="rule mt-9 border-0 p-0 pt-7">
-        <legend className="text-2xl">You</legend>
+      <fieldset className="mt-8 border-0 p-0" hidden={step !== 2}>
+        <legend className="text-2xl">Your details</legend>
         <div className="mt-5 space-y-5">
           <FormField id="name" label="Your name" value={name} onChange={setName} error={errors.name} autoComplete="name" />
           <FormField
@@ -158,11 +205,34 @@ export default function CustomizeForm({ products }: { products: ProductChoice[] 
         </p>
       )}
 
-      <button type="submit" disabled={submitting} className="btn btn-ink mt-9 w-full">
-        {submitting ? "Sending" : "Send my measurements"}
-      </button>
+      <div className="mt-9 flex items-center gap-5">
+        {step > 0 && (
+          <button
+            type="button"
+            onClick={() => setStep((s) => s - 1)}
+            className="text-sm underline underline-offset-4"
+          >
+            Back
+          </button>
+        )}
+        <button type="submit" disabled={submitting} className="btn btn-ink flex-1">
+          {step < STEPS.length - 1 ? "Next" : submitting ? "Sending" : "Send my measurements"}
+        </button>
+      </div>
       <p className="mt-3 text-center text-sm" style={{ color: "var(--color-ink-soft)" }}>
         No payment yet — we call to agree a price first.
+      </p>
+
+      <p className="rule mt-8 pt-6 text-center text-sm">
+        Not sure?{" "}
+        <a
+          href={whatsappLink("Salam! I'd like to book a 5-minute call about a custom piece.")}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4"
+        >
+          Book a 5-minute call on WhatsApp
+        </a>
       </p>
     </form>
   );
@@ -207,5 +277,38 @@ function MeasurementField({
         </p>
       )}
     </div>
+  );
+}
+
+/* Where each tape measurement goes, drawn once rather than described six
+   times. Decorative for screen readers: every field is labelled already. */
+function MeasureGuide() {
+  const mark = { stroke: "var(--color-sage-deep)", strokeWidth: 1.5, strokeDasharray: "4 3" };
+  const label = { fontSize: 9, fill: "var(--color-ink-soft)", fontFamily: "var(--font-body)" };
+  return (
+    <figure className="mt-5 flex items-center gap-5 border p-4" style={{ borderColor: "var(--color-line)" }}>
+      <svg viewBox="0 0 150 200" className="h-44 w-auto shrink-0" aria-hidden="true">
+        <path
+          d="M60 18 Q75 30 90 18 L118 30 L140 110 L124 114 L108 58 L108 190 L42 190 L42 58 L26 114 L10 110 L32 30Z"
+          fill="var(--color-khaddar)"
+          stroke="var(--color-ink)"
+          strokeWidth="1.2"
+          strokeLinejoin="round"
+        />
+        <line x1="32" y1="30" x2="118" y2="30" {...mark} />
+        <text x="58" y="14" {...label}>shoulder</text>
+        <line x1="44" y1="70" x2="106" y2="70" {...mark} />
+        <text x="63" y="66" {...label}>chest</text>
+        <line x1="44" y1="120" x2="106" y2="120" {...mark} />
+        <text x="63" y="116" {...label}>waist</text>
+        <line x1="118" y1="32" x2="138" y2="108" {...mark} />
+        <text x="120" y="126" {...label}>sleeve</text>
+      </svg>
+      <figcaption className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
+        Measure over light clothes with a soft tape, snug but not tight. Chest
+        and waist go all the way round; sleeve runs from the shoulder seam to
+        the wrist.
+      </figcaption>
+    </figure>
   );
 }

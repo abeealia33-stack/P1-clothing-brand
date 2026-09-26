@@ -5,9 +5,9 @@ import type { Product } from "@/lib/types";
 import { priceLabel } from "@/lib/format";
 
 /**
- * No card container, no border, no radius, no resting shadow: the photograph
- * is the card and the type sits directly on the paper. Depth arrives only when
- * a finger or cursor is on it.
+ * No card container, no border, no radius, no shadow: the photograph is the
+ * card and the type sits directly on the paper. The only motion is the photo
+ * easing in slightly under a cursor.
  */
 export default function ProductCard({
   product,
@@ -23,12 +23,21 @@ export default function ProductCard({
        anchor is neither valid nor operable — the link swallows the click. */
     <div className="relative">
       <Link href={`/product/${product.slug}`} className="group block">
-        <div className="lift relative aspect-[3/4] overflow-hidden">
+        <div className="relative aspect-[3/4] overflow-hidden">
           <ClothImage
             src={product.photos[0]}
             alt={`${product.name} in ${product.colors[0].name}`}
             priority={priority}
+            className="transition-transform duration-500 group-hover:scale-[1.03]"
           />
+          {/* On a desktop, the second photo on hover — usually the back or a
+              detail, which is the next thing anyone wants to see. Phones never
+              download it: there is no hover to earn it. */}
+          {product.photos[1] && (
+            <div className="card-second absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+              <ClothImage src={product.photos[1]} alt="" />
+            </div>
+          )}
           {low && (
             <span
               className="absolute top-3 left-3 px-2 py-1 text-[0.6875rem] text-white"

@@ -36,7 +36,7 @@ export default async function ShopLayout({
       </a>
       <SiteHeader collections={shown} />
       {/* Clears the fixed tab bar so nothing hides behind it on phones. */}
-      <div className="pb-tabbar md:pb-0">
+      <div className="shop pb-tabbar md:pb-0">
         <main id="main">{children}</main>
         <SiteFooter collections={shown} />
       </div>

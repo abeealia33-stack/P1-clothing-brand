@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ResolvedCollection } from "@/lib/types";
-import { instagramLink, site, whatsappLink } from "@/lib/site";
+import { facebookLink, instagramLink, linkedinLink, site, whatsappLink } from "@/lib/site";
 import { rupees } from "@/lib/format";
 
 export default function SiteFooter({
@@ -13,7 +13,7 @@ export default function SiteFooter({
       className="rule mt-24"
       style={{ background: "var(--color-khaddar)" }}
     >
-      <div className="mx-auto max-w-6xl px-5 py-14">
+      <div className="mx-auto max-w-7xl px-5 md:px-16 py-14">
         <p
           className="urdu text-2xl"
           style={{ color: "var(--color-sage-deep)" }}
@@ -21,7 +21,7 @@ export default function SiteFooter({
           آرام سے تیار
         </p>
         <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Ready with comfort. Made in Pakistan, sold from Lahore.
+          {site.tagline} — ready with comfort. Made in Pakistan, sold from Lahore.
         </p>
 
         <div className="mt-10 grid gap-8 text-sm sm:grid-cols-3">
@@ -51,6 +51,7 @@ export default function SiteFooter({
                 ["/shipping", "Shipping and returns"],
                 ["/track", "Track your order"],
                 ["/about", "About Bilques"],
+                ["/about#promises", "What we will not do"],
                 ["/contact", "Contact us"],
               ].map(([href, label]) => (
                 <li key={href}>
@@ -85,6 +86,28 @@ export default function SiteFooter({
                   className="block py-2 hover:text-ink"
                 >
                   Instagram
+                </a>
+              </li>
+              <li>
+                <a
+                  href={facebookLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--color-ink-soft)" }}
+                  className="block py-2 hover:text-ink"
+                >
+                  Facebook
+                </a>
+              </li>
+              <li>
+                <a
+                  href={linkedinLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "var(--color-ink-soft)" }}
+                  className="block py-2 hover:text-ink"
+                >
+                  LinkedIn
                 </a>
               </li>
               <li className="py-2" style={{ color: "var(--color-ink-soft)" }}>

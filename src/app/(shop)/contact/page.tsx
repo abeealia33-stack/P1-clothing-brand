@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Talk to us</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Talk to us</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         A real person answers, usually within a couple of hours between 11am and
         9pm.

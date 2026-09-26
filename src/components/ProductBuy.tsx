@@ -129,7 +129,7 @@ export default function ProductBuy({ product }: { product: Product }) {
         className="fixed inset-x-0 bottom-tabbar z-40 border-t border-line bg-paper/95 px-5 py-3 backdrop-blur-sm md:static md:mt-9 md:border-0 md:bg-transparent md:p-0 md:backdrop-blur-none"
 
       >
-        <div className="mx-auto flex max-w-6xl items-center gap-4 md:gap-5">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 md:gap-5">
           <div className="md:hidden">
             <p className="tnum text-lg leading-tight">{priceLabel(product.price)}</p>
             <p className="text-xs leading-tight" style={{ color: "var(--color-ink-soft)" }}>
@@ -160,7 +160,7 @@ export default function ProductBuy({ product }: { product: Product }) {
         {added && (
           <p
             role="status"
-            className="settle mx-auto mt-2 flex max-w-6xl items-center gap-3 text-sm"
+            className="settle mx-auto mt-2 flex max-w-7xl items-center gap-3 text-sm"
           >
             <span style={{ color: "var(--color-sage-deep)" }}>Added to your cart.</span>
             <Link href="/cart" className="underline underline-offset-4">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useRef, useState } from "react";
+import { checkImageSize, MIN_SIZES, sizeLabel, type MinSize } from "@/lib/image-size";
 
 type Photo = { url: string; uploading?: boolean; error?: string };
 
@@ -16,11 +17,14 @@ export default function PhotoUploader({
   name,
   initial,
   purpose = "product",
+  minSize = MIN_SIZES.product,
 }: {
   name: string;
   initial: string[];
   /** "feature" for the pictures that run the full width of the page. */
   purpose?: "product" | "feature";
+  /** Photos smaller than this are refused before they upload. */
+  minSize?: MinSize;
 }) {
   const [photos, setPhotos] = useState<Photo[]>(
     initial.map((url) => ({ url }))
@@ -30,8 +34,15 @@ export default function PhotoUploader({
   const inputId = useId();
   const fileInput = useRef<HTMLInputElement>(null);
 
+  const [refused, setRefused] = useState<string[]>([]);
+
   const upload = async (files: FileList | File[]) => {
-    const list = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const images = Array.from(files).filter((f) => f.type.startsWith("image/"));
+    const problems = await Promise.all(images.map((f) => checkImageSize(f, minSize)));
+    setRefused(
+      images.flatMap((f, i) => (problems[i] ? [`${f.name}: ${problems[i]}`] : []))
+    );
+    const list = images.filter((_, i) => !problems[i]);
     if (list.length === 0) return;
 
     // Show each photo immediately with a local preview, then swap in the
@@ -141,8 +152,14 @@ export default function PhotoUploader({
           }}
         />
         <p className="mt-3 text-xs" style={{ color: "var(--color-ink-soft)" }}>
-          JPG, PNG or WebP, up to 8 MB each
+          JPG, PNG or WebP, up to 8 MB each. Upload at {sizeLabel(minSize)} (3:4
+          portrait) — smaller photos are refused.
         </p>
+        {refused.map((line) => (
+          <p key={line} role="alert" className="mt-1 text-xs" style={{ color: "var(--color-alert)" }}>
+            {line}
+          </p>
+        ))}
       </div>
 
       {photos.length > 0 && (

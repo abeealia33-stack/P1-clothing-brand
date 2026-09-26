@@ -74,7 +74,7 @@ export default function ReelsRail({ reels }: { reels: Reel[] }) {
 
   return (
     <div className="relative">
-      <div ref={rail} className="rail gap-4 px-5 md:mx-auto md:max-w-6xl">
+      <div ref={rail} className="rail gap-4 px-5 md:px-16 md:mx-auto md:max-w-7xl">
         {reels.map((reel) => (
           <ReelCard key={reel.id} reel={reel} playing={active === reel.id} />
         ))}
@@ -84,7 +84,7 @@ export default function ReelsRail({ reels }: { reels: Reel[] }) {
           track the rail's own width rather than the viewport's, so they sit
           against the cards instead of drifting off to the window edges. */}
       {edges.scrollable && (
-        <div className="pointer-events-none absolute inset-0 mx-auto hidden max-w-6xl items-center justify-between px-1 md:flex">
+        <div className="pointer-events-none absolute inset-0 mx-auto hidden max-w-7xl items-center justify-between px-1 md:flex">
           <Arrow
             direction="back"
             disabled={edges.atStart}

@@ -1,11 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   bannerHref,
+  dayProductIds,
   homeBlocks,
   normaliseHomeOrder,
-  DEFAULT_BUTTON_LABEL,
   DEFAULT_CTA_LABEL,
-  DEFAULT_STRIP_HEADING,
   emptyHomeBanners,
   linkedProductIds,
   normaliseHomeBanners,
@@ -57,14 +56,23 @@ describe("normaliseHomeBanners", () => {
     expect(normaliseHomeBanners({ strip: { tiles: many } }).strip.tiles).toHaveLength(12);
   });
 
-  it("puts the wording back when a field is cleared", () => {
+  it("puts the strip's link wording back when cleared, and leaves optional words blank", () => {
     const banners = normaliseHomeBanners({
       strip: { heading: "   ", buttonLabel: "" },
       split: { panels: [{ ...slot("/a.jpg"), buttonLabel: "" }] },
     });
-    expect(banners.strip.heading).toBe(DEFAULT_STRIP_HEADING);
+    expect(banners.strip.heading).toBe("");
     expect(banners.strip.buttonLabel).toBe(DEFAULT_CTA_LABEL);
-    expect(banners.split.panels[0].buttonLabel).toBe(DEFAULT_BUTTON_LABEL);
+    expect(banners.split.panels[0].buttonLabel).toBe("");
+  });
+
+  it("drops the old placeholder wording saved by earlier versions", () => {
+    const banners = normaliseHomeBanners({
+      strip: { heading: "Promotional Moments" },
+      split: { panels: [slot("/a.jpg"), slot("/b.jpg")] },
+    });
+    expect(banners.strip.heading).toBe("");
+    expect(banners.split.panels.map((p) => p.buttonLabel)).toEqual(["", ""]);
   });
 
   it("keeps the owner's own wording, trimmed", () => {
@@ -84,7 +92,8 @@ describe("normaliseHomeBanners", () => {
 
   it("carries the order of the page", () => {
     expect(normaliseHomeBanners({}).order).toEqual([...homeBlocks]);
-    expect(normaliseHomeBanners({ order: ["reels"] }).order[0]).toBe("reels");
+    const reversed = [...homeBlocks].reverse();
+    expect(normaliseHomeBanners({ order: reversed }).order).toEqual(reversed);
   });
 
   it("shows a section unless it was switched off", () => {
@@ -133,45 +142,66 @@ describe("normaliseHomeOrder", () => {
   });
 
   it("keeps the owner's order", () => {
-    const moved = [
-      "groupOrders",
-      "carousel",
-      "newIn",
-      "pair",
-      "reels",
-      "madeToFit",
-      "collections",
-    ];
+    const moved = ["reels", "carousel", "pair", "groupOrders", "dayPicker", "newIn", "collections"];
     expect(normaliseHomeOrder(moved)).toEqual(moved);
   });
 
-  it("adds the sections that did not exist when an order was saved, at the end", () => {
-    const savedBefore = ["collections", "pair", "newIn", "carousel", "reels"];
-    expect(normaliseHomeOrder(savedBefore)).toEqual([...savedBefore, "madeToFit", "groupOrders"]);
-  });
-
-  it("puts back a block that is missing, at the end", () => {
+  it("puts a missing block after the one it follows by default", () => {
     expect(normaliseHomeOrder(["reels", "pair"])).toEqual([
-      "reels",
-      "pair",
-      "madeToFit",
       "collections",
       "newIn",
+      "dayPicker",
+      "groupOrders",
+      "reels",
+      "pair",
+      "carousel",
+    ]);
+  });
+
+  it("slots a new section into an order saved before it existed, and drops retired ones", () => {
+    const saved = ["madeToFit", "collections", "pair", "newIn", "carousel", "groupOrders", "reels"];
+    expect(normaliseHomeOrder(saved)).toEqual([
+      "collections",
+      "pair",
+      "newIn",
+      "dayPicker",
       "carousel",
       "groupOrders",
+      "reels",
     ]);
   });
 
   it("drops anything it does not know, and any repeat", () => {
     expect(normaliseHomeOrder(["reels", "reels", "footer", 7, "pair"])).toEqual([
-      "reels",
-      "pair",
-      "madeToFit",
       "collections",
       "newIn",
-      "carousel",
+      "dayPicker",
       "groupOrders",
+      "reels",
+      "pair",
+      "carousel",
     ]);
+  });
+});
+
+describe("day picks", () => {
+  it("start empty for every day", () => {
+    expect(Object.values(emptyHomeBanners().days)).toEqual(
+      Array.from({ length: 5 }, () => ({ reason: "", productIds: [] }))
+    );
+  });
+
+  it("keep up to three distinct pieces and the reason, trimmed", () => {
+    const banners = normaliseHomeBanners({
+      days: { dawat: { reason: "  Lawn, no ironing ", productIds: ["a", "a", "b", "", "c", "d"] } },
+    });
+    expect(banners.days.dawat).toEqual({ reason: "Lawn, no ironing", productIds: ["a", "b", "c"] });
+    expect(banners.days.ghar).toEqual({ reason: "", productIds: [] });
+    expect(dayProductIds(banners)).toEqual(["a", "b", "c"]);
+  });
+
+  it("keep the group photo", () => {
+    expect(normaliseHomeBanners({ groupImage: " /g.jpg " }).groupImage).toBe("/g.jpg");
   });
 });
 
@@ -243,7 +273,7 @@ describe("resolveHomeBanners", () => {
       split: { panels: [slot("/a.jpg"), slot("/b.jpg")] },
     });
     const shown = resolveHomeBanners(banners, none);
-    expect(shown.strip?.heading).toBe(DEFAULT_STRIP_HEADING);
+    expect(shown.strip?.heading).toBe("");
     expect(shown.strip?.href).toBe("/shop?collection=azad");
     expect(shown.strip?.tiles.map((t) => t.href)).toEqual([
       "/shop?collection=rozana",

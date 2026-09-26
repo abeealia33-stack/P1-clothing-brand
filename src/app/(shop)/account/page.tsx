@@ -40,7 +40,7 @@ const links = [
 export default function AccountPage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Your orders</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Your orders</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         No sign-up here. Everything is tied to the mobile number you order with,
         so there is one less password to keep.

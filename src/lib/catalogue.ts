@@ -309,6 +309,16 @@ export async function liveProductSlugs(ids: string[]): Promise<Map<string, strin
   return new Map(rows.map((row) => [row.id, row.slug]));
 }
 
+/** Live pieces by id, for sections the owner fills by hand. Hidden ones are left out. */
+export async function liveProductsByIds(ids: string[]): Promise<Map<string, Product>> {
+  if (ids.length === 0) return new Map();
+  const rows = await prisma.product.findMany({
+    where: { id: { in: ids }, active: true },
+    include: withCategories,
+  });
+  return new Map(rows.map((row) => [row.id, toProduct(row)]));
+}
+
 export async function countProducts() {
   const [total, live, outOfStock] = await Promise.all([
     prisma.product.count(),

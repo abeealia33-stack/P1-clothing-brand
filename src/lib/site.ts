@@ -23,3 +23,7 @@ export const whatsappLink = (message?: string) =>
   `https://wa.me/${site.whatsapp}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 
 export const instagramLink = `https://instagram.com/${site.instagram}`;
+
+export const linkedinLink = "https://www.linkedin.com/company/bilques/";
+
+export const facebookLink = "https://www.facebook.com/profile.php?id=61588620676136";

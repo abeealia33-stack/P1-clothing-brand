@@ -57,14 +57,17 @@ export default function SplitBanner({ panels }: { panels: ShownSlot[] }) {
                       {panel.heading}
                     </h3>
                   )}
-                  <span className="banner-cta mt-4 inline-block">
-                    <span
-                      className="banner-button btn"
-                      style={{ background: "var(--color-paper)", color: "var(--color-ink)" }}
-                    >
-                      {panel.buttonLabel}
+                  {/* Optional: the whole photograph is already the link. */}
+                  {panel.buttonLabel && (
+                    <span className="banner-cta mt-4 inline-block">
+                      <span
+                        className="banner-button btn"
+                        style={{ background: "var(--color-paper)", color: "var(--color-ink)" }}
+                      >
+                        {panel.buttonLabel}
+                      </span>
                     </span>
-                  </span>
+                  )}
                 </div>
               </Link>
             </div>

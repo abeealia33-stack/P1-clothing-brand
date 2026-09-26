@@ -3,18 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
+import { emptyHero, normaliseHero } from "@/lib/hero";
 import { saveSettings, type PaymentAccounts } from "@/lib/settings";
 
 export type SettingsFormState = { errors?: Record<string, string> };
-
-function parseJsonArray<T>(raw: string): T[] {
-  try {
-    const value = JSON.parse(raw);
-    return Array.isArray(value) ? (value as T[]) : [];
-  } catch {
-    return [];
-  }
-}
 
 export async function saveSettingsAction(
   _previous: SettingsFormState,
@@ -22,9 +14,12 @@ export async function saveSettingsAction(
 ): Promise<SettingsFormState> {
   await requireAdmin();
 
-  const heroImages = parseJsonArray<string>(String(formData.get("heroImages") ?? "[]")).filter(
-    (v) => typeof v === "string"
-  );
+  let hero = emptyHero();
+  try {
+    hero = normaliseHero(JSON.parse(String(formData.get("hero") ?? "{}")));
+  } catch {
+    return { errors: { form: "Could not read the hero settings. Try again." } };
+  }
 
   /* Only the shape is checked here; saveSettings drops any account missing a
      title or a number, so a half-typed row never reaches a customer. */
@@ -37,7 +32,7 @@ export async function saveSettingsAction(
   }
 
   try {
-    await saveSettings({ heroImages, payments });
+    await saveSettings({ hero, payments });
   } catch (error) {
     console.error("Could not save the settings", error);
     return { errors: { form: "Could not save. Try again." } };

@@ -16,25 +16,35 @@ import {
 describe("resolveCollections", () => {
   it("leaves every collection as written in the code when nothing is edited", () => {
     expect(resolveCollections({})).toEqual(
-      collections.map((c) => ({ ...c, inNav: true }))
+      collections.map((c) => ({
+        ...c,
+        inNav: true,
+        image: `/cloth/collection-${c.slug}.svg`,
+        banner: "",
+      }))
     );
+  });
+
+  it("uses the owner's tile photo and banner once uploaded", () => {
+    const [first] = resolveCollections({ rozana: { image: "/t.jpg", banner: "/b.jpg" } });
+    expect(first.image).toBe("/t.jpg");
+    expect(first.banner).toBe("/b.jpg");
   });
 
   it("applies the owner's wording", () => {
     const [first] = resolveCollections({
-      rozana: { name: "Everyday", urdu: "روز", line: "For the week." },
+      rozana: { name: "Everyday", urdu: "روز" },
     });
     expect(first.name).toBe("Everyday");
     expect(first.urdu).toBe("روز");
-    expect(first.line).toBe("For the week.");
     // Untouched fields keep their built-in wording rather than emptying out.
-    expect(first.intro).toBe(collections[0].intro);
+    expect(first.line).toBe(collections[0].line);
   });
 
   it("falls back to the built-in wording when a field is cleared", () => {
-    const [first] = resolveCollections({ rozana: { name: "   ", intro: "" } });
+    const [first] = resolveCollections({ rozana: { name: "   ", line: "" } });
     expect(first.name).toBe(collections[0].name);
-    expect(first.intro).toBe(collections[0].intro);
+    expect(first.line).toBe(collections[0].line);
   });
 
   it("keeps all four whatever is hidden, so nothing can be lost by editing", () => {

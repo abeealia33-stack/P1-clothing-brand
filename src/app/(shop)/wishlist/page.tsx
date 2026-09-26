@@ -10,8 +10,8 @@ export const metadata: Metadata = { title: "Saved" };
  */
 export default function WishlistPage() {
   return (
-    <div className="mx-auto max-w-6xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Saved</h1>
+    <div className="mx-auto max-w-7xl px-5 md:px-16 py-10 md:py-14">
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Saved</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         Pieces you have kept for later. They stay in this browser — there is no
         sign-up here — so they will not follow you to another phone.

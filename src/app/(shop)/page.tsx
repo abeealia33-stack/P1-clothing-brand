@@ -1,224 +1,147 @@
 import Link from "next/link";
 import { Fragment } from "react";
 import CollectionRail from "@/components/CollectionRail";
+import DayPicker, { type ShownDay } from "@/components/DayPicker";
 import GroupOrdersSection from "@/components/GroupOrdersSection";
-import HeroSlideshow from "@/components/HeroSlideshow";
-import MadeToFitSection from "@/components/MadeToFitSection";
+import HeroBanner from "@/components/HeroBanner";
 import ProductCard from "@/components/ProductCard";
 import PromoStrip from "@/components/PromoStrip";
 import ReelsRail from "@/components/ReelsRail";
 import SplitBanner from "@/components/SplitBanner";
-import SwipeRail from "@/components/SwipeRail";
 import {
+  bannerHref,
+  dayKeys,
+  dayLabels,
+  dayProductIds,
   linkedProductIds,
   resolveHomeBanners,
+  type HomeBanners,
   type HomeBlock,
 } from "@/lib/banners";
-import { liveProductSlugs, newestProducts } from "@/lib/catalogue";
+import { liveProductSlugs, liveProductsByIds, newestProducts } from "@/lib/catalogue";
 import { listReels, type Reel } from "@/lib/reels";
 import { getNavCollections, getSettings } from "@/lib/settings";
-import { rupees, spellCount } from "@/lib/format";
+import { rupees } from "@/lib/format";
 import type { Product, ResolvedCollection } from "@/lib/types";
 import { site } from "@/lib/site";
 
 const DEFAULT_HERO = "/cloth/hero.svg";
 
 export default async function HomePage() {
-  // None of the three depends on the others, and this is the page most people
+  // None of these depends on the others, and this is the page most people
   // land on, so they go together rather than one round trip after another.
-  const [newIn, reels, { heroImages: uploadedHero, banners }, shownCollections] =
-    await Promise.all([
-      newestProducts(4),
-      listReels(),
-      getSettings(),
-      getNavCollections(),
-    ]);
-  const heroImages = uploadedHero.length > 0 ? uploadedHero : [DEFAULT_HERO];
+  const [newIn, reels, { hero, banners }, shownCollections] = await Promise.all([
+    newestProducts(4),
+    listReels(),
+    getSettings(),
+    getNavCollections(),
+  ]);
 
-  const { order } = banners;
-
-  // A banner pointing at a piece stores its id, not its address, so the
-  // addresses are looked up here — all of them in one query.
-  const { strip, split } = resolveHomeBanners(
-    banners,
-    await liveProductSlugs(linkedProductIds(banners))
-  );
+  // Banners store the pieces they point at by id, not address, so both the
+  // addresses and the day picker's pieces are looked up here, together.
+  const [productSlugs, dayProducts] = await Promise.all([
+    liveProductSlugs([
+      ...linkedProductIds(banners),
+      ...(hero.link.kind === "product" ? [hero.link.id] : []),
+    ]),
+    liveProductsByIds(dayProductIds(banners)),
+  ]);
+  const { strip, split } = resolveHomeBanners(banners, productSlugs);
+  const days = shownDays(banners, dayProducts);
 
   /*
    * The middle of the page, in whatever order the owner has put it.
    *
    * Each entry draws nothing when it has nothing to show, so an empty one
-   * leaves no gap and simply gives up its turn. The hero above and the
-   * promises below are the page's frame and stay where they are.
+   * leaves no gap and simply gives up its turn. The hero and the promises
+   * under it are the page's frame and stay where they are.
    */
   const blocks: Record<HomeBlock, React.ReactNode> = {
-    madeToFit: <MadeToFitSection />,
     collections: <CollectionsBlock shownCollections={shownCollections} />,
-    pair: split && <SplitBanner panels={split.panels} />,
     newIn: <NewInBlock newIn={newIn} />,
+    dayPicker: days.length > 0 && <DayPicker days={days} />,
+    groupOrders: <GroupOrdersSection image={banners.groupImage} />,
+    pair: split && <SplitBanner panels={split.panels} />,
     carousel: strip && <PromoStrip strip={strip} />,
-    groupOrders: <GroupOrdersSection />,
     reels: <ReelsBlock reels={reels} />,
   };
 
   return (
     <>
       {/* The fold: this stays put while the paper below slides up over it. */}
-      <section className="fold-hero -mt-14 md:-mt-16">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="fold-parallax relative h-full w-full origin-center">
-            <HeroSlideshow
-              images={heroImages}
-              alt="A length of undyed cotton in morning light"
-            />
-          </div>
-        </div>
-
-        <div className="relative flex h-full items-end">
-          <div className="hero-copy mx-auto w-full max-w-6xl px-5 pb-14 md:pb-24">
-            <p
-              className="urdu text-2xl leading-none sm:text-3xl md:text-4xl"
-              style={{ color: "var(--color-sage-deep)" }}
-            >
-              آرام سے تیار
-            </p>
-            <h1 className="measure-display mt-2 text-[clamp(2.25rem,10vw,3.25rem)] leading-[0.95] md:text-[5rem]">
-              Aaram se tayaar
-            </h1>
-            <p
-              className="measure mt-4 text-sm sm:text-base md:text-lg"
-              style={{ color: "var(--color-ink)" }}
-            >
-              Cotton and khaddar you can put on without thinking about it, and
-              still feel dressed in by evening.
-            </p>
-            {/* Points at whichever range is shown first rather than always at
-                Rozana, so hiding it does not leave the main button leading
-                somewhere the owner has taken out of the menus. */}
-            <div className="mt-6 flex flex-wrap gap-3 md:mt-7">
-              {shownCollections[0] && (
-                <Link
-                  href={`/shop?collection=${shownCollections[0].slug}`}
-                  className="btn btn-ink"
-                >
-                  Shop {shownCollections[0].name}
-                </Link>
-              )}
-              <Link
-                href="/shop"
-                className={shownCollections[0] ? "btn btn-quiet" : "btn btn-ink"}
-              >
-                See everything
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroBanner
+        desktopImage={hero.desktopImage || DEFAULT_HERO}
+        mobileImage={hero.mobileImage}
+        buttonLabel={hero.buttonLabel}
+        href={bannerHref(hero.link, productSlugs)}
+        position={hero.position}
+        focus={hero.focus}
+      />
 
       <div className="fold-body">
-        {order.map((block) => (
+        {/* The three promises, first thing under the photo, where they can
+            still change someone's mind rather than at the foot of the page. */}
+        <p className="trust-strip tnum px-5 py-2.5 text-center">
+          Cash on delivery <span aria-hidden="true">·</span> Free over PKR{" "}
+          {rupees(site.freeShippingOver)} <span aria-hidden="true">·</span>{" "}
+          <Link href="/shipping" className="underline-offset-4 hover:underline">
+            7-day exchange
+          </Link>
+        </p>
+
+        {banners.order.map((block) => (
           <Fragment key={block}>{blocks[block]}</Fragment>
         ))}
-
-        <section className="mx-auto max-w-6xl px-5 py-16 md:py-20">
-          {/* A hairline over each promise, so the three read as a set of
-              terms rather than three loose paragraphs. */}
-          <dl className="grid gap-8 sm:grid-cols-3 sm:gap-6">
-            <div className="rule pt-5">
-              <dt className="text-2xl">Pay when it arrives</dt>
-              <dd className="mt-1.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-                Cash on delivery everywhere in Pakistan. Bank transfer, JazzCash
-                and EasyPaisa also accepted.
-              </dd>
-            </div>
-            <div className="rule pt-5">
-              <dt className="tnum text-2xl">
-                Free over PKR {rupees(site.freeShippingOver)}
-              </dt>
-              <dd className="mt-1.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-                {site.shipping.majorCities} to Karachi, Lahore and Islamabad.{" "}
-                {site.shipping.elsewhere} everywhere else.
-              </dd>
-            </div>
-            <div className="rule pt-5">
-              <dt className="text-2xl">Wrong size, no argument</dt>
-              <dd className="mt-1.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-                Exchange any unworn piece within seven days.{" "}
-                <Link href="/shipping" className="underline underline-offset-4">
-                  Read the policy
-                </Link>
-                .
-              </dd>
-            </div>
-          </dl>
-        </section>
       </div>
     </>
   );
 }
 
-/* Everything below is one block of the orderable middle. Kept out of the
-   page above so the frame — the hero and the promises — reads as the fixed
-   thing it is. */
+/* A day shows once it has at least one live piece; the rest stay out of the
+   chips rather than offering a choice that leads to nothing. */
+function shownDays(banners: HomeBanners, products: Map<string, Product>): ShownDay[] {
+  return dayKeys.flatMap((key) => {
+    const day = banners.days[key];
+    const picked = day.productIds.flatMap((id) => products.get(id) ?? []);
+    return picked.length > 0
+      ? [{ key, label: dayLabels[key], reason: day.reason, products: picked }]
+      : [];
+  });
+}
 
-function CollectionsBlock({
-  shownCollections,
-}: {
-  shownCollections: ResolvedCollection[];
-}) {
+/* Everything below is one block of the orderable middle. */
+
+function CollectionsBlock({ shownCollections }: { shownCollections: ResolvedCollection[] }) {
+  if (shownCollections.length === 0) return null;
+
   return (
-    <>
-      {/* Counted rather than fixed at four: the owner can hide the ranges
-          she is not selling yet, and the heading has to keep up. */}
-      {shownCollections.length > 0 && (
-        <section className="mx-auto max-w-6xl px-5 py-12 md:py-16">
-          <h2 className="text-4xl md:text-5xl">
-            {spellCount(shownCollections.length)}{" "}
-            {shownCollections.length === 1 ? "way" : "ways"} to get dressed
-          </h2>
-          <p
-            className="measure mt-2 mb-8 text-sm"
-            style={{ color: "var(--color-ink-soft)" }}
-          >
-            {shownCollections.length === 1
-              ? "Start here."
-              : "Every piece belongs to one of these. Start wherever your week is."}
-          </p>
-          <CollectionRail collections={shownCollections} />
-        </section>
-      )}
-    </>
+    <section className="home-section mx-auto max-w-7xl px-5 md:px-16">
+      <h2 className="home-h2 mb-6">Shop by collection</h2>
+      <CollectionRail collections={shownCollections} />
+    </section>
   );
 }
 
 /* Nothing new to show until there are pieces: an empty band under a "Just in"
-   heading reads as a broken page, not an empty shop. */
+   heading reads as a broken page, not an empty shop. A piece without a photo
+   is left out for the same reason. */
 function NewInBlock({ newIn }: { newIn: Product[] }) {
-  if (newIn.length === 0) return null;
+  const shown = newIn.filter((p) => p.photos.length > 0);
+  if (shown.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16" style={{ background: "var(--color-khaddar)" }}>
-      <div className="mx-auto max-w-6xl px-5">
-        <div className="flex items-baseline justify-between gap-4">
-          <h2 className="text-4xl md:text-5xl">Just in</h2>
-          <Link
-            href="/shop"
-            className="shrink-0 text-sm underline underline-offset-4"
-            style={{ color: "var(--color-ink-soft)" }}
-          >
-            All pieces
-          </Link>
-        </div>
+    <section className="home-section mx-auto max-w-7xl px-5 md:px-16">
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 className="home-h2">Just in</h2>
+        <Link href="/shop" className="shrink-0 text-sm underline underline-offset-4">
+          See all
+        </Link>
       </div>
-
-      {/* Swipeable on phones, a plain grid once there is room for one. */}
-      <SwipeRail className="rail mt-8 gap-4 px-5 md:mx-auto md:grid md:max-w-6xl md:grid-cols-4 md:overflow-visible">
-        {newIn.map((product, i) => (
-          <div key={product.slug} className="w-[68vw] max-w-72 md:w-auto md:max-w-none">
-            <ProductCard product={product} priority={i === 0} />
-          </div>
+      <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-6">
+        {shown.map((product, i) => (
+          <ProductCard key={product.slug} product={product} priority={i === 0} />
         ))}
-      </SwipeRail>
+      </div>
     </section>
   );
 }
@@ -227,12 +150,9 @@ function ReelsBlock({ reels }: { reels: Reel[] }) {
   if (reels.length === 0) return null;
 
   return (
-    <section className="py-12 md:py-16">
-      <div className="mx-auto max-w-6xl px-5">
-        <h2 className="text-4xl md:text-5xl">See it worn</h2>
-        <p className="measure mt-2 mb-8 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Short clips of real pieces. Tap one to shop it.
-        </p>
+    <section className="home-section">
+      <div className="mx-auto mb-6 max-w-7xl px-5 md:px-16">
+        <h2 className="home-h2">See it worn</h2>
       </div>
       <ReelsRail reels={reels} />
     </section>

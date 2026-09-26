@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import SettingsForm from "@/components/admin/SettingsForm";
 import { requireAdmin } from "@/lib/auth";
-import { getSettings } from "@/lib/settings";
+import { listProductChoices } from "@/lib/catalogue";
+import { getAllCollections, getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { title: "Settings" };
 export const dynamic = "force-dynamic";
@@ -14,7 +15,11 @@ export default async function AdminSettingsPage({
   await requireAdmin();
 
   const { saved } = await searchParams;
-  const { heroImages, payments } = await getSettings();
+  const [{ hero, payments }, collections, products] = await Promise.all([
+    getSettings(),
+    getAllCollections(),
+    listProductChoices(),
+  ]);
 
   return (
     <div className="py-8">
@@ -34,7 +39,12 @@ export default async function AdminSettingsPage({
         </p>
       )}
 
-      <SettingsForm heroImages={heroImages} payments={payments} />
+      <SettingsForm
+        initialHero={hero}
+        payments={payments}
+        collections={collections}
+        products={products}
+      />
     </div>
   );
 }

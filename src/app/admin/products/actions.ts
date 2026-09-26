@@ -85,7 +85,13 @@ async function readForm(
   }
   if (sizes.length === 0) errors.sizes = "Add at least one size.";
   if (colours.length === 0) errors.colors = "Add at least one colour.";
-  if (photos.length === 0) errors.photos = "Add at least one photo.";
+  if (photos.length === 0) {
+    errors.photos = "Add at least one photo.";
+  } else if (active && photos.length < 2) {
+    // A single photo reads as unfinished on the shop. A draft can wait with
+    // one; showing it needs a second (the back, or a detail).
+    errors.photos = "Add a second photo before showing this piece in the shop, or untick “Show in the shop” to save it as a draft.";
+  }
 
   const slug = slugify(String(formData.get("slug") ?? "") || name);
   if (!slug) {

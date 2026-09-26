@@ -4,9 +4,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 
 /**
  * Fades and lifts its children in the first time they scroll into view, then
- * leaves them alone — a one-shot entrance rather than the ambient motion
- * elsewhere on the site (see .centre-scale in globals.css, which oscillates
- * on purpose). Stands down entirely under prefers-reduced-motion.
+ * leaves them alone — a one-shot entrance, never motion that repeats as you
+ * scroll back and forth. Stands down entirely under prefers-reduced-motion.
  *
  * A section that choreographs its own entrance — the home page banners, where
  * each card arrives on its own beat — passes `lift={false}`: this then only

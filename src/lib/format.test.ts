@@ -1,12 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ago, spellCount } from "./format";
-
-describe("spellCount", () => {
-  it("spells the counts a heading can actually have", () => {
-    expect(spellCount(1)).toBe("One");
-    expect(spellCount(4)).toBe("Four");
-  });
-});
+import { ago } from "./format";
 
 describe("ago", () => {
   const minutesAgo = (n: number) => new Date(Date.now() - n * 60_000).toISOString();

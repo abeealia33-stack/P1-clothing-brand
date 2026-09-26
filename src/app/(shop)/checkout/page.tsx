@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import FormField from "@/components/FormField";
 import { useCart } from "@/components/useCart";
 import { priceLabel, rupees } from "@/lib/format";
@@ -103,7 +103,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Checkout</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Checkout</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         One page, no account needed. We call before dispatch to confirm.
       </p>
@@ -165,11 +165,18 @@ export default function CheckoutPage() {
         <fieldset className="rule mt-9 border-0 p-0 pt-7">
           <legend className="text-2xl">How you will pay</legend>
           <div className="mt-5 space-y-2">
-            {paymentMethods.map((method) => {
+            {paymentMethods.map((method, i) => {
               const on = payment === method.value;
               return (
+                <Fragment key={method.value}>
+                {/* Cash on delivery first and chosen already; paying ahead is
+                    offered underneath rather than as an equal choice. */}
+                {i === 1 && (
+                  <p className="pt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+                    Or pay in advance
+                  </p>
+                )}
                 <label
-                  key={method.value}
                   className="flex cursor-pointer gap-3 border p-4 transition-colors"
                   style={{
                     borderColor: on ? "var(--color-ink)" : "var(--color-line)",
@@ -197,6 +204,7 @@ export default function CheckoutPage() {
                     </span>
                   </span>
                 </label>
+                </Fragment>
               );
             })}
           </div>

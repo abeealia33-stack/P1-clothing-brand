@@ -47,12 +47,12 @@ export type BannerTile = { image: string; label: string; link: BannerLink };
  * below the fold is a shop with a broken front door.
  */
 export const homeBlocks = [
-  "madeToFit",
   "collections",
-  "pair",
   "newIn",
-  "carousel",
+  "dayPicker",
   "groupOrders",
+  "pair",
+  "carousel",
   "reels",
 ] as const;
 
@@ -60,14 +60,35 @@ export type HomeBlock = (typeof homeBlocks)[number];
 
 /** What each block is called in the admin, in the words on the page itself. */
 export const homeBlockLabels: Record<HomeBlock, string> = {
-  madeToFit: "Made to fit you",
   collections: "Ways to get dressed",
   pair: "The pair (two photos)",
   newIn: "Just in",
   carousel: "The carousel",
+  dayPicker: "Aaj ka din kaisa hai? (day picker)",
   groupOrders: "Made to match (group orders)",
   reels: "See it worn (reels)",
 };
+
+/**
+ * "Aaj ka din kaisa hai?" — the shopper picks what their day looks like and
+ * the pieces under it change. The owner chooses the pieces for each day and
+ * the one line saying why they suit it.
+ */
+export const dayKeys = ["ghar", "work", "ammi", "bahar", "dawat"] as const;
+export type DayKey = (typeof dayKeys)[number];
+
+export const dayLabels: Record<DayKey, string> = {
+  ghar: "Ghar pe aaram",
+  work: "University / office",
+  ammi: "Ammi ke ghar",
+  bahar: "Bahar ghoomna",
+  dawat: "Dawat",
+};
+
+/** Three pieces per day: a row on a desktop, and no scrolling to compare them. */
+export const DAY_PIECES = 3;
+
+export type DayPick = { reason: string; productIds: string[] };
 
 export type HomeBanners = {
   /** The order the blocks above are drawn in, top to bottom. */
@@ -88,6 +109,9 @@ export type HomeBanners = {
     tiles: BannerTile[];
   };
   split: { show: boolean; panels: BannerSlot[] };
+  days: Record<DayKey, DayPick>;
+  /** The wide Hum rang photo; "" draws the illustration instead. */
+  groupImage: string;
 };
 
 export const SPLIT_PANELS = 2;
@@ -95,14 +119,12 @@ export const SPLIT_PANELS = 2;
 export const MIN_TILES = 3;
 /** Past this the dots become a smear and nobody reaches the end. */
 export const MAX_TILES = 12;
-export const DEFAULT_STRIP_HEADING = "Promotional Moments";
-export const DEFAULT_BUTTON_LABEL = "Explore Now";
 export const DEFAULT_CTA_LABEL = "Shop now";
 
 const emptySlot = (): BannerSlot => ({
   image: "",
   heading: "",
-  buttonLabel: DEFAULT_BUTTON_LABEL,
+  buttonLabel: "",
   link: { kind: "shop" },
 });
 
@@ -114,7 +136,7 @@ export const emptyHomeBanners = (): HomeBanners => ({
   strip: {
     show: true,
     eyebrow: "",
-    heading: DEFAULT_STRIP_HEADING,
+    heading: "",
     text: "",
     buttonLabel: DEFAULT_CTA_LABEL,
     link: { kind: "shop" },
@@ -124,9 +146,25 @@ export const emptyHomeBanners = (): HomeBanners => ({
     show: true,
     panels: Array.from({ length: SPLIT_PANELS }, emptySlot),
   },
+  days: emptyDays(),
+  groupImage: "",
 });
 
+function emptyDays(): Record<DayKey, DayPick> {
+  const day = (): DayPick => ({ reason: "", productIds: [] });
+  return { ghar: day(), work: day(), ammi: day(), bahar: day(), dawat: day() };
+}
+
 const text = (value: unknown): string => (typeof value === "string" ? value.trim() : "");
+
+/* Wording that used to be filled in by default and was saved into every
+   shop's settings. It read as template text on the live page, so it is
+   dropped on the way out — a blank heading or button simply isn't drawn. */
+const RETIRED_PLACEHOLDERS = new Set(["Promotional Moments", "Explore Now"]);
+const owned = (value: unknown): string => {
+  const words = text(value);
+  return RETIRED_PLACEHOLDERS.has(words) ? "" : words;
+};
 
 const record = (value: unknown): Record<string, unknown> =>
   value && typeof value === "object" && !Array.isArray(value)
@@ -134,7 +172,7 @@ const record = (value: unknown): Record<string, unknown> =>
     : {};
 
 /** Anything that cannot be followed becomes a link to the whole shop. */
-function normaliseLink(value: unknown): BannerLink {
+export function normaliseBannerLink(value: unknown): BannerLink {
   const link = record(value);
   if (link.kind === "collection" && typeof link.slug === "string" && isCollectionSlug(link.slug)) {
     return { kind: "collection", slug: link.slug };
@@ -150,9 +188,9 @@ function normaliseSlot(value: unknown): BannerSlot {
   return {
     image: text(slot.image),
     heading: text(slot.heading),
-    // A cleared button reads as it does by default rather than an empty box.
-    buttonLabel: text(slot.buttonLabel) || DEFAULT_BUTTON_LABEL,
-    link: normaliseLink(slot.link),
+    // Optional: the whole photo is the link, so no button is needed.
+    buttonLabel: owned(slot.buttonLabel),
+    link: normaliseBannerLink(slot.link),
   };
 }
 
@@ -168,7 +206,7 @@ function tiles(value: unknown): BannerTile[] {
     return {
       image: text(tile.image),
       label: text(tile.label),
-      link: normaliseLink(tile.link),
+      link: normaliseBannerLink(tile.link),
     };
   });
 }
@@ -202,25 +240,39 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
     strip: {
       show: strip.show !== false,
       eyebrow: text(strip.eyebrow),
-      heading: text(strip.heading) || DEFAULT_STRIP_HEADING,
+      heading: owned(strip.heading),
       text: text(strip.text),
       buttonLabel: text(strip.buttonLabel) || DEFAULT_CTA_LABEL,
-      link: normaliseLink(strip.link),
+      link: normaliseBannerLink(strip.link),
       tiles: tiles(strip.tiles),
     },
     split: {
       show: split.show !== false,
       panels: slots(split.panels, SPLIT_PANELS),
     },
+    days: normaliseDays(source.days),
+    groupImage: text(source.groupImage),
   };
+}
+
+function normaliseDays(value: unknown): Record<DayKey, DayPick> {
+  const source = record(value);
+  const days = emptyDays();
+  for (const key of dayKeys) {
+    const day = record(source[key]);
+    const ids = Array.isArray(day.productIds) ? day.productIds.map(text).filter(Boolean) : [];
+    days[key] = { reason: text(day.reason), productIds: [...new Set(ids)].slice(0, DAY_PIECES) };
+  }
+  return days;
 }
 
 /**
  * Every block exactly once, in the order stored.
  *
- * Anything unknown is dropped and anything missing is put back at the end, so
- * a block added to the site later appears on every shop without the owner
- * having to notice, and one removed from the code cannot leave a gap.
+ * Anything unknown is dropped. Anything missing — a block added to the site
+ * since the owner last saved — goes in after the block it follows in the
+ * default order, so it lands where it was designed to sit rather than at the
+ * foot of the page, and she never has to notice it arriving.
  */
 export function normaliseHomeOrder(value: unknown): HomeBlock[] {
   const stored = Array.isArray(value) ? value : [];
@@ -228,8 +280,18 @@ export function normaliseHomeOrder(value: unknown): HomeBlock[] {
     (entry): entry is HomeBlock =>
       typeof entry === "string" && (homeBlocks as readonly string[]).includes(entry)
   );
-  const unique = [...new Set(known)];
-  return [...unique, ...homeBlocks.filter((block) => !unique.includes(block))];
+  const order = [...new Set(known)];
+  homeBlocks.forEach((block, i) => {
+    if (order.includes(block)) return;
+    const before = homeBlocks.slice(0, i).reverse().find((b) => order.includes(b));
+    order.splice(before ? order.indexOf(before) + 1 : 0, 0, block);
+  });
+  return order;
+}
+
+/** Every piece picked for the day picker, once. */
+export function dayProductIds(banners: HomeBanners): string[] {
+  return [...new Set(dayKeys.flatMap((key) => banners.days[key].productIds))];
 }
 
 /** Every piece a banner points at, once — to look their addresses up together. */

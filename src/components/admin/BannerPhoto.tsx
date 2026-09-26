@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { checkImageSize, sizeLabel, type MinSize } from "@/lib/image-size";
 
 /**
  * The photograph half of a banner row: the preview, the button that replaces
@@ -16,6 +17,7 @@ export default function BannerPhoto({
   purpose,
   frame,
   sizeHint,
+  minSize,
 }: {
   image: string;
   onUploaded: (url: string) => void;
@@ -26,14 +28,21 @@ export default function BannerPhoto({
   /** The preview's shape, matching how the photo is cropped on the page. */
   frame: string;
   sizeHint: string;
+  /** Photos smaller than this are refused before they upload. */
+  minSize: MinSize;
 }) {
   const id = useId();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
   const upload = async (file: File) => {
-    setUploading(true);
     setError("");
+    const problem = await checkImageSize(file, minSize);
+    if (problem) {
+      setError(problem);
+      return;
+    }
+    setUploading(true);
     onBusyChange(true);
     const body = new FormData();
     body.set("file", file);
@@ -88,7 +97,7 @@ export default function BannerPhoto({
         }}
       />
       <p className="mt-1.5 text-xs" style={{ color: "var(--color-ink-soft)" }}>
-        {sizeHint}
+        {sizeHint} Smallest accepted: {sizeLabel(minSize)}.
       </p>
       {error && (
         <p role="alert" className="mt-1.5 text-xs" style={{ color: "var(--color-alert)" }}>

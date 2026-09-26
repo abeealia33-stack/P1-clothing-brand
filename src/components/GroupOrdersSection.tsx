@@ -1,11 +1,18 @@
+import ClothImage from "./ClothImage";
 import { whatsappLink } from "@/lib/site";
 
 const occasions = ["Mehndi", "Eid", "Dholki", "Bridesmaids", "Mother & daughter"];
 
+const ask = whatsappLink(
+  "Hi Bilques, I'd like to plan a group order. How many people, and for which occasion? "
+);
+
 /* Hum rang — matching outfits for a group. There is no group-order page yet,
    so the button opens WhatsApp with the request already written, which is
    how these orders would be agreed anyway. */
-export default function GroupOrdersSection() {
+export default function GroupOrdersSection({ image }: { image: string }) {
+  if (image) return <GroupBanner image={image} />;
+
   return (
     <section className="bqf flip">
       <div className="bqf-wrap">
@@ -15,30 +22,9 @@ export default function GroupOrdersSection() {
           </div>
           <h2>Made to match.</h2>
           <div className="bqf-rule" />
-          <p>
-            Mehndi, Eid or a family day. Choose one design and we&rsquo;ll stitch it for
-            everyone, each to their own measurements, delivered together.
-          </p>
-          <ul className="bqf-chips">
-            {occasions.map((occasion) => (
-              <li key={occasion} className="bqf-chip">
-                {occasion}
-              </li>
-            ))}
-          </ul>
-          <ul className="bqf-facts">
-            <li>From 4 people</li>
-            <li>Group discount on 6+</li>
-            <li>Book 3 weeks ahead</li>
-          </ul>
-          <a
-            className="bqf-btn"
-            href={whatsappLink(
-              "Hi Bilques, I'd like to plan a group order. How many people, and for which occasion? "
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <p>One design, stitched for everyone to their own measurements, delivered together.</p>
+          <Occasions />
+          <a className="bqf-btn" href={ask} target="_blank" rel="noopener noreferrer">
             Plan a group order
           </a>
         </div>
@@ -102,6 +88,47 @@ export default function GroupOrdersSection() {
               <use href="#bq-kurta" transform="translate(134 112) scale(.66)" />
             </g>
           </svg>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Occasions() {
+  return (
+    <ul className="bqf-chips">
+      {occasions.map((occasion) => (
+        <li key={occasion} className="bqf-chip">
+          {occasion}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* With the owner's photo: the photo wide across the page (cropped to
+   portrait on a phone), then the words, chips and button under it. */
+function GroupBanner({ image }: { image: string }) {
+  return (
+    <section className="bqf home-section">
+      <div className="mx-auto max-w-7xl px-5 md:px-16">
+        <div className="relative aspect-[4/5] overflow-hidden md:aspect-[12/5]">
+          <ClothImage src={image} alt="A family dressed in matching Bilques outfits" />
+        </div>
+        <div className="mt-6 md:flex md:items-end md:justify-between md:gap-10">
+          <div>
+            <div className="bqf-eyebrow">
+              Group orders <span className="urdu">ہم رنگ</span>
+            </div>
+            <h2 className="home-h2">Made to match.</h2>
+            <p className="mt-2 mb-5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+              One design, stitched for everyone to their own measurements, delivered together.
+            </p>
+            <Occasions />
+          </div>
+          <a className="bqf-btn shrink-0" href={ask} target="_blank" rel="noopener noreferrer">
+            Plan a group order
+          </a>
         </div>
       </div>
     </section>

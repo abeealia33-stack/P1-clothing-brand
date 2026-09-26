@@ -55,7 +55,7 @@ export default async function ProductPage({
 
   return (
     <div className="pb-28 md:pb-0">
-      <div className="mx-auto max-w-6xl md:grid md:grid-cols-2 md:gap-12 md:px-5 md:py-12">
+      <div className="mx-auto max-w-7xl md:grid md:grid-cols-2 md:gap-12 md:px-16 md:py-12">
         <div className="md:sticky md:top-24 md:self-start">
           <Gallery
             photos={product.photos}
@@ -71,7 +71,7 @@ export default async function ProductPage({
           >
             {collection.name}
           </Link>
-          <h1 className="mt-1 text-4xl md:text-5xl">{product.name}</h1>
+          <h1 className="mt-1 text-[2.25rem] md:text-[3.5rem]">{product.name}</h1>
           {product.urdu && (
             <p className="urdu mt-1 text-2xl" style={{ color: "var(--color-sage-deep)" }}>
               {product.urdu}
@@ -130,8 +130,8 @@ export default async function ProductPage({
       </div>
 
       {alsoIn.length > 0 && (
-        <section className="mx-auto max-w-6xl px-5 py-14 md:py-16">
-          <h2 className="text-3xl md:text-4xl">The rest of {collection.name}</h2>
+        <section className="mx-auto max-w-7xl px-5 md:px-16 py-14 md:py-16">
+          <h2 className="home-h2">Complete the look</h2>
           <div className="mt-6 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6">
             {alsoIn.map((p) => (
               <ProductCard key={p.slug} product={p} />

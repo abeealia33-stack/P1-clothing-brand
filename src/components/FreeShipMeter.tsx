@@ -17,7 +17,7 @@ export default function FreeShipMeter({ subtotal }: { subtotal: number }) {
       <p className="tnum text-sm">
         {reached
           ? "Your order ships free."
-          : `PKR ${rupees(remaining)} more and your order ships free.`}
+          : `PKR ${rupees(remaining)} away from free delivery.`}
       </p>
       <div
         className="mt-2 h-px w-full"

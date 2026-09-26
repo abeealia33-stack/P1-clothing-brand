@@ -106,7 +106,7 @@ export default function SiteHeader({
         onHome ? "bg-paper/80 backdrop-blur-md" : "bg-paper"
       }`}
     >
-      <div className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-5 md:h-16">
+      <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-5 md:px-16 md:h-16">
         <Link href="/" className="flex items-baseline gap-2.5">
           <span
             className="text-[1.375rem] leading-none"

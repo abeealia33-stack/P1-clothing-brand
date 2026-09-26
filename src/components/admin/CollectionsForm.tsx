@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import CollectionPhotos from "./CollectionPhotos";
 import {
   saveCollectionsAction,
   type CollectionsFormState,
@@ -18,6 +19,8 @@ export default function CollectionsForm({
     saveCollectionsAction,
     {}
   );
+  const [busy, setBusy] = useState(0);
+  const onBusyChange = (on: boolean) => setBusy((n) => n + (on ? 1 : -1));
 
   return (
     <form action={action} className="mt-8 max-w-2xl">
@@ -46,6 +49,12 @@ export default function CollectionsForm({
             </legend>
 
             <div className="mt-3 space-y-4">
+              <CollectionPhotos
+                slug={collection.slug}
+                image={collection.image}
+                banner={collection.banner}
+                onBusyChange={onBusyChange}
+              />
               <Field
                 id={`${collection.slug}.name`}
                 label="Name"
@@ -60,15 +69,8 @@ export default function CollectionsForm({
               <Field
                 id={`${collection.slug}.line`}
                 label="Short line"
-                hint="Sits under the name on the home page."
+                hint="One sentence under the name at the top of this collection's shop page."
                 defaultValue={collection.line}
-              />
-              <Field
-                id={`${collection.slug}.intro`}
-                label="Intro"
-                hint="The longer paragraph at the top of this collection's page."
-                defaultValue={collection.intro}
-                multiline
               />
 
               <label className="flex cursor-pointer items-start gap-2.5">
@@ -96,8 +98,8 @@ export default function CollectionsForm({
       })}
 
       <div className="rule mt-8 flex flex-wrap gap-3 pt-6">
-        <button type="submit" disabled={pending} className="btn btn-ink">
-          {pending ? "Saving" : "Save"}
+        <button type="submit" disabled={pending || busy > 0} className="btn btn-ink">
+          {pending ? "Saving" : busy > 0 ? "Waiting for photos" : "Save"}
         </button>
       </div>
     </form>

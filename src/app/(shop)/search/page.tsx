@@ -19,8 +19,8 @@ export default async function SearchPage({
   const searched = q.trim().length > 0;
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Search</h1>
+    <div className="mx-auto max-w-7xl px-5 md:px-16 py-10 md:py-14">
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Search</h1>
 
       {/* A plain GET form: it works before the JavaScript arrives, and the
           result is a shareable URL. */}

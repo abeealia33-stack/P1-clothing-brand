@@ -72,7 +72,7 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-5 py-10 md:py-14">
-      <h1 className="flex items-center gap-3 text-5xl md:text-6xl">
+      <h1 className="flex items-center gap-3 text-[2.25rem] md:text-[3.5rem]">
         <svg
           width="40"
           height="40"

@@ -239,6 +239,33 @@
     height: 100svh;
     z-index: 0;
   }
+  @media (min-width: 768px) {
+    .fold-hero {
+      height: min(88vh, 860px);
+    }
+  }
+
+  /* The hero's one button: paper on the photo, square, capitals. */
+  .hero-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 0 2rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition:
+      background 0.2s,
+      color 0.2s;
+  }
+  .hero-button:hover {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
 
   .fold-body {
     position: relative;
@@ -270,55 +297,11 @@
     }
   }
 
-  /* ---------------------------------------------------------------------------
-     Collection cards grow as they reach the middle of the screen.
-
-     Scroll-driven CSS where the browser has it; an IntersectionObserver adds
-     .is-near as the fallback (see CollectionRail). Both paths land on the same
-     transform, and both stand down under reduced motion.
-  --------------------------------------------------------------------------- */
-  @media (prefers-reduced-motion: no-preference) {
-    .centre-scale {
-      transform: scale(0.93);
-      opacity: 0.72;
-      transition:
-        transform 0.5s cubic-bezier(0.22, 0.61, 0.36, 1),
-        opacity 0.5s ease;
-      will-change: transform;
-    }
-    .centre-scale.is-near {
-      transform: scale(1);
-      opacity: 1;
-    }
-
-    @supports (animation-timeline: view()) {
-      .centre-scale {
-        transform: none;
-        opacity: 1;
-        transition: none;
-        animation: centre-grow linear both;
-        animation-timeline: view();
-        animation-range: entry 8% exit 92%;
-      }
-      .centre-scale.is-near {
-        transform: none;
-      }
-    }
-  }
-
-  @keyframes centre-grow {
-    0% {
-      transform: scale(0.93);
-      opacity: 0.72;
-    }
-    40%,
-    60% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(0.93);
-      opacity: 0.72;
+  /* A product card's second photo is for hover only; below the width where a
+     cursor is likely, it is not drawn (and so not downloaded). */
+  @media (hover: none), (max-width: 767px) {
+    .card-second {
+      display: none;
     }
   }
 
@@ -342,24 +325,12 @@
   }
 
   /* ---------------------------------------------------------------------------
-     The hero copy rises in on load, each line a beat after the last.
+     The hero button rises in on load, a beat after the photo.
   --------------------------------------------------------------------------- */
   @media (prefers-reduced-motion: no-preference) {
-    .hero-copy > * {
+    .hero-cta > * {
       opacity: 0;
-      animation: hero-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-    }
-    .hero-copy > *:nth-child(1) {
-      animation-delay: 0.05s;
-    }
-    .hero-copy > *:nth-child(2) {
-      animation-delay: 0.16s;
-    }
-    .hero-copy > *:nth-child(3) {
-      animation-delay: 0.27s;
-    }
-    .hero-copy > *:nth-child(4) {
-      animation-delay: 0.38s;
+      animation: hero-rise 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s both;
     }
   }
   @keyframes hero-rise {
@@ -646,26 +617,60 @@
 @layer components {
   .bqf {
     --tile: #ece5dc;
-    --tile-side: #e4dcd1;
-    padding: 4.5rem 0;
+  }
+  .bqf:not(.home-section) {
+    padding: 2.25rem 0;
+  }
+  @media (min-width: 768px) {
+    .bqf:not(.home-section) {
+      padding: 3.75rem 0;
+    }
   }
   .bqf *,
   .bqf *::before,
   .bqf *::after {
     box-sizing: border-box;
   }
+  /* On a phone the words, then the picture, then the button full width — so
+     the button is the last thing read rather than sitting above an
+     illustration that pushes the next section off screen. The text column
+     is flattened (display: contents) so its button can be reordered past
+     the picture. */
   .bqf-wrap {
-    max-width: 72rem;
+    max-width: 80rem;
     margin: 0 auto;
     padding: 0 1.25rem;
-    display: grid;
-    gap: 3rem;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  @media (max-width: 859px) {
+    .bqf-text {
+      display: contents;
+    }
+    .bqf-group {
+      order: 1;
+      margin-top: 0.4rem;
+      align-self: stretch;
+    }
+    .bqf-btn {
+      order: 2;
+      margin-top: 2rem;
+      align-self: stretch;
+      text-align: center;
+    }
+  }
+  @media (min-width: 768px) {
+    .bqf-wrap {
+      padding: 0 4rem;
+    }
   }
   @media (min-width: 860px) {
     .bqf-wrap {
+      display: grid;
       grid-template-columns: 1fr 1.15fr;
       gap: 4rem;
+      align-items: center;
     }
     .bqf.flip .bqf-wrap {
       grid-template-columns: 1.15fr 1fr;
@@ -693,10 +698,14 @@
     padding-block-end: 0;
   }
   .bqf h2 {
-    font-weight: 400;
-    font-size: clamp(2.4rem, 4.6vw, 3.6rem);
-    line-height: 1.05;
+    font-size: 1.75rem;
+    line-height: 1.1;
     margin: 0;
+  }
+  @media (min-width: 768px) {
+    .bqf h2 {
+      font-size: 2.5rem;
+    }
   }
   .bqf-rule {
     width: 88px;
@@ -726,45 +735,24 @@
     border-radius: 999px;
     color: var(--color-ink-soft);
   }
-  .bqf-facts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem 1.4rem;
-    margin: 0 0 2.2rem;
-    padding: 0;
-    list-style: none;
-    font-size: 0.82rem;
-    color: var(--color-ink-soft);
-  }
-  .bqf-facts li {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-  }
-  .bqf-facts li::before {
-    content: "";
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background: var(--color-sage);
-  }
+  /* The site's one button style: ink, square, capitals. */
   .bqf-btn {
-    display: inline-block;
-    border: 1px solid var(--color-ink);
-    color: var(--color-ink);
-    padding: 0.95rem 2.1rem;
-    font-size: 0.8rem;
-    letter-spacing: 0.18em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 0 2rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     text-decoration: none;
     font-weight: 500;
-    transition:
-      background 0.25s,
-      color 0.25s;
+    transition: background 0.2s;
   }
   .bqf-btn:hover {
-    background: var(--color-ink);
-    color: var(--color-paper);
+    background: var(--color-sage-deep);
   }
 
   /* Artwork shared by both illustrations. */
@@ -788,54 +776,6 @@
   }
   .bqf-fab {
     fill: #f7f2ec;
-  }
-
-  /* Three-panel fold card. */
-  .bqf-fold {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    perspective: 1100px;
-    padding: 1rem 0;
-  }
-  .bqf-panel {
-    background: var(--tile-side);
-    display: grid;
-    place-items: center;
-    aspect-ratio: 3 / 4;
-    width: 30%;
-    border-radius: 18px;
-    transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
-  }
-  .bqf-panel.l {
-    transform: rotateY(38deg) translateX(14%);
-    transform-origin: right center;
-    border-radius: 18px 0 0 18px;
-    background: linear-gradient(90deg, var(--tile-side), #ddd4c8);
-  }
-  .bqf-panel.r {
-    transform: rotateY(-38deg) translateX(-14%);
-    transform-origin: left center;
-    border-radius: 0 18px 18px 0;
-    background: linear-gradient(270deg, var(--tile-side), #ddd4c8);
-  }
-  .bqf-panel.c {
-    width: 42%;
-    aspect-ratio: 1 / 1.08;
-    background: var(--tile);
-    border-radius: 36px;
-    position: relative;
-    z-index: 2;
-    box-shadow: 0 20px 40px -24px rgba(107, 96, 85, 0.45);
-  }
-  .bqf-panel.c svg {
-    width: 80%;
-  }
-  .bqf-fold:hover .bqf-panel.l {
-    transform: rotateY(22deg) translateX(8%);
-  }
-  .bqf-fold:hover .bqf-panel.r {
-    transform: rotateY(-22deg) translateX(-8%);
   }
 
   /* Group card: three matching kurtas on one tile. */
@@ -869,5 +809,65 @@
   }
   .bqf-group:hover .bqf-k3 {
     transform: translateX(8px);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Home page rhythm: 72px between sections on a phone, 120px on a desktop,
+   and one heading size for every section.
+--------------------------------------------------------------------------- */
+@layer components {
+  .home-section {
+    padding-block: 2.25rem;
+  }
+  .home-h2 {
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+  @media (min-width: 768px) {
+    .home-section {
+      padding-block: 3.75rem;
+    }
+    .home-h2 {
+      font-size: 2.5rem;
+    }
+  }
+
+  /* The three promises, in one thin line under the hero. */
+  .trust-strip {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The storefront's one button: ink, square, 52px, capitals. A second action
+   is a plain underlined link, never a second box. Scoped to the shop — the
+   admin is a working room with its own denser controls.
+--------------------------------------------------------------------------- */
+@layer components {
+  .shop .btn {
+    min-height: 52px;
+    border-radius: 0;
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .shop .btn-quiet {
+    min-height: 44px;
+    padding-inline: 0;
+    background: none;
+    border-color: transparent;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 0.875rem;
+  }
+  .shop .btn-quiet:hover:not(:disabled) {
+    border-color: transparent;
+    color: var(--color-sage-deep);
   }
 }

@@ -36,7 +36,7 @@ export default async function CustomRequestSubmittedPage() {
       <p className="urdu text-2xl" style={{ color: "var(--color-sage-deep)" }}>
         شکریہ
       </p>
-      <h1 className="settle mt-1 text-5xl md:text-6xl">Request sent</h1>
+      <h1 className="settle mt-1 text-[2.25rem] md:text-[3.5rem]">Request sent</h1>
       <p className="measure mt-4">
         Thank you, {request.name.split(" ")[0]}. We will call{" "}
         <span className="tnum">{request.phone}</span> to talk through your

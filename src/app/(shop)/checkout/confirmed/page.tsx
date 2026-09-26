@@ -71,7 +71,7 @@ export default async function ConfirmedPage({
       <p className="urdu text-2xl" style={{ color: "var(--color-sage-deep)" }}>
         شکریہ
       </p>
-      <h1 className="settle mt-1 text-5xl md:text-6xl">Order placed</h1>
+      <h1 className="settle mt-1 text-[2.25rem] md:text-[3.5rem]">Order placed</h1>
       <p className="measure mt-4">
         Thank you, {order.name.split(" ")[0]}. We will call{" "}
         <span className="tnum">{order.phone}</span> to confirm before the courier

@@ -23,7 +23,3 @@ export const dateTimeLabel = (iso: string) =>
     hour: "numeric",
     minute: "2-digit",
   });
-
-/** Spelled out, because "4 ways to get dressed" reads like a spec sheet. */
-export const spellCount = (n: number): string =>
-  ["No", "One", "Two", "Three", "Four"][n] ?? String(n);

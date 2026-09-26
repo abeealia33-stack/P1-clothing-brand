@@ -3,6 +3,7 @@
 import { useId } from "react";
 import BannerLinkPicker from "./BannerLinkPicker";
 import BannerPhoto from "./BannerPhoto";
+import { MIN_SIZES } from "@/lib/image-size";
 import type { BannerSlot } from "@/lib/banners";
 import type { ProductChoice } from "@/lib/catalogue";
 import type { ResolvedCollection } from "@/lib/types";
@@ -41,7 +42,8 @@ export default function BannerSlotEditor({
           onBusyChange={onBusyChange}
           purpose="feature"
           frame="aspect-square"
-          sizeHint="2000 × 2000 px, square — keep the subject away from the edges"
+          sizeHint="2000 × 2000 px, square — keep the subject away from the edges."
+          minSize={MIN_SIZES.pair}
         />
       </div>
 
@@ -61,12 +63,13 @@ export default function BannerSlotEditor({
 
         <div>
           <label className="block text-sm font-medium" htmlFor={`${id}-button`}>
-            Button text
+            Button text (optional)
           </label>
           <input
             id={`${id}-button`}
             value={slot.buttonLabel}
             onChange={(e) => set({ buttonLabel: e.target.value })}
+            placeholder="Leave blank — the whole photo is the link"
             className="field mt-1"
           />
         </div>

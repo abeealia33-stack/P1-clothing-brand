@@ -26,7 +26,8 @@ export async function saveCollectionsAction(
       name: String(formData.get(`${slug}.name`) ?? "").trim(),
       urdu: String(formData.get(`${slug}.urdu`) ?? "").trim(),
       line: String(formData.get(`${slug}.line`) ?? "").trim(),
-      intro: String(formData.get(`${slug}.intro`) ?? "").trim(),
+      image: String(formData.get(`${slug}.image`) ?? "").trim(),
+      banner: String(formData.get(`${slug}.banner`) ?? "").trim(),
       // An unchecked box sends nothing at all, which is how it means hidden.
       inNav: formData.get(`${slug}.inNav`) === "on",
     };

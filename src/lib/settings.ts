@@ -2,6 +2,7 @@ import "server-only";
 
 import { cache } from "react";
 import { normaliseHomeBanners, emptyHomeBanners, type HomeBanners } from "./banners";
+import { emptyHero, normaliseHero, type HeroSettings } from "./hero";
 import { prisma } from "./prisma";
 import {
   collections,
@@ -38,7 +39,8 @@ export type PaymentAccount = {
 export type PaymentAccounts = Partial<Record<TransferMethod, PaymentAccount>>;
 
 export type SiteSettings = {
-  heroImages: string[];
+  /** The photo and button at the top of the home page. See hero.ts. */
+  hero: HeroSettings;
   /** The strip of three cards and the pair of photos. See banners.ts. */
   banners: HomeBanners;
   /** Absent keys mean that method has no account set up yet. */
@@ -46,15 +48,6 @@ export type SiteSettings = {
   /** Absent keys mean that collection reads as it does in the code. */
   collections: CollectionEdits;
 };
-
-function parseArray<T>(raw: string): T[] {
-  try {
-    const value = JSON.parse(raw);
-    return Array.isArray(value) ? (value as T[]) : [];
-  } catch {
-    return [];
-  }
-}
 
 /**
  * An account is only usable if someone can actually be paid with it, so a row
@@ -101,7 +94,7 @@ function normaliseCollections(value: unknown): CollectionEdits {
     if (!row) continue;
 
     const edit: CollectionEdit = {};
-    for (const field of ["name", "urdu", "line", "intro"] as const) {
+    for (const field of ["name", "urdu", "line", "image", "banner"] as const) {
       const text = String(row[field] ?? "").trim();
       if (text) edit[field] = text;
     }
@@ -134,11 +127,12 @@ function parseJson<T>(raw: string, normalise: (value: unknown) => T, fallback: T
 export const getSettings = cache(async (): Promise<SiteSettings> => {
   const row = await prisma.settings.findUnique({ where: { id: SETTINGS_ID } });
   if (!row) {
-    return { heroImages: [], banners: emptyHomeBanners(), payments: {}, collections: {} };
+    return { hero: emptyHero(), banners: emptyHomeBanners(), payments: {}, collections: {} };
   }
 
   return {
-    heroImages: parseArray<string>(row.heroImages).filter((v) => typeof v === "string"),
+    // The column keeps its old name; it now holds the hero object.
+    hero: parseJson(row.heroImages, normaliseHero, emptyHero()),
     banners: parseJson(row.banners, normaliseHomeBanners, emptyHomeBanners()),
     payments: parseJson(row.payments, normaliseAccounts, {}),
     collections: parseJson(row.collections, normaliseCollections, {}),
@@ -186,10 +180,10 @@ export async function saveHomeBanners(banners: HomeBanners): Promise<void> {
 
 /** The hero and the payment accounts — the Site settings screen. */
 export async function saveSettings(
-  input: Pick<SiteSettings, "heroImages" | "payments">
+  input: Pick<SiteSettings, "hero" | "payments">
 ): Promise<void> {
   const data = {
-    heroImages: JSON.stringify(input.heroImages),
+    heroImages: JSON.stringify(normaliseHero(input.hero)),
     // Normalised on the way in as well as out: the admin form is not the only
     // thing that could ever call this.
     payments: JSON.stringify(normaliseAccounts(input.payments)),

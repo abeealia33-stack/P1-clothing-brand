@@ -280,7 +280,7 @@ export default function ProductForm({
         <span>
           <span className="block text-sm font-medium">Show in the shop</span>
           <span className="block text-sm" style={{ color: "var(--color-ink-soft)" }}>
-            Untick to hide it from customers without deleting it.
+            Untick to hide it from customers without deleting it. Needs at least two photos to show.
           </span>
         </span>
       </label>

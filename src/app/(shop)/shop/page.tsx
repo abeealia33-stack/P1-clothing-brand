@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ClothImage from "@/components/ClothImage";
 import ProductCard from "@/components/ProductCard";
 import ShopFilters from "@/components/ShopFilters";
 import { listCategories } from "@/lib/categories";
@@ -47,8 +48,14 @@ export default async function ShopPage({
   const hasFilters = Boolean(active || activeCategory || priceTier || sortBy);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">
+    <div className="mx-auto max-w-7xl px-5 md:px-16 py-10 md:py-14">
+      {/* A collection's own photo strip, when the owner has uploaded one. */}
+      {active?.banner && (
+        <div className="relative -mx-5 -mt-10 mb-8 aspect-[2/1] overflow-hidden md:mx-0 md:-mt-4 md:aspect-[4/1]">
+          <ClothImage src={active.banner} alt="" priority />
+        </div>
+      )}
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">
         {active ? active.name : "Everything"}
       </h1>
       {active ? (
@@ -60,7 +67,7 @@ export default async function ShopPage({
           whatever was actually on the shelf. */}
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         {active
-          ? active.intro
+          ? active.line
           : liveCount > 0
             ? `${liveCount} ${liveCount === 1 ? "piece" : "pieces"}, made in small runs. Filter by how you plan to wear them.`
             : "Made in small runs. New pieces go up here as they are finished."}

@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-20">
-      <h1 className="text-5xl md:text-6xl">This page is not here</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">This page is not here</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         The piece may have sold out and been taken down, or the link may be
         mistyped. The shop is still where you left it.

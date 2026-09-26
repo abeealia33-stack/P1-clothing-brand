@@ -1,22 +1,32 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
+import HeroEditor from "./HeroEditor";
 import PaymentAccountsEditor from "./PaymentAccountsEditor";
-import PhotoUploader from "./PhotoUploader";
 import { saveSettingsAction, type SettingsFormState } from "@/app/admin/settings/actions";
+import type { ProductChoice } from "@/lib/catalogue";
+import type { HeroSettings } from "@/lib/hero";
 import type { PaymentAccounts } from "@/lib/settings";
+import type { ResolvedCollection } from "@/lib/types";
 
 export default function SettingsForm({
-  heroImages,
+  initialHero,
   payments,
+  collections,
+  products,
 }: {
-  heroImages: string[];
+  initialHero: HeroSettings;
   payments: PaymentAccounts;
+  collections: ResolvedCollection[];
+  products: ProductChoice[];
 }) {
   const [state, action, pending] = useActionState<SettingsFormState, FormData>(
     saveSettingsAction,
     {}
   );
+  const [hero, setHero] = useState(initialHero);
+  // Counted rather than a flag: both photos can be uploading at once.
+  const [busy, setBusy] = useState(0);
 
   return (
     <form action={action} className="mt-8 max-w-2xl">
@@ -31,14 +41,20 @@ export default function SettingsForm({
       )}
 
       <div className="mt-6">
-        <label className="block text-sm font-medium">Hero banner</label>
-        <p className="mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Shown at the top of the home page. Upload more than one and they
-          fade from one to the next automatically. Leave empty to use the
-          plain default image.
+        <p className="block text-sm font-medium">Hero banner</p>
+        <p className="measure mt-0.5 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          The photo at the top of the home page, with one button on it. No
+          words over the photo — the picture does the talking.
         </p>
-        <div className="mt-2">
-          <PhotoUploader name="heroImages" initial={heroImages} purpose="feature" />
+        <input type="hidden" name="hero" value={JSON.stringify(hero)} />
+        <div className="mt-4">
+          <HeroEditor
+            hero={hero}
+            onChange={setHero}
+            onBusyChange={(on) => setBusy((n) => n + (on ? 1 : -1))}
+            collections={collections}
+            products={products}
+          />
         </div>
       </div>
 
@@ -55,8 +71,8 @@ export default function SettingsForm({
       </div>
 
       <div className="rule mt-8 flex flex-wrap gap-3 pt-6">
-        <button type="submit" disabled={pending} className="btn btn-ink">
-          {pending ? "Saving" : "Save"}
+        <button type="submit" disabled={pending || busy > 0} className="btn btn-ink">
+          {pending ? "Saving" : busy > 0 ? "Waiting for photos" : "Save"}
         </button>
       </div>
     </form>

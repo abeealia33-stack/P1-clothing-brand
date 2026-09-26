@@ -9,10 +9,8 @@ export type Collection = {
   slug: CollectionSlug;
   name: string;
   urdu: string;
-  /** Shown under the collection name on the home rail. */
+  /** The one line under the name at the top of the collection's shop page. */
   line: string;
-  /** Longer intro at the top of the collection's shop view. */
-  intro: string;
 };
 
 /**
@@ -26,32 +24,24 @@ export const collections: Collection[] = [
     name: "Rozana",
     urdu: "روزانہ",
     line: "For the days that just need getting on with.",
-    intro:
-      "Kurtas you can pull on at 8am and still feel like yourself in at 6pm. Cotton and lawn, cut straight, nothing that needs ironing twice.",
   },
   {
     slug: "ghar",
     name: "Ghar",
     urdu: "گھر",
     line: "Soft enough to sleep in, decent enough to open the door.",
-    intro:
-      "Home sets in khaddar and washed cotton. Loose waistbands, deep pockets, and colours that survive a hundred washes.",
   },
   {
     slug: "azad",
     name: "Azad",
     urdu: "آزاد",
     line: "Cut wide. Takes up room on purpose.",
-    intro:
-      "Oversized shapes for when you want the clothes to say something. Dropped shoulders, long lines, wide legs.",
   },
   {
     slug: "bundles",
     name: "Bundles",
     urdu: "بنڈل",
     line: "Three pieces, one price, a week sorted.",
-    intro:
-      "Put together so you stop thinking about it. Every bundle ships free and works as a full week of wearing.",
   },
 ];
 
@@ -73,7 +63,10 @@ export type CollectionEdit = {
   name?: string;
   urdu?: string;
   line?: string;
-  intro?: string;
+  /** The home page tile photo, 3:4. Blank uses the drawn placeholder. */
+  image?: string;
+  /** The slim banner across the top of this collection's shop page. */
+  banner?: string;
   /** Listed in the menus and on the home page. Defaults to shown. */
   inNav?: boolean;
 };
@@ -81,7 +74,12 @@ export type CollectionEdit = {
 export type CollectionEdits = Partial<Record<CollectionSlug, CollectionEdit>>;
 
 /** A collection as it should read, once the owner's edits are applied. */
-export type ResolvedCollection = Collection & { inNav: boolean };
+export type ResolvedCollection = Collection & {
+  inNav: boolean;
+  image: string;
+  /** "" when none has been uploaded. */
+  banner: string;
+};
 
 const edited = (value: string | undefined, fallback: string) => {
   const trimmed = value?.trim();
@@ -100,7 +98,8 @@ export function resolveCollections(edits: CollectionEdits): ResolvedCollection[]
       name: edited(edit.name, c.name),
       urdu: edited(edit.urdu, c.urdu),
       line: edited(edit.line, c.line),
-      intro: edited(edit.intro, c.intro),
+      image: edited(edit.image, `/cloth/collection-${c.slug}.svg`),
+      banner: edit.banner?.trim() ?? "",
       inNav: edit.inNav !== false,
     };
   });

@@ -60,7 +60,7 @@ export default function WishlistView() {
         {items.map((item) => (
           <li key={item.slug}>
             <Link href={`/product/${item.slug}`} className="group block">
-              <div className="lift relative aspect-[3/4] overflow-hidden">
+              <div className="relative aspect-[3/4] overflow-hidden">
                 <ClothImage src={item.photo} alt={item.name} />
               </div>
               <h2 className="mt-3 text-xl leading-snug">{item.name}</h2>

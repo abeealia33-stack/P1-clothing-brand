@@ -26,7 +26,7 @@ export default async function TrackPage({
 
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Track your order</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Track your order</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         Enter the order number from your confirmation, or the mobile number you
         ordered with. No account, no password.

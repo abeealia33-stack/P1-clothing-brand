@@ -19,7 +19,7 @@ const sizes = [
 export default function ShippingPage() {
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
-      <h1 className="text-5xl md:text-6xl">Shipping and returns</h1>
+      <h1 className="text-[2.25rem] md:text-[3.5rem]">Shipping and returns</h1>
       <p className="measure mt-3" style={{ color: "var(--color-ink-soft)" }}>
         The whole policy, in the order people actually ask about it.
       </p>

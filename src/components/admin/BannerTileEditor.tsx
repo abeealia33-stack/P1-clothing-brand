@@ -3,6 +3,7 @@
 import { useId } from "react";
 import BannerLinkPicker from "./BannerLinkPicker";
 import BannerPhoto from "./BannerPhoto";
+import { MIN_SIZES } from "@/lib/image-size";
 import type { BannerTile } from "@/lib/banners";
 import type { ProductChoice } from "@/lib/catalogue";
 import type { ResolvedCollection } from "@/lib/types";
@@ -49,7 +50,8 @@ export default function BannerTileEditor({
           onBusyChange={onBusyChange}
           purpose="product"
           frame="aspect-[3/4]"
-          sizeHint="1200 × 1600 px, portrait"
+          sizeHint="1200 × 1600 px, 3:4 portrait."
+          minSize={MIN_SIZES.tile}
         />
       </div>
 
