@@ -149,7 +149,7 @@ function ReelCard({ reel, playing }: { reel: Reel; playing: boolean }) {
     <Link
       href={`/product/${reel.productSlug}`}
       data-reel-id={reel.id}
-      className="lift relative block aspect-[9/16] w-44 shrink-0 overflow-hidden sm:w-52"
+      className="lift relative isolate block aspect-[9/16] w-44 shrink-0 overflow-hidden rounded-2xl bg-khaddar shadow-[0_6px_20px_rgba(44,44,44,0.08)] sm:w-52"
     >
       <video
         ref={video}
