@@ -52,7 +52,7 @@ export default function HeroEditor({
             onBusyChange={onBusyChange}
             purpose="feature"
             frame="aspect-video"
-            sizeHint="2400 × 1350 px (16:9), JPG or WebP, under 400 KB."
+            sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
             minSize={MIN_SIZES.heroDesktop}
           />
         </div>

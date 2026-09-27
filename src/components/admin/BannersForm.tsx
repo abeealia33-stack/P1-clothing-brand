@@ -152,7 +152,7 @@ export default function BannersForm({
             onBusyChange={onBusyChange}
             purpose="feature"
             frame="aspect-[12/5]"
-            sizeHint="2400 × 1000 px (12:5), under 350 KB."
+            sizeHint="A wide photo, around 1920 × 800 px, under 350 KB."
             minSize={MIN_SIZES.groupBanner}
           />
           {banners.groupImage && (

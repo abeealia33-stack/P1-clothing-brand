@@ -1,18 +1,26 @@
 /**
- * The smallest photo each upload slot accepts, in pixels. Anything smaller
- * looks soft on a large screen, so it is turned away before it is uploaded
- * rather than discovered on the live page.
+ * The smallest photo each slot will take, in pixels.
+ *
+ * A floor, not a specification. The size printed under each upload box is
+ * what to aim for; this is only the point below which a picture is going to
+ * look soft however it is used, and it sits well under the recommendation so
+ * that a photograph a little off the ideal still goes up. A guardrail that
+ * turns away usable work is working against the person it is meant to help.
+ *
+ * Nothing here asks for more than the picture is ever served at either:
+ * IMAGE_WIDTHS in uploads.ts caps a feature photo at 2000px wide and a
+ * product photo at 1200, and the rest is discarded on the way in.
  */
 export type MinSize = { width: number; height: number };
 
 export const MIN_SIZES = {
-  heroDesktop: { width: 2400, height: 1350 },
-  heroMobile: { width: 1080, height: 1350 },
-  product: { width: 1200, height: 1600 },
-  tile: { width: 1200, height: 1600 },
-  pair: { width: 2000, height: 2000 },
-  collectionBanner: { width: 2400, height: 600 },
-  groupBanner: { width: 2400, height: 1000 },
+  heroDesktop: { width: 1600, height: 700 },
+  heroMobile: { width: 900, height: 1125 },
+  product: { width: 1000, height: 1333 },
+  tile: { width: 1000, height: 1333 },
+  pair: { width: 1400, height: 1400 },
+  collectionBanner: { width: 1600, height: 400 },
+  groupBanner: { width: 1600, height: 660 },
 } satisfies Record<string, MinSize>;
 
 export const sizeLabel = ({ width, height }: MinSize) => `${width} × ${height} px`;

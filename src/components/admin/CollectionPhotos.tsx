@@ -47,7 +47,7 @@ export default function CollectionPhotos({
           onBusyChange={onBusyChange}
           purpose="feature"
           frame="aspect-[4/1]"
-          sizeHint="2400 × 600 px, a slim strip across the top of this collection."
+          sizeHint="A slim strip, around 1920 × 480 px, across the top of this collection."
           minSize={MIN_SIZES.collectionBanner}
         />
         {wide && (

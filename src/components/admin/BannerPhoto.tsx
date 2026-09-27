@@ -97,7 +97,7 @@ export default function BannerPhoto({
         }}
       />
       <p className="mt-1.5 text-xs" style={{ color: "var(--color-ink-soft)" }}>
-        {sizeHint} Smallest accepted: {sizeLabel(minSize)}.
+        {sizeHint} Nothing smaller than {sizeLabel(minSize)}.
       </p>
       {error && (
         <p role="alert" className="mt-1.5 text-xs" style={{ color: "var(--color-alert)" }}>
