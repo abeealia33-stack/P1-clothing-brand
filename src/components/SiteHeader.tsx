@@ -226,17 +226,23 @@ function useOverHero(onHome: boolean, bar: React.RefObject<HTMLElement | null>) 
     const hero = document.querySelector<HTMLElement>(".fold-hero");
     if (!hero) return;
 
-    const check = () => {
-      const reach = hero.offsetHeight - (bar.current?.offsetHeight ?? 0);
-      setPastHero(window.scrollY >= reach);
+    /* Measured on resize rather than on scroll: reading offsetHeight makes
+       the browser recalculate layout there and then, and asking it to do
+       that on every scroll event is how a sticky bar starts to stutter.
+       Neither height changes as the page scrolls. */
+    let reach = 0;
+    const check = () => setPastHero(window.scrollY >= reach);
+    const measure = () => {
+      reach = hero.offsetHeight - (bar.current?.offsetHeight ?? 0);
+      check();
     };
 
-    check();
+    measure();
     window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
+    window.addEventListener("resize", measure);
     return () => {
       window.removeEventListener("scroll", check);
-      window.removeEventListener("resize", check);
+      window.removeEventListener("resize", measure);
     };
   }, [onHome, bar]);
 
