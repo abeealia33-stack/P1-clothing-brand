@@ -16,6 +16,11 @@ export const site = {
   shipping: {
     majorCities: "2–4 days",
     elsewhere: "4–7 days",
+    /* The same two windows as numbers, so a date can be worked out from
+       them. Kept beside the words they have to agree with. */
+    fastCities: ["karachi", "lahore", "islamabad", "rawalpindi"],
+    fastDays: [2, 4],
+    restDays: [4, 7],
   },
 } as const;
 
