@@ -35,6 +35,60 @@ export async function generateMetadata({
   };
 }
 
+/** A folded panel. <details> so it works before the JavaScript arrives. */
+function Fold({
+  title,
+  open = false,
+  children,
+}: {
+  title: string;
+  open?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className="fold-panel" open={open}>
+      <summary>
+        {title}
+        <span aria-hidden="true" className="fold-sign" />
+      </summary>
+      <div className="fold-body">{children}</div>
+    </details>
+  );
+}
+
+const mark = {
+  width: 17,
+  height: 17,
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.4,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+  "aria-hidden": true,
+};
+
+const Van = () => (
+  <svg {...mark}>
+    <path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z" />
+    <circle cx="7" cy="18" r="1.6" />
+    <circle cx="17.5" cy="18" r="1.6" />
+  </svg>
+);
+
+const Wallet = () => (
+  <svg {...mark}>
+    <path d="M3 7.5A1.5 1.5 0 0 1 4.5 6H18v3M3 7.5V17a1 1 0 0 0 1 1h16v-4M3 7.5V10h18" />
+    <circle cx="17" cy="12" r="1" />
+  </svg>
+);
+
+const Swap = () => (
+  <svg {...mark}>
+    <path d="M4 9h13l-3-3M20 15H7l3 3" />
+  </svg>
+);
+
 export default async function ProductPage({
   params,
 }: {
@@ -64,20 +118,19 @@ export default async function ProductPage({
         </div>
 
         <div className="px-5 pt-6 md:px-0 md:pt-0">
-          <Link
-            href={`/shop?collection=${collection.slug}`}
-            className="text-sm"
-            style={{ color: "var(--color-sage-deep)" }}
-          >
+          <p className="field-label" style={{ color: "var(--color-sage-deep)" }}>
             {collection.name}
-          </Link>
-          <h1 className="mt-1 text-[2.25rem] md:text-[3.5rem]">{product.name}</h1>
+          </p>
+          <h1 className="mt-2 text-[2.25rem] md:text-[3.5rem]">{product.name}</h1>
           {product.urdu && (
             <p className="urdu mt-1 text-2xl" style={{ color: "var(--color-sage-deep)" }}>
               {product.urdu}
             </p>
           )}
-          <p className="tnum mt-3 text-lg">{priceLabel(product.price)}</p>
+          <p className="tnum mt-3 text-2xl">{priceLabel(product.price)}</p>
+          <p className="mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+            Inclusive of all taxes
+          </p>
 
           <p className="measure mt-5">{product.description}</p>
 
@@ -99,32 +152,60 @@ export default async function ProductPage({
             Ask about this piece on WhatsApp
           </a>
 
-          <div className="rule mt-9 pt-6">
-            <h2 className="text-2xl">The details</h2>
-            <ul className="measure mt-3 space-y-2 text-sm">
-              {product.details.map((detail) => (
-                <li key={detail} className="flex gap-3">
-                  <span
-                    aria-hidden="true"
-                    className="mt-2.5 h-px w-3 shrink-0"
-                    style={{ background: "var(--color-sage)" }}
-                  />
-                  <span style={{ color: "var(--color-ink-soft)" }}>{detail}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <ul className="promise-list mt-8">
+            <li>
+              <Van />
+              <span className="tnum">
+                {shipsFree
+                  ? "Ships free — this piece is over the threshold"
+                  : `PKR 250 delivery, free over PKR ${rupees(site.freeShippingOver)}`}
+              </span>
+            </li>
+            <li>
+              <Wallet />
+              <span>Cash on delivery, bank transfer, JazzCash or EasyPaisa</span>
+            </li>
+            <li>
+              <Swap />
+              <span>Seven-day exchange on anything unworn</span>
+            </li>
+          </ul>
 
-          <div className="rule mt-8 pt-6 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-            <p className="tnum">
-              {shipsFree
-                ? "Ships free — this piece is over the free shipping threshold."
-                : `PKR 250 shipping, or free once your cart passes PKR ${rupees(site.freeShippingOver)}.`}
-            </p>
-            <p className="mt-1.5">
-              {site.shipping.majorCities} in major cities,{" "}
-              {site.shipping.elsewhere} elsewhere. Pay cash when it arrives.
-            </p>
+          <div className="mt-9">
+            {product.details.length > 0 && (
+              <Fold title="Fabric and details" open>
+                <ul className="space-y-2">
+                  {product.details.map((detail) => (
+                    <li key={detail}>{detail}</li>
+                  ))}
+                </ul>
+              </Fold>
+            )}
+            <Fold title="Size and fit">
+              <p>
+                Everything is cut loose over the body measurements on the{" "}
+                <Link href="/shipping#sizes" className="underline underline-offset-4">
+                  size guide
+                </Link>
+                . Between two sizes, take the smaller one — these are generous.
+                Azad pieces run two sizes wider on purpose.
+              </p>
+            </Fold>
+            <Fold title="Delivery, care and returns">
+              <p>
+                {site.shipping.majorCities} to Karachi, Lahore and Islamabad,{" "}
+                {site.shipping.elsewhere} everywhere else. We call to confirm
+                before the parcel goes out.
+              </p>
+              <p className="mt-3">
+                Wash cold and hang in shade. Exchange an unworn, unwashed piece
+                within seven days —{" "}
+                <Link href="/shipping#returns" className="underline underline-offset-4">
+                  the full policy
+                </Link>
+                .
+              </p>
+            </Fold>
           </div>
         </div>
       </div>

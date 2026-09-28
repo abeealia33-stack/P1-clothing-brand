@@ -1299,3 +1299,152 @@
     outline-color: var(--color-paper);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The product page
+--------------------------------------------------------------------------- */
+@layer components {
+  /* A field's name, above or beside whatever it is naming. */
+  .field-label {
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* The one action this page exists for. Sage rather than ink: on a page of
+     ink type it is the only thing wearing a colour, which is the point. */
+  .shop .btn-buy {
+    background: var(--color-sage-deep);
+    color: var(--color-paper);
+  }
+  .shop .btn-buy:hover:not(:disabled) {
+    background: var(--color-ink);
+  }
+
+  .qty {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--color-line);
+  }
+  .qty button {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 1.125rem;
+    line-height: 1;
+    color: var(--color-ink);
+    transition: background 0.15s ease;
+  }
+  .qty button:hover:not(:disabled) {
+    background: var(--color-khaddar);
+  }
+  .qty button:disabled {
+    opacity: 0.3;
+  }
+  .qty span {
+    min-width: 2.5rem;
+    text-align: center;
+    font-size: 0.9375rem;
+  }
+
+  .measure-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--color-ink-soft);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .measure-link:hover {
+    color: var(--color-sage-deep);
+  }
+
+  .promise-list {
+    display: grid;
+    gap: 0.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--color-line);
+    font-size: 0.875rem;
+    color: var(--color-ink-soft);
+  }
+  .promise-list li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .promise-list svg {
+    flex: none;
+    color: var(--color-sage-deep);
+  }
+
+  /* ---- Folded panels --------------------------------------------------- */
+  .fold-panel {
+    border-top: 1px solid var(--color-line);
+  }
+  .fold-panel:last-of-type {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .fold-panel > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.125rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.9375rem;
+  }
+  .fold-panel > summary::-webkit-details-marker {
+    display: none;
+  }
+  /* A plus that becomes a minus, drawn rather than typed so it stays put. */
+  .fold-sign {
+    position: relative;
+    flex: none;
+    width: 14px;
+    height: 14px;
+  }
+  .fold-sign::before,
+  .fold-sign::after {
+    content: "";
+    position: absolute;
+    inset: 50% 0 auto 0;
+    height: 1px;
+    background: var(--color-ink);
+    transition: transform 0.2s ease;
+  }
+  .fold-sign::after {
+    transform: rotate(90deg);
+  }
+  .fold-panel[open] .fold-sign::after {
+    transform: rotate(0deg);
+  }
+  .fold-body {
+    padding-bottom: 1.25rem;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-ink-soft);
+    max-width: 34rem;
+  }
+
+  /* ---- The shots beside the picture ------------------------------------ */
+  .shot {
+    display: block;
+    aspect-ratio: 3 / 4;
+    overflow: hidden;
+    background: var(--color-khaddar);
+    box-shadow: inset 0 0 0 1px var(--color-line);
+    opacity: 0.6;
+    transition:
+      opacity 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .shot:hover {
+    opacity: 1;
+  }
+  .shot[data-on="true"] {
+    opacity: 1;
+    box-shadow: inset 0 0 0 1.5px var(--color-ink);
+  }
+}

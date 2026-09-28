@@ -18,6 +18,7 @@ export default function ProductBuy({ product }: { product: Product }) {
   const [size, setSize] = useState<string | null>(
     product.sizes.length === 1 ? product.sizes[0] : null
   );
+  const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
   /* Separate from `added`: the button says "Added" for a moment and then
      offers itself again, while the line underneath stays put so the way to
@@ -39,7 +40,7 @@ export default function ProductBuy({ product }: { product: Product }) {
       size,
       color,
       photo: product.photos[0] ?? "",
-      qty: 1,
+      qty,
     });
     setAdded(true);
     setJustAdded(true);
@@ -50,10 +51,14 @@ export default function ProductBuy({ product }: { product: Product }) {
   return (
     <>
       <div className="mt-8">
-        <h2 className="text-sm font-medium">
-          Colour<span className="sr-only">:</span>{" "}
-          <span style={{ color: "var(--color-ink-soft)" }}>{color}</span>
-        </h2>
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="field-label">
+            Colour<span className="sr-only">:</span>
+          </h2>
+          <span className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
+            {color}
+          </span>
+        </div>
         <div className="mt-3 flex flex-wrap gap-3">
           {product.colors.map((c) => {
             const on = c.name === color;
@@ -87,7 +92,7 @@ export default function ProductBuy({ product }: { product: Product }) {
 
       <div className="mt-7">
         <div className="flex items-baseline justify-between gap-3">
-          <h2 className="text-sm font-medium">Size</h2>
+          <h2 className="field-label">Size</h2>
           <Link
             href="/shipping#sizes"
             className="text-sm underline underline-offset-4"
@@ -123,6 +128,53 @@ export default function ProductBuy({ product }: { product: Product }) {
         </div>
       </div>
 
+      <Link href="/customize" className="measure-link mt-5">
+        <svg
+          width="15"
+          height="15"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M3 17l14-14 4 4-14 14H3v-4Z M13 7l4 4" />
+        </svg>
+        Rather have it made to fit you? Send your measurements
+      </Link>
+
+      {/* How many, beside what is left, so the two numbers are read together. */}
+      <div className="mt-6 hidden items-center gap-5 md:flex">
+        <div className="qty">
+          <button
+            type="button"
+            onClick={() => setQty((n) => Math.max(1, n - 1))}
+            disabled={qty <= 1}
+            aria-label="One fewer"
+          >
+            −
+          </button>
+          <span className="tnum" aria-live="polite">
+            {qty}
+          </span>
+          <button
+            type="button"
+            onClick={() => setQty((n) => Math.min(10, n + 1))}
+            disabled={qty >= 10 || (product.stock > 0 && qty >= product.stock)}
+            aria-label="One more"
+          >
+            +
+          </button>
+        </div>
+        {product.stock > 0 && product.stock <= 6 && (
+          <p className="tnum text-sm" style={{ color: "var(--color-alert)" }}>
+            Only {product.stock} left
+          </p>
+        )}
+      </div>
+
       {/* Sits above the tab bar on phones; becomes an ordinary button on
           desktop, where the whole page is already in view. */}
       <div
@@ -140,8 +192,7 @@ export default function ProductBuy({ product }: { product: Product }) {
             type="button"
             onClick={addToCart}
             disabled={soldOut || !size}
-            className="btn btn-ink ml-auto flex-1 md:ml-0 md:max-w-64 md:flex-none"
-            style={justAdded ? { background: "var(--color-sage-deep)" } : undefined}
+            className="btn btn-buy ml-auto flex-1 md:ml-0 md:w-full"
           >
             {soldOut
               ? "Sold out"
@@ -149,7 +200,7 @@ export default function ProductBuy({ product }: { product: Product }) {
                 ? "Pick a size"
                 : justAdded
                   ? "Added"
-                  : "Add to cart"}
+                  : `Add to bag · ${priceLabel(product.price * qty)}`}
           </button>
 
           {/* Saving needs no size, so it stays available on a piece that is

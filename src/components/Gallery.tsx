@@ -42,7 +42,9 @@ export default function Gallery({
   };
 
   return (
-    <div className="relative">
+    <div className="md:flex md:gap-4">
+      <div className="order-2 min-w-0 flex-1">
+      <div className="relative">
       <div ref={rail} className="rail aspect-[3/4] w-full">
         {photos.map((photo, i) => (
           <div key={photo} className="h-full w-full">
@@ -56,7 +58,7 @@ export default function Gallery({
       </div>
 
       {photos.length > 1 && (
-        <div className="absolute inset-x-0 bottom-1 flex justify-center">
+        <div className="absolute inset-x-0 bottom-1 flex justify-center md:hidden">
           {photos.map((photo, i) => (
             <button
               key={photo}
@@ -76,6 +78,26 @@ export default function Gallery({
                   boxShadow: "0 0 0 3px rgba(245,240,235,.7)",
                 }}
               />
+            </button>
+          ))}
+        </div>
+      )}
+      </div>
+      </div>
+
+      {photos.length > 1 && (
+        <div className="order-1 hidden w-20 shrink-0 flex-col gap-3 md:flex">
+          {photos.map((photo, i) => (
+            <button
+              key={photo}
+              type="button"
+              onClick={() => goTo(i)}
+              aria-label={`Show image ${i + 1} of ${photos.length}`}
+              aria-current={i === index ? "true" : undefined}
+              className="shot"
+              data-on={i === index ? "true" : undefined}
+            >
+              <ClothImage src={photo} alt="" />
             </button>
           ))}
         </div>
