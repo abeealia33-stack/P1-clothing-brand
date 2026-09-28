@@ -115,37 +115,29 @@ export default function SiteHeader({
       } ${onHome ? (overHero ? "" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-5 md:px-16 md:h-16">
-        <Link href="/" className="flex items-baseline gap-2.5">
-          <span
-            className="text-[1.375rem] leading-none"
-            style={{ fontFamily: "var(--font-display)", letterSpacing: "0.01em" }}
-          >
-            Bilques
-          </span>
-          <span
-            className="urdu hidden text-[0.8125rem] leading-none sm:inline"
-            style={{ color: "var(--color-sage-deep)" }}
-          >
-            آرام سے تیار
-          </span>
+        <Link href="/" className="shrink-0">
+          <span className="brand-mark">Bilques</span>
+          <span className="brand-urdu urdu">آرام سے تیار</span>
         </Link>
 
-        {/* Dropped entirely when the owner has hidden every collection, rather
-            than left as an empty list taking up the middle of the header. */}
+        {/* The ranges, then the ways of buying that are not ranges. Dropped
+            entirely when every collection is hidden, rather than left as an
+            empty list taking up the middle of the header. */}
         {collections.length > 0 && (
           <nav aria-label="Collections" className="ml-auto hidden md:block">
-            <ul className="flex items-center gap-7 text-sm">
+            <ul className="flex items-center gap-7">
               {collections.map((c) => (
                 <li key={c.slug}>
-                  <Link
-                    href={`/shop?collection=${c.slug}`}
-                    className="transition-colors hover:text-ink"
-                    style={{ color: "var(--color-ink-soft)" }}
-                  >
+                  <Link href={`/shop?collection=${c.slug}`} className="nav-link">
                     {c.name}
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/customize" className="nav-link">
+                  Made to measure
+                </Link>
+              </li>
             </ul>
           </nav>
         )}

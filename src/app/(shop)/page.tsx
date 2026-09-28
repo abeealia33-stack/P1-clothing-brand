@@ -7,6 +7,7 @@ import HeroBanner from "@/components/HeroBanner";
 import ProductCard from "@/components/ProductCard";
 import PromoStrip from "@/components/PromoStrip";
 import ReelsRail from "@/components/ReelsRail";
+import SaleBand from "@/components/SaleBand";
 import SplitBanner from "@/components/SplitBanner";
 import {
   bannerHref,
@@ -47,6 +48,12 @@ export default async function HomePage() {
     liveProductsByIds(dayProductIds(banners)),
   ]);
   const { strip, split } = resolveHomeBanners(banners, productSlugs);
+  /* Shown once it has something to say: a heading, or a photograph to say it
+     over. An empty ink band would just be a bar across the page. */
+  const sale =
+    banners.sale.show && (banners.sale.heading || banners.sale.image)
+      ? banners.sale
+      : null;
   const days = shownDays(banners, dayProducts);
 
   /*
@@ -62,6 +69,15 @@ export default async function HomePage() {
     dayPicker: days.length > 0 && <DayPicker days={days} />,
     groupOrders: <GroupOrdersSection image={banners.groupImage} />,
     pair: split && <SplitBanner panels={split.panels} />,
+    sale: sale && (
+      <SaleBand
+        image={sale.image}
+        eyebrow={sale.eyebrow}
+        heading={sale.heading}
+        buttonLabel={sale.buttonLabel}
+        href={bannerHref(sale.link, productSlugs)}
+      />
+    ),
     carousel: strip && <PromoStrip strip={strip} />,
     reels: <ReelsBlock reels={reels} />,
   };

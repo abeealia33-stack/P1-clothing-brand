@@ -1,8 +1,10 @@
+import AnnouncementBar from "@/components/AnnouncementBar";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import TabBar from "@/components/TabBar";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { getNavCollections } from "@/lib/settings";
+import { shownAnnouncement } from "@/lib/banners";
+import { getNavCollections, getSettings } from "@/lib/settings";
 
 /**
  * Everything a customer sees. The admin sits outside this group so it gets
@@ -24,7 +26,8 @@ export default async function ShopLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const shown = await getNavCollections();
+  const [shown, { banners }] = await Promise.all([getNavCollections(), getSettings()]);
+  const announcement = shownAnnouncement(banners);
 
   return (
     <>
@@ -34,6 +37,7 @@ export default async function ShopLayout({
       >
         Skip to content
       </a>
+      {announcement && <AnnouncementBar messages={announcement} />}
       <SiteHeader collections={shown} />
       {/* Clears the fixed tab bar so nothing hides behind it on phones. */}
       <div className="shop pb-tabbar md:pb-0">

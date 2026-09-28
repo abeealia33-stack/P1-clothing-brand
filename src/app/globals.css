@@ -885,7 +885,8 @@
 --------------------------------------------------------------------------- */
 @layer components {
   .footer {
-    background: var(--color-khaddar);
+    background: var(--color-ink);
+    color: var(--color-paper);
     padding-block: 4.5rem 6rem;
   }
   @media (min-width: 768px) {
@@ -1057,5 +1058,244 @@
       min-width: 0;
       min-height: 0;
     }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Announcement strip, nav marks, category and promo cards, the sale band and
+   the reels rail — the front page's furniture.
+--------------------------------------------------------------------------- */
+@layer components {
+  .announce {
+    background: var(--color-sage-deep);
+    color: var(--color-paper);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-align: center;
+  }
+  .announce-dot {
+    opacity: 0.5;
+  }
+
+  /* The wordmark and its Urdu, stacked so the name keeps its own line. */
+  .brand-mark {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 1.375rem;
+    line-height: 1;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .brand-urdu {
+    display: block;
+    padding-block-end: 0;
+    margin-top: 0.125rem;
+    font-size: 0.6875rem;
+    line-height: 1;
+    text-align: right;
+    color: var(--color-ink-soft);
+  }
+
+  .nav-link {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-ink-soft);
+    transition: color 0.15s ease;
+  }
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    color: var(--color-ink);
+  }
+
+  /* ---- Category cards ------------------------------------------------- */
+  .cat-card {
+    display: block;
+    width: 72vw;
+    max-width: 22rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+  }
+  @media (min-width: 768px) {
+    .cat-card {
+      width: auto;
+      max-width: none;
+    }
+  }
+  .cat-card-photo {
+    aspect-ratio: 5 / 4;
+    overflow: hidden;
+    background: var(--color-khaddar);
+  }
+  .cat-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+  .cat-card-name {
+    font-size: 1.25rem;
+    line-height: 1.2;
+  }
+  .cat-card-line {
+    margin-top: 0.125rem;
+    font-size: 0.8125rem;
+    color: var(--color-ink-soft);
+  }
+  .cat-card-arrow {
+    flex: none;
+    color: var(--color-ink-soft);
+    transition: transform 0.2s ease;
+  }
+  .cat-card:hover .cat-card-arrow {
+    transform: translateX(3px);
+  }
+
+  /* ---- The pair ------------------------------------------------------- */
+  .promo-card {
+    display: block;
+    background: var(--color-khaddar);
+  }
+  .promo-card-photo {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+  }
+  .promo-card-foot {
+    padding: 1.5rem;
+  }
+  @media (min-width: 768px) {
+    .promo-card-foot {
+      padding: 2rem;
+    }
+  }
+  .promo-card-heading {
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+  .promo-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid currentColor;
+    padding-bottom: 0.25rem;
+  }
+  .promo-card:hover .promo-card-cta {
+    color: var(--color-sage-deep);
+  }
+
+  /* ---- The sale band -------------------------------------------------- */
+  .sale-band {
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .sale-band-scrim {
+    background: rgba(28, 26, 23, 0.55);
+  }
+  .sale-band-eyebrow {
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.75;
+  }
+  .sale-band-heading {
+    margin-top: 0.5rem;
+    font-family: var(--font-display);
+    font-weight: 300;
+    font-size: clamp(1.75rem, 4vw, 2.75rem);
+    line-height: 1.1;
+  }
+  .sale-band-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 52px;
+    padding: 0 2rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: background 0.2s;
+  }
+  .sale-band-btn:hover {
+    background: var(--color-khaddar);
+  }
+
+  /* ---- Reels ---------------------------------------------------------- */
+  .reel-card {
+    border-radius: 1rem;
+    background: var(--color-khaddar);
+    box-shadow: 0 6px 20px rgba(44, 44, 44, 0.08);
+  }
+  .reel-shop {
+    position: absolute;
+    right: 0.625rem;
+    bottom: 0.625rem;
+    padding: 0.375rem 0.875rem;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-size: 0.6875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .reel-caption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+  .reel-meta {
+    margin-top: 0.125rem;
+    font-size: 0.8125rem;
+    color: var(--color-ink-soft);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   The footer in ink. Same columns, same words — the palette inverts, so every
+   colour inside it is restated against the dark rather than left to the
+   tokens, which are all written for paper.
+--------------------------------------------------------------------------- */
+@layer components {
+  .footer .urdu,
+  .footer-heading {
+    color: var(--color-paper);
+  }
+  .footer-blurb,
+  .footer-link,
+  .footer-bottom,
+  .footer-legal a,
+  .footer-social a {
+    color: rgba(245, 240, 235, 0.68);
+  }
+  .footer-link:hover,
+  .footer-link:focus-visible,
+  .footer-legal a:hover,
+  .footer-legal a:focus-visible,
+  .footer-social a:hover,
+  .footer-social a:focus-visible {
+    color: var(--color-paper);
+  }
+  .footer-col + .footer-col,
+  .footer-bottom {
+    border-color: rgba(245, 240, 235, 0.16);
+  }
+  @media (min-width: 768px) {
+    .footer-col + .footer-col {
+      border-color: transparent;
+    }
+  }
+  .footer :focus-visible {
+    outline-color: var(--color-paper);
   }
 }

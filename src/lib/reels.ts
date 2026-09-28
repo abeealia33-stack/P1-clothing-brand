@@ -16,6 +16,7 @@ export type Reel = {
   productId: string;
   productSlug: string;
   productName: string;
+  productPrice: number;
   active: boolean;
   position: number;
 };
@@ -28,7 +29,7 @@ type Row = {
   productId: string;
   active: boolean;
   position: number;
-  product: { slug: string; name: string };
+  product: { slug: string; name: string; price: number };
 };
 
 const toReel = (row: Row): Reel => ({
@@ -39,6 +40,7 @@ const toReel = (row: Row): Reel => ({
   productId: row.productId,
   productSlug: row.product.slug,
   productName: row.product.name,
+  productPrice: row.product.price,
   active: row.active,
   position: row.position,
 });
@@ -51,7 +53,7 @@ export async function listReels(options?: {
   const rows = await prisma.reel.findMany({
     where: options?.includeInactive ? {} : { active: true, product: { active: true } },
     orderBy: order,
-    include: { product: { select: { slug: true, name: true } } },
+    include: { product: { select: { slug: true, name: true, price: true } } },
   });
   return rows.map(toReel);
 }
@@ -59,7 +61,7 @@ export async function listReels(options?: {
 export async function getReelById(id: string): Promise<Reel | null> {
   const row = await prisma.reel.findUnique({
     where: { id },
-    include: { product: { select: { slug: true, name: true } } },
+    include: { product: { select: { slug: true, name: true, price: true } } },
   });
   return row ? toReel(row) : null;
 }
@@ -79,7 +81,7 @@ export async function createReel(input: ReelInput): Promise<Reel> {
   });
   const row = await prisma.reel.create({
     data: { ...input, position: (last?.position ?? 0) + 1 },
-    include: { product: { select: { slug: true, name: true } } },
+    include: { product: { select: { slug: true, name: true, price: true } } },
   });
   return toReel(row);
 }
@@ -88,7 +90,7 @@ export async function updateReel(id: string, input: ReelInput): Promise<Reel> {
   const row = await prisma.reel.update({
     where: { id },
     data: input,
-    include: { product: { select: { slug: true, name: true } } },
+    include: { product: { select: { slug: true, name: true, price: true } } },
   });
   return toReel(row);
 }

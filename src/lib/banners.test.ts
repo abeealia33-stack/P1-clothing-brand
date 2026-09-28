@@ -142,7 +142,7 @@ describe("normaliseHomeOrder", () => {
   });
 
   it("keeps the owner's order", () => {
-    const moved = ["reels", "carousel", "pair", "groupOrders", "dayPicker", "newIn", "collections"];
+    const moved = [...homeBlocks].reverse();
     expect(normaliseHomeOrder(moved)).toEqual(moved);
   });
 
@@ -154,6 +154,7 @@ describe("normaliseHomeOrder", () => {
       "groupOrders",
       "reels",
       "pair",
+      "sale",
       "carousel",
     ]);
   });
@@ -163,6 +164,7 @@ describe("normaliseHomeOrder", () => {
     expect(normaliseHomeOrder(saved)).toEqual([
       "collections",
       "pair",
+      "sale",
       "newIn",
       "dayPicker",
       "carousel",
@@ -179,6 +181,7 @@ describe("normaliseHomeOrder", () => {
       "groupOrders",
       "reels",
       "pair",
+      "sale",
       "carousel",
     ]);
   });

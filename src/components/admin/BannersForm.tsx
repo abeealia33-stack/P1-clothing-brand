@@ -11,6 +11,7 @@ import HomeOrderEditor from "./HomeOrderEditor";
 import { saveBannersAction, type BannersFormState } from "@/app/admin/banners/actions";
 import {
   DAY_PIECES,
+  MAX_ANNOUNCEMENTS,
   MAX_TILES,
   MIN_TILES,
   type BannerSlot,
@@ -83,6 +84,9 @@ export default function BannersForm({
   const [busy, setBusy] = useState(0);
   const onBusyChange = (started: boolean) => setBusy((n) => n + (started ? 1 : -1));
 
+  const setSale = (patch: Partial<HomeBanners["sale"]>) =>
+    setBanners((b) => ({ ...b, sale: { ...b.sale, ...patch } }));
+
   const setStrip = (patch: Partial<HomeBanners["strip"]>) =>
     setBanners((b) => ({ ...b, strip: { ...b.strip, ...patch } }));
 
@@ -122,6 +126,142 @@ export default function BannersForm({
           order={banners.order}
           onChange={(order) => setBanners((b) => ({ ...b, order }))}
         />
+      </fieldset>
+
+      <fieldset className="rule mt-10 border-0 p-0 pt-8">
+        <legend className="text-2xl">The strip above the menu</legend>
+        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          Up to {MAX_ANNOUNCEMENTS} short lines across the top of every page —
+          delivery, payment, anything worth saying before someone starts
+          looking. Leave a line blank to drop it.
+        </p>
+
+        <label className="mt-4 flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={banners.announcement.show}
+            onChange={(e) =>
+              setBanners((b) => ({
+                ...b,
+                announcement: { ...b.announcement, show: e.target.checked },
+              }))
+            }
+            className="h-4 w-4 accent-[var(--color-sage-deep)]"
+          />
+          <span className="text-sm">Show the strip</span>
+        </label>
+
+        <div className="mt-4 space-y-3">
+          {Array.from({ length: MAX_ANNOUNCEMENTS }, (_, i) => (
+            <div key={i}>
+              <label htmlFor={`announce-${i}`} className="block text-sm font-medium">
+                Line {i + 1}
+              </label>
+              <input
+                id={`announce-${i}`}
+                value={banners.announcement.messages[i] ?? ""}
+                onChange={(e) => {
+                  const messages = Array.from(
+                    { length: MAX_ANNOUNCEMENTS },
+                    (_, j) => banners.announcement.messages[j] ?? ""
+                  );
+                  messages[i] = e.target.value;
+                  setBanners((b) => ({ ...b, announcement: { ...b.announcement, messages } }));
+                }}
+                placeholder={
+                  ["Cash on delivery", "Free delivery over PKR 3,000", "Seven-day exchange"][i]
+                }
+                className="field mt-1"
+              />
+            </div>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="rule mt-10 border-0 p-0 pt-8">
+        <legend className="text-2xl">The sale band</legend>
+        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
+          A wide dark band for a sale or a drop. A photograph sits behind the
+          words when you add one, darkened so they stay readable. It shows once
+          it has a heading or a photograph.
+        </p>
+
+        <label className="mt-4 flex cursor-pointer items-center gap-2">
+          <input
+            type="checkbox"
+            checked={banners.sale.show}
+            onChange={(e) => setSale({ show: e.target.checked })}
+            className="h-4 w-4 accent-[var(--color-sage-deep)]"
+          />
+          <span className="text-sm">Show on the home page</span>
+        </label>
+
+        <div className="mt-5 max-w-xl">
+          <BannerPhoto
+            image={banners.sale.image}
+            onUploaded={(image) => setSale({ image })}
+            onBusyChange={onBusyChange}
+            purpose="feature"
+            frame="aspect-[12/5]"
+            sizeHint="A wide photo, around 1920 × 800 px."
+            minSize={MIN_SIZES.groupBanner}
+          />
+          {banners.sale.image && (
+            <button
+              type="button"
+              onClick={() => setSale({ image: "" })}
+              className="mt-1 text-xs underline underline-offset-4"
+              style={{ color: "var(--color-ink-soft)" }}
+            >
+              Remove photo — plain ink instead
+            </button>
+          )}
+        </div>
+
+        <div className="mt-5 space-y-3">
+          <div>
+            <label htmlFor="sale-eyebrow" className="block text-sm font-medium">
+              Small line above (optional)
+            </label>
+            <input
+              id="sale-eyebrow"
+              value={banners.sale.eyebrow}
+              onChange={(e) => setSale({ eyebrow: e.target.value })}
+              placeholder="Winter sale"
+              className="field mt-1"
+            />
+          </div>
+          <div>
+            <label htmlFor="sale-heading" className="block text-sm font-medium">
+              Heading
+            </label>
+            <input
+              id="sale-heading"
+              value={banners.sale.heading}
+              onChange={(e) => setSale({ heading: e.target.value })}
+              placeholder="Up to 30% off selected khaddar"
+              className="field mt-1"
+            />
+          </div>
+          <div>
+            <label htmlFor="sale-button" className="block text-sm font-medium">
+              Button text
+            </label>
+            <input
+              id="sale-button"
+              value={banners.sale.buttonLabel}
+              onChange={(e) => setSale({ buttonLabel: e.target.value })}
+              className="field mt-1"
+            />
+          </div>
+          <BannerLinkPicker
+            label="Where the button goes"
+            link={banners.sale.link}
+            onChange={(link) => setSale({ link })}
+            collections={collections}
+            products={products}
+          />
+        </div>
       </fieldset>
 
       <fieldset className="rule mt-10 border-0 p-0 pt-8">

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { priceLabel } from "@/lib/format";
 import type { Reel } from "@/lib/reels";
 
 /**
@@ -149,8 +150,9 @@ function ReelCard({ reel, playing }: { reel: Reel; playing: boolean }) {
     <Link
       href={`/product/${reel.productSlug}`}
       data-reel-id={reel.id}
-      className="lift relative isolate block aspect-[9/16] w-44 shrink-0 overflow-hidden rounded-2xl bg-khaddar shadow-[0_6px_20px_rgba(44,44,44,0.08)] sm:w-52"
+      className="group block w-44 shrink-0 sm:w-52"
     >
+      <div className="reel-card relative isolate aspect-[9/16] overflow-hidden">
       <video
         ref={video}
         src={reel.video}
@@ -161,17 +163,16 @@ function ReelCard({ reel, playing }: { reel: Reel; playing: boolean }) {
         preload={playing ? "auto" : "metadata"}
         className="h-full w-full object-cover"
       />
-      <div
-        className="absolute inset-x-0 bottom-0 p-3"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(30,28,25,.78) 0%, rgba(30,28,25,0) 65%)",
-        }}
-      >
-        <p className="truncate text-sm text-white">
-          {reel.caption || reel.productName}
-        </p>
+        {/* The way in, said plainly on the clip rather than left implied. */}
+        <span className="reel-shop" aria-hidden="true">
+          Shop
+        </span>
       </div>
+
+      <p className="reel-caption">{reel.caption || reel.productName}</p>
+      <p className="reel-meta tnum">
+        {reel.productName} · {priceLabel(reel.productPrice)}
+      </p>
     </Link>
   );
 }

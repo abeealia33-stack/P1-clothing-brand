@@ -52,6 +52,7 @@ export const homeBlocks = [
   "dayPicker",
   "groupOrders",
   "pair",
+  "sale",
   "carousel",
   "reels",
 ] as const;
@@ -62,6 +63,7 @@ export type HomeBlock = (typeof homeBlocks)[number];
 export const homeBlockLabels: Record<HomeBlock, string> = {
   collections: "Ways to get dressed",
   pair: "The pair (two photos)",
+  sale: "The sale band",
   newIn: "Just in",
   carousel: "The carousel",
   dayPicker: "Aaj ka din kaisa hai? (day picker)",
@@ -90,6 +92,23 @@ export const DAY_PIECES = 3;
 
 export type DayPick = { reason: string; productIds: string[] };
 
+/** The strip above the header. Each line is shown in turn, dot separated. */
+export type Announcement = { show: boolean; messages: string[] };
+
+/** How many lines the strip will carry before it stops reading as a strip. */
+export const MAX_ANNOUNCEMENTS = 3;
+
+/** The wide band for a sale or a drop: a photograph, a few words, a button. */
+export type SaleBand = {
+  show: boolean;
+  /** "" draws the band in plain ink rather than over a photograph. */
+  image: string;
+  eyebrow: string;
+  heading: string;
+  buttonLabel: string;
+  link: BannerLink;
+};
+
 export type HomeBanners = {
   /** The order the blocks above are drawn in, top to bottom. */
   order: HomeBlock[];
@@ -109,6 +128,8 @@ export type HomeBanners = {
     tiles: BannerTile[];
   };
   split: { show: boolean; panels: BannerSlot[] };
+  announcement: Announcement;
+  sale: SaleBand;
   days: Record<DayKey, DayPick>;
   /** The wide Hum rang photo; "" draws the illustration instead. */
   groupImage: string;
@@ -145,6 +166,15 @@ export const emptyHomeBanners = (): HomeBanners => ({
   split: {
     show: true,
     panels: Array.from({ length: SPLIT_PANELS }, emptySlot),
+  },
+  announcement: { show: false, messages: [] },
+  sale: {
+    show: false,
+    image: "",
+    eyebrow: "",
+    heading: "",
+    buttonLabel: DEFAULT_CTA_LABEL,
+    link: { kind: "shop" },
   },
   days: emptyDays(),
   groupImage: "",
@@ -250,8 +280,32 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
       show: split.show !== false,
       panels: slots(split.panels, SPLIT_PANELS),
     },
+    announcement: normaliseAnnouncement(source.announcement),
+    sale: normaliseSale(source.sale),
     days: normaliseDays(source.days),
     groupImage: text(source.groupImage),
+  };
+}
+
+function normaliseAnnouncement(value: unknown): Announcement {
+  const source = record(value);
+  const lines = Array.isArray(source.messages) ? source.messages : [];
+  return {
+    show: source.show === true,
+    // A blank line would draw a stray dot, so it is dropped rather than kept.
+    messages: lines.map(text).filter(Boolean).slice(0, MAX_ANNOUNCEMENTS),
+  };
+}
+
+function normaliseSale(value: unknown): SaleBand {
+  const source = record(value);
+  return {
+    show: source.show === true,
+    image: text(source.image),
+    eyebrow: text(source.eyebrow),
+    heading: text(source.heading),
+    buttonLabel: text(source.buttonLabel) || DEFAULT_CTA_LABEL,
+    link: normaliseBannerLink(source.link),
   };
 }
 
@@ -289,6 +343,12 @@ export function normaliseHomeOrder(value: unknown): HomeBlock[] {
   return order;
 }
 
+/** The strip as the storefront draws it, or null when it has nothing to say. */
+export function shownAnnouncement(banners: HomeBanners): string[] | null {
+  const { show, messages } = banners.announcement;
+  return show && messages.length > 0 ? messages : null;
+}
+
 /** Every piece picked for the day picker, once. */
 export function dayProductIds(banners: HomeBanners): string[] {
   return [...new Set(dayKeys.flatMap((key) => banners.days[key].productIds))];
@@ -297,6 +357,7 @@ export function dayProductIds(banners: HomeBanners): string[] {
 /** Every piece a banner points at, once — to look their addresses up together. */
 export function linkedProductIds(banners: HomeBanners): string[] {
   const ids = [
+    banners.sale.link,
     banners.strip.link,
     ...banners.strip.tiles.map((t) => t.link),
     ...banners.split.panels.map((p) => p.link),
