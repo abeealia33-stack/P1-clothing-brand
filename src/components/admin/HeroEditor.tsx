@@ -5,10 +5,13 @@ import BannerLinkPicker from "./BannerLinkPicker";
 import BannerPhoto from "./BannerPhoto";
 import { MIN_SIZES } from "@/lib/image-size";
 import {
+  emptySlide,
   MAX_HERO_BUTTON,
+  MAX_HERO_SLIDES,
   type HeroFocus,
   type HeroPosition,
   type HeroSettings,
+  type HeroSlide,
 } from "@/lib/hero";
 import type { ProductChoice } from "@/lib/catalogue";
 import type { ResolvedCollection } from "@/lib/types";
@@ -40,44 +43,91 @@ export default function HeroEditor({
 }) {
   const id = useId();
   const set = (patch: Partial<HeroSettings>) => onChange({ ...hero, ...patch });
+  const setSlides = (slides: HeroSlide[]) => set({ slides });
+  const setSlide = (index: number, patch: Partial<HeroSlide>) =>
+    setSlides(hero.slides.map((s, i) => (i === index ? { ...s, ...patch } : s)));
 
   return (
     <div className="space-y-5">
-      <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
-        <div>
-          <p className="mb-1 text-sm font-medium">Desktop photo</p>
-          <BannerPhoto
-            image={hero.desktopImage}
-            onUploaded={(url) => set({ desktopImage: url })}
-            onBusyChange={onBusyChange}
-            purpose="feature"
-            frame="aspect-video"
-            sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
-            minSize={MIN_SIZES.heroDesktop}
-          />
-        </div>
-        <div>
-          <p className="mb-1 text-sm font-medium">Phone photo (optional)</p>
-          <BannerPhoto
-            image={hero.mobileImage}
-            onUploaded={(url) => set({ mobileImage: url })}
-            onBusyChange={onBusyChange}
-            purpose="feature"
-            frame="aspect-[4/5]"
-            sizeHint="1080 × 1350 px (4:5), under 250 KB. Blank uses the desktop photo."
-            minSize={MIN_SIZES.heroMobile}
-          />
-          {hero.mobileImage && (
-            <button
-              type="button"
-              onClick={() => set({ mobileImage: "" })}
-              className="mt-1 text-xs underline underline-offset-4"
-              style={{ color: "var(--color-ink-soft)" }}
-            >
-              Remove phone photo
-            </button>
-          )}
-        </div>
+      <div className="space-y-4">
+        {hero.slides.map((slide, i) => (
+          <div key={i} className="border p-4" style={{ borderColor: "var(--color-line)" }}>
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium">
+                Photo {i + 1}
+                {i === 0 && (
+                  <span style={{ color: "var(--color-ink-soft)" }}> — shown first</span>
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={() => setSlides(hero.slides.filter((_, j) => j !== i))}
+                className="text-xs underline underline-offset-4"
+                style={{ color: "var(--color-ink-soft)" }}
+              >
+                Remove
+              </button>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
+              <div>
+                <p className="mb-1 text-sm font-medium">On a computer</p>
+                <BannerPhoto
+                  image={slide.desktopImage}
+                  onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
+                  onBusyChange={onBusyChange}
+                  purpose="feature"
+                  frame="aspect-video"
+                  sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
+                  minSize={MIN_SIZES.heroDesktop}
+                />
+              </div>
+              <div>
+                <p className="mb-1 text-sm font-medium">On a phone (optional)</p>
+                <BannerPhoto
+                  image={slide.mobileImage}
+                  onUploaded={(mobileImage) => setSlide(i, { mobileImage })}
+                  onBusyChange={onBusyChange}
+                  purpose="feature"
+                  frame="aspect-[4/5]"
+                  sizeHint="1080 × 1350 px (4:5). Blank crops the wide photo."
+                  minSize={MIN_SIZES.heroMobile}
+                />
+                {slide.mobileImage && (
+                  <button
+                    type="button"
+                    onClick={() => setSlide(i, { mobileImage: "" })}
+                    className="mt-1 text-xs underline underline-offset-4"
+                    style={{ color: "var(--color-ink-soft)" }}
+                  >
+                    Remove phone photo
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {hero.slides.length < MAX_HERO_SLIDES ? (
+          <button
+            type="button"
+            onClick={() => setSlides([...hero.slides, emptySlide()])}
+            className="btn btn-quiet"
+          >
+            {hero.slides.length === 0 ? "Add a photo" : "Add another photo"}
+          </button>
+        ) : (
+          <p className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
+            {MAX_HERO_SLIDES} photos is as many as the hero shows.
+          </p>
+        )}
+
+        {hero.slides.length > 1 && (
+          <p className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
+            They fade from one to the next every few seconds. Someone who has
+            asked their phone to reduce motion sees the first and no more.
+          </p>
+        )}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

@@ -1,12 +1,7 @@
 import Link from "next/link";
-import type { HeroFocus, HeroPosition } from "@/lib/hero";
+import HeroSlides from "./HeroSlides";
+import type { HeroFocus, HeroPosition, HeroSlide } from "@/lib/hero";
 import { site } from "@/lib/site";
-
-const FOCUS: Record<HeroFocus, string> = {
-  top: "50% 15%",
-  center: "50% 50%",
-  bottom: "50% 85%",
-};
 
 const POSITION: Record<HeroPosition, string> = {
   center: "justify-center",
@@ -23,15 +18,13 @@ const POSITION: Record<HeroPosition, string> = {
  * is downloaded.
  */
 export default function HeroBanner({
-  desktopImage,
-  mobileImage,
+  slides,
   buttonLabel,
   href,
   position,
   focus,
 }: {
-  desktopImage: string;
-  mobileImage: string;
+  slides: HeroSlide[];
   buttonLabel: string;
   href: string;
   position: HeroPosition;
@@ -43,23 +36,9 @@ export default function HeroBanner({
     <section className="fold-hero -mt-14 md:-mt-16">
       <h1 className="sr-only">{alt}</h1>
 
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="hero-photo absolute inset-0 overflow-hidden">
         <div className="fold-parallax relative h-full w-full origin-center">
-          <picture>
-            {mobileImage && <source media="(max-width: 767px)" srcSet={mobileImage} />}
-            <img
-              src={desktopImage}
-              alt={alt}
-              loading="eager"
-              decoding="sync"
-              fetchPriority="high"
-              className="block h-full w-full object-cover"
-              style={{
-                objectPosition: FOCUS[focus],
-                backgroundColor: "var(--color-khaddar)",
-              }}
-            />
-          </picture>
+          <HeroSlides slides={slides} focus={focus} alt={alt} />
         </div>
       </div>
 

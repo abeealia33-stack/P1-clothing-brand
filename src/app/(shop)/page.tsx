@@ -26,7 +26,7 @@ import { rupees } from "@/lib/format";
 import type { Product, ResolvedCollection } from "@/lib/types";
 import { site } from "@/lib/site";
 
-const DEFAULT_HERO = "/cloth/hero.svg";
+const DEFAULT_SLIDE = { desktopImage: "/cloth/hero.svg", mobileImage: "" };
 
 export default async function HomePage() {
   // None of these depends on the others, and this is the page most people
@@ -86,8 +86,7 @@ export default async function HomePage() {
     <>
       {/* The fold: this stays put while the paper below slides up over it. */}
       <HeroBanner
-        desktopImage={hero.desktopImage || DEFAULT_HERO}
-        mobileImage={hero.mobileImage}
+        slides={hero.slides.length > 0 ? hero.slides : [DEFAULT_SLIDE]}
         buttonLabel={hero.buttonLabel}
         href={bannerHref(hero.link, productSlugs)}
         position={hero.position}

@@ -1448,3 +1448,36 @@
     box-shadow: inset 0 0 0 1.5px var(--color-ink);
   }
 }
+
+/* ---------------------------------------------------------------------------
+   The hero's photographs, crossfading.
+
+   Stacked, and faded between rather than slid: the button sits over them, and
+   anything travelling sideways under it is movement asking to be watched.
+--------------------------------------------------------------------------- */
+@layer components {
+  .hero-photo {
+    background: var(--color-khaddar);
+  }
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    display: block;
+    opacity: 0;
+  }
+  /* The first is painted even before the script that runs the timer arrives,
+     so the hero is never a blank rectangle waiting on JavaScript. */
+  .hero-slide:first-child,
+  .hero-slide[data-on="true"] {
+    opacity: 1;
+  }
+  .hero-slide:first-child:not([data-on="true"]) {
+    opacity: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-slide {
+      transition: opacity 1.2s ease-in-out;
+    }
+  }
+}
