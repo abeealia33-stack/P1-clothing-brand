@@ -51,7 +51,7 @@ function Fold({
         {title}
         <span aria-hidden="true" className="fold-sign" />
       </summary>
-      <div className="fold-body">{children}</div>
+      <div className="fold-panel-body">{children}</div>
     </details>
   );
 }
