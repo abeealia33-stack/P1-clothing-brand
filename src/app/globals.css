@@ -5,8 +5,9 @@
 
    Three colours come from the brand: paper, ink, sage. The other three exist
    so the palette is a system rather than three flat swatches — khaddar for
-   ground alternation, sage-deep for pressed states, ink-soft for secondary
-   text (a warm brown rather than a grey, so it belongs to the cloth).
+   ground alternation, sage-deep for pressed states and for any fill with
+   words on it (white on sage is 2.85:1, too faint to read), ink-soft for
+   secondary text (a warm brown rather than a grey, so it belongs to the cloth).
 --------------------------------------------------------------------------- */
 @theme {
   --color-paper: #f5f0eb;
@@ -190,12 +191,14 @@
     background: var(--color-sage-deep);
   }
 
+  /* Paper on the deep sage, as on Add to bag; the light sage is too pale to
+     carry words. */
   .btn-sage {
-    background: var(--color-sage);
-    color: #fff;
+    background: var(--color-sage-deep);
+    color: var(--color-paper);
   }
   .btn-sage:hover:not(:disabled) {
-    background: var(--color-sage-deep);
+    background: var(--color-ink);
   }
 
   .btn-quiet {

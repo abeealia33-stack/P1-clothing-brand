@@ -23,8 +23,7 @@ export default function ContactPage() {
       <div className="mt-9 space-y-3">
         <a
           href={whatsappLink("Salam! I have a question about Bilques.")}
-          className="block p-6 transition-colors"
-          style={{ background: "var(--color-sage)", color: "#fff" }}
+          className="block bg-sage-deep p-6 text-paper transition-colors hover:bg-ink"
         >
           <span
             className="flex items-center gap-3 text-3xl"
@@ -33,7 +32,7 @@ export default function ContactPage() {
             <WhatsAppGlyph size={28} />
             WhatsApp
           </span>
-          <span className="tnum mt-1 block text-sm text-white/85">
+          <span className="tnum mt-1 block text-sm">
             {site.whatsappDisplay} — sizing, orders, exchanges
           </span>
         </a>

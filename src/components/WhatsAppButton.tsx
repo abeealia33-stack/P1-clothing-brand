@@ -66,7 +66,7 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message Bilques on WhatsApp"
-      className={`group fixed right-4 bottom-tabbar z-50 mb-4 h-14 items-center gap-3 rounded-full bg-sage px-4 text-white shadow-lg transition-colors hover:bg-sage-deep md:right-6 md:bottom-6 md:mb-0 ${
+      className={`group fixed right-4 bottom-tabbar z-50 mb-4 h-14 items-center gap-3 rounded-full bg-sage-deep px-4 text-paper shadow-lg transition-colors hover:bg-ink md:right-6 md:bottom-6 md:mb-0 ${
         crowdedOnPhones ? "hidden md:flex" : "flex"
       }`}
     >
