@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { whatsappLink } from "@/lib/site";
+import { showsFloatingWhatsApp, whatsappLink } from "@/lib/site";
 
 /**
  * The floating way into WhatsApp.
@@ -50,15 +50,8 @@ function openingLine(pathname: string): string {
 export default function WhatsAppButton() {
   const pathname = usePathname();
 
-  /* Nothing floats over checkout. A shopper mid-payment does not need a second
-     way to buy, and the confirmation page has its own celebration. */
-  if (pathname.startsWith("/checkout")) return null;
-
-  /* On phones the product page already parks a buy bar above the tab bar, and
-     two fixed elements in the same corner is one too many. Desktop has the
-     room, and the product page carries its own inline WhatsApp line either
-     way. */
-  const crowdedOnPhones = pathname.startsWith("/product/");
+  // Not over checkout or a product page; the reasons are kept with the rule.
+  if (!showsFloatingWhatsApp(pathname)) return null;
 
   return (
     <a
@@ -66,9 +59,7 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Message Bilques on WhatsApp"
-      className={`group fixed right-4 bottom-tabbar z-50 mb-4 h-14 items-center gap-3 rounded-full bg-sage-deep px-4 text-paper shadow-lg transition-colors hover:bg-ink md:right-6 md:bottom-6 md:mb-0 ${
-        crowdedOnPhones ? "hidden md:flex" : "flex"
-      }`}
+      className="group fixed right-4 bottom-tabbar z-50 mb-4 flex h-14 items-center gap-3 rounded-full bg-sage-deep px-4 text-paper shadow-lg transition-colors hover:bg-ink md:right-6 md:bottom-6 md:mb-0"
     >
       <WhatsAppGlyph size={26} />
       {/* Collapsed to a circle until you reach for it: the label explains the

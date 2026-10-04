@@ -27,6 +27,17 @@ export const site = {
 export const whatsappLink = (message?: string) =>
   `https://wa.me/${site.whatsapp}${message ? `?text=${encodeURIComponent(message)}` : ""}`;
 
+/**
+ * Whether the floating WhatsApp button belongs on a page.
+ *
+ * Not over checkout: someone mid-payment does not need a second way to buy.
+ * Not over a product page, at any width: it carries its own WhatsApp line
+ * under the buy row, and on windows narrower than about 1340px the floating
+ * button sits on Save as the buy row scrolls past the corner.
+ */
+export const showsFloatingWhatsApp = (pathname: string): boolean =>
+  !pathname.startsWith("/checkout") && !pathname.startsWith("/product/");
+
 export const instagramLink = `https://instagram.com/${site.instagram}`;
 
 export const linkedinLink = "https://www.linkedin.com/company/bilques/";
