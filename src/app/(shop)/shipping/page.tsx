@@ -101,7 +101,7 @@ export default async function ShippingPage() {
         <h2 className="text-3xl">Sizes</h2>
         <p className="measure mt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
           Body measurements in inches, not garment measurements. Everything is
-          cut loose over these — Azad pieces run two sizes wider on purpose.
+          cut loose over these — {names.azad} pieces run two sizes wider on purpose.
         </p>
 
         <div className="rail mt-5 -mx-5 px-5 sm:mx-0 sm:px-0">

@@ -6,7 +6,7 @@ import ProductBuy from "@/components/ProductBuy";
 import ProductCard from "@/components/ProductCard";
 import { getProductBySlug, relatedProducts } from "@/lib/catalogue";
 import { getSettings } from "@/lib/settings";
-import { resolveCollection } from "@/lib/types";
+import { collectionNames, resolveCollection } from "@/lib/types";
 import { photoAlt, priceLabel, rupees } from "@/lib/format";
 import { site, whatsappLink } from "@/lib/site";
 import { WhatsAppGlyph } from "@/components/WhatsAppButton";
@@ -105,6 +105,7 @@ export default async function ProductPage({
     relatedProducts(product.collection, product.slug, 4),
   ]);
   const collection = resolveCollection(product.collection, collectionEdits)!;
+  const names = collectionNames(collectionEdits);
   const shipsFree = product.price >= site.freeShippingOver;
 
   return (
@@ -187,8 +188,8 @@ export default async function ProductPage({
                 <Link href="/shipping#sizes" className="underline underline-offset-4">
                   size guide
                 </Link>
-                . Between two sizes, take the smaller one — these are generous.
-                Azad pieces run two sizes wider on purpose.
+                . Between two sizes, take the smaller one — these are generous.{" "}
+                {names.azad} pieces run two sizes wider on purpose.
               </p>
             </Fold>
             <Fold title="Delivery, care and returns">
