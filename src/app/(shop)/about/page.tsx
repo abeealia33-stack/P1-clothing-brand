@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ClothImage from "@/components/ClothImage";
 import { site } from "@/lib/site";
+import { getCollectionNames } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "About",
@@ -15,7 +16,9 @@ const WONT = [
   "Take your money before you have the clothes in your hands — cash on delivery is the default, and always will be.",
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const names = await getCollectionNames();
+
   return (
     <div className="pb-10 md:pb-16">
       {/* The mill first, full width: the story starts with the cloth. */}
@@ -23,12 +26,12 @@ export default function AboutPage() {
         <div className="aspect-[4/5] overflow-hidden sm:aspect-[3/2] md:max-h-[70vh] md:w-full">
           <ClothImage
             src="/cloth/suti-kurta-2.svg"
-            alt="Close view of the cotton weave used across the Rozana collection"
+            alt={`Close view of the cotton weave used across the ${names.rozana} collection`}
             priority
           />
         </div>
         <figcaption className="mx-auto max-w-7xl px-5 md:px-16 pt-3 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          The cotton we use across Rozana, photographed at the mill in Faisalabad before it was cut.
+          The cotton we use across {names.rozana}, photographed at the mill in Faisalabad before it was cut.
         </figcaption>
       </figure>
 

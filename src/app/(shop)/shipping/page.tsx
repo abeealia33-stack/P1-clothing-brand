@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { rupees } from "@/lib/format";
+import { getCollectionNames } from "@/lib/settings";
 import { site, whatsappLink } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -16,7 +17,9 @@ const sizes = [
   { size: "XL", bust: "43", waist: "37", hip: "45" },
 ];
 
-export default function ShippingPage() {
+export default async function ShippingPage() {
+  const names = await getCollectionNames();
+
   return (
     <div className="mx-auto max-w-2xl px-5 py-10 md:py-14">
       <h1 className="text-[2.25rem] md:text-[3.5rem]">Shipping and returns</h1>
@@ -125,8 +128,8 @@ export default function ShippingPage() {
         </div>
 
         <p className="measure mt-4 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          Between two sizes? Take the smaller one in Rozana and Ghar, the larger
-          one in Azad.
+          Between two sizes? Take the smaller one in {names.rozana} and {names.ghar},
+          the larger one in {names.azad}.
         </p>
       </section>
 

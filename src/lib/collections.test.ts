@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  collectionNames,
   collections,
   navCollections,
   resolveCollection,
@@ -100,6 +101,25 @@ describe("resolveCollection", () => {
 
   it("returns nothing for a slug that is not one of the four", () => {
     expect(resolveCollection("party", {})).toBeUndefined();
+  });
+});
+
+describe("collectionNames", () => {
+  it("names each collection as the owner has", () => {
+    expect(collectionNames({ rozana: { name: "Roze" } })).toEqual({
+      rozana: "Roze",
+      ghar: "Ghar",
+      azad: "Azad",
+      bundles: "Bundles",
+    });
+  });
+
+  it("falls back to the built-in name when the owner's is blank", () => {
+    expect(collectionNames({ rozana: { name: "   " } }).rozana).toBe("Rozana");
+  });
+
+  it("still names a collection taken out of the menus", () => {
+    expect(collectionNames({ ghar: { name: "Ghar Ka", inNav: false } }).ghar).toBe("Ghar Ka");
   });
 });
 

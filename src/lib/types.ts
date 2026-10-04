@@ -125,6 +125,20 @@ export const resolveCollection = (
 ): ResolvedCollection | undefined =>
   resolveCollections(edits).find((c) => c.slug === slug);
 
+/** Each collection's name as the storefront shows it, keyed by slug. */
+export type CollectionNames = Record<CollectionSlug, string>;
+
+/**
+ * For sentences that name a collection in passing. The owner can rename one
+ * from the admin, and a sentence that spells out the old name then disagrees
+ * with the product page. Hidden collections are named too: advice about
+ * sizing stays true when a collection is out of the menus.
+ */
+export const collectionNames = (edits: CollectionEdits): CollectionNames =>
+  Object.fromEntries(
+    resolveCollections(edits).map((c) => [c.slug, c.name])
+  ) as CollectionNames;
+
 export type PriceTier = "under-2500" | "2500-5000" | "over-5000";
 
 export const priceTiers: { value: PriceTier; label: string }[] = [

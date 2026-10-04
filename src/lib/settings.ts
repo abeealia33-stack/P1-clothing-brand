@@ -5,12 +5,14 @@ import { normaliseHomeBanners, emptyHomeBanners, type HomeBanners } from "./bann
 import { emptyHero, normaliseHero, type HeroSettings } from "./hero";
 import { prisma } from "./prisma";
 import {
+  collectionNames,
   collections,
   navCollections,
   resolveCollections,
   transferMethods,
   type CollectionEdit,
   type CollectionEdits,
+  type CollectionNames,
   type ResolvedCollection,
   type TransferMethod,
 } from "./types";
@@ -154,6 +156,10 @@ export const getNavCollections = async (
 /** All four, hidden ones included. For the admin, and for naming a piece. */
 export const getAllCollections = async (): Promise<ResolvedCollection[]> =>
   resolveCollections((await getSettings()).collections);
+
+/** The four names as they read now, for pages that mention one in a sentence. */
+export const getCollectionNames = async (): Promise<CollectionNames> =>
+  collectionNames((await getSettings()).collections);
 
 /**
  * Each admin screen writes only its own column, so saving the collections
