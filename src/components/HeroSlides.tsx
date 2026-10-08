@@ -46,14 +46,11 @@ export default function HeroSlides({
   return (
     <>
       {slides.map((slide, i) => (
-        <picture
+        <div
           key={slide.desktopImage}
           className="hero-slide"
           data-on={i === shown ? "true" : undefined}
         >
-          {slide.mobileImage && (
-            <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
-          )}
           <img
             src={slide.desktopImage}
             /* Only the first is described: the rest are the same subject
@@ -65,7 +62,7 @@ export default function HeroSlides({
             className="block h-full w-full object-cover"
             style={{ objectPosition: FOCUS[focus] }}
           />
-        </picture>
+        </div>
       ))}
     </>
   );

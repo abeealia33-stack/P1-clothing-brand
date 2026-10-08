@@ -18,11 +18,11 @@ export type HeroPosition = (typeof heroPositions)[number];
 export const heroFocuses = ["top", "center", "bottom"] as const;
 export type HeroFocus = (typeof heroFocuses)[number];
 
-/** One photograph in the hero, with its own crop for a phone. */
+/** One photograph in the hero, shared across screen sizes. */
 export type HeroSlide = {
   /** "" while nothing has been uploaded; the storefront uses a placeholder. */
   desktopImage: string;
-  /** "" means the phone shows the desktop photo, cropped. */
+  /** Retained for stored settings compatibility; no longer rendered or edited. */
   mobileImage: string;
 };
 

@@ -13,9 +13,7 @@ const POSITION: Record<HeroPosition, string> = {
  * the alt text and a hidden heading, so search engines and screen readers
  * still get the tagline the eye no longer has to read.
  *
- * A <picture> rather than a slideshow component: the phone gets its own
- * portrait crop when one is uploaded, and only the photo that will be shown
- * is downloaded.
+ * Each photo is shared across devices and cropped to the responsive frame.
  */
 export default function HeroBanner({
   slides,
@@ -48,10 +46,8 @@ export default function HeroBanner({
         style={{ background: "linear-gradient(to top, rgba(0,0,0,.12), rgba(0,0,0,0))" }}
       />
 
-      {/* On a phone the fixed tab bar covers the bottom, so the button sits
-          its 32px above that rather than above the screen edge. */}
       <div
-        className={`hero-cta absolute inset-x-0 bottom-[calc(var(--spacing-tabbar)+2rem)] mx-auto flex max-w-7xl px-5 md:px-16 md:bottom-8 ${POSITION[position]}`}
+        className={`hero-cta absolute inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+2rem)] mx-auto flex max-w-7xl px-5 md:px-16 md:bottom-8 ${POSITION[position]}`}
       >
         <Link href={href} className="hero-button">
           {buttonLabel}

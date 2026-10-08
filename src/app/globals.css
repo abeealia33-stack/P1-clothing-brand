@@ -239,7 +239,8 @@
   .fold-hero {
     position: sticky;
     top: 0;
-    height: 100svh;
+    /* A shorter phone frame keeps more of the shared wide photo in view. */
+    height: min(100vw, 75svh);
     z-index: 0;
   }
   @media (min-width: 768px) {
@@ -284,7 +285,7 @@
      animations run off the main thread; browsers without them simply hold the
      image still, which is a perfectly good hero. */
   @supports (animation-timeline: view()) {
-    @media (prefers-reduced-motion: no-preference) {
+    @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
       .fold-parallax {
         animation: fold-drift linear both;
         animation-timeline: view();

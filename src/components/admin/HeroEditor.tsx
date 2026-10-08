@@ -27,7 +27,7 @@ const FOCUS_LABELS: Record<HeroFocus, string> = {
   bottom: "Bottom",
 };
 
-/** The hero's six settings: two photos, the button, where it sits, and the crop. */
+/** Shared hero photos, the button, its position, and the crop. */
 export default function HeroEditor({
   hero,
   onChange,
@@ -69,41 +69,17 @@ export default function HeroEditor({
               </button>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
-              <div>
-                <p className="mb-1 text-sm font-medium">On a computer</p>
-                <BannerPhoto
-                  image={slide.desktopImage}
-                  onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
-                  onBusyChange={onBusyChange}
-                  purpose="feature"
-                  frame="aspect-video"
-                  sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
-                  minSize={MIN_SIZES.heroDesktop}
-                />
-              </div>
-              <div>
-                <p className="mb-1 text-sm font-medium">On a phone (optional)</p>
-                <BannerPhoto
-                  image={slide.mobileImage}
-                  onUploaded={(mobileImage) => setSlide(i, { mobileImage })}
-                  onBusyChange={onBusyChange}
-                  purpose="feature"
-                  frame="aspect-[4/5]"
-                  sizeHint="1080 × 1350 px (4:5). Blank crops the wide photo."
-                  minSize={MIN_SIZES.heroMobile}
-                />
-                {slide.mobileImage && (
-                  <button
-                    type="button"
-                    onClick={() => setSlide(i, { mobileImage: "" })}
-                    className="mt-1 text-xs underline underline-offset-4"
-                    style={{ color: "var(--color-ink-soft)" }}
-                  >
-                    Remove phone photo
-                  </button>
-                )}
-              </div>
+            <div>
+              <p className="mb-1 text-sm font-medium">Banner photo</p>
+              <BannerPhoto
+                image={slide.desktopImage}
+                onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
+                onBusyChange={onBusyChange}
+                purpose="feature"
+                frame="aspect-video"
+                sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
+                minSize={MIN_SIZES.heroDesktop}
+              />
             </div>
           </div>
         ))}
