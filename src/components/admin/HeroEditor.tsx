@@ -27,7 +27,7 @@ const FOCUS_LABELS: Record<HeroFocus, string> = {
   bottom: "Bottom",
 };
 
-/** Shared hero photos, the button, its position, and the crop. */
+/** Desktop and portrait hero photos, the button, and its crop. */
 export default function HeroEditor({
   hero,
   onChange,
@@ -69,17 +69,43 @@ export default function HeroEditor({
               </button>
             </div>
 
-            <div>
-              <p className="mb-1 text-sm font-medium">Banner photo</p>
-              <BannerPhoto
-                image={slide.desktopImage}
-                onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
-                onBusyChange={onBusyChange}
-                purpose="feature"
-                frame="aspect-video"
-                sizeHint="A wide photo, around 1920 × 860 px, JPG or WebP under 400 KB."
-                minSize={MIN_SIZES.heroDesktop}
-              />
+            <div className="grid gap-4 sm:grid-cols-[1.6fr_1fr]">
+              <div>
+                <p className="mb-1 text-sm font-medium">Desktop photo</p>
+                <BannerPhoto
+                  image={slide.desktopImage}
+                  onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
+                  onBusyChange={onBusyChange}
+                  purpose="feature"
+                  frame="aspect-video"
+                  sizeHint="A wide photo, around 1920 x 1080 px (16:9), JPG or WebP."
+                  minSize={MIN_SIZES.heroDesktop}
+                />
+              </div>
+              <div>
+                <p className="mb-1 text-sm font-medium">Mobile photo (optional)</p>
+                <div className="max-w-56">
+                  <BannerPhoto
+                    image={slide.mobileImage}
+                    onUploaded={(mobileImage) => setSlide(i, { mobileImage })}
+                    onBusyChange={onBusyChange}
+                    purpose="feature"
+                    frame="aspect-[752/1540]"
+                    sizeHint="A portrait photo, around 752 x 1540 px, JPG or WebP."
+                    minSize={MIN_SIZES.heroMobile}
+                  />
+                </div>
+                {slide.mobileImage && (
+                  <button
+                    type="button"
+                    onClick={() => setSlide(i, { mobileImage: "" })}
+                    className="mt-1 text-xs underline underline-offset-4"
+                    style={{ color: "var(--color-ink-soft)" }}
+                  >
+                    Remove mobile photo
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         ))}
@@ -95,13 +121,6 @@ export default function HeroEditor({
         ) : (
           <p className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
             {MAX_HERO_SLIDES} photos is as many as the hero shows.
-          </p>
-        )}
-
-        {hero.slides.length > 1 && (
-          <p className="text-sm" style={{ color: "var(--color-ink-soft)" }}>
-            They fade from one to the next every few seconds. Someone who has
-            asked their phone to reduce motion sees the first and no more.
           </p>
         )}
       </div>

@@ -15,7 +15,7 @@ export type MinSize = { width: number; height: number };
 
 export const MIN_SIZES = {
   heroDesktop: { width: 1600, height: 700 },
-  heroMobile: { width: 900, height: 1125 },
+  heroMobile: { width: 750, height: 1300 },
   product: { width: 1000, height: 1333 },
   tile: { width: 1000, height: 1333 },
   pair: { width: 1400, height: 1400 },

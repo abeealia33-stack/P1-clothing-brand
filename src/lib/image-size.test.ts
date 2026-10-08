@@ -33,6 +33,11 @@ describe("tooSmall", () => {
 });
 
 describe("the floors themselves", () => {
+  it("accepts the recommended portrait hero and rejects a short image", () => {
+    expect(tooSmall({ width: 752, height: 1540 }, MIN_SIZES.heroMobile)).toBeNull();
+    expect(tooSmall({ width: 752, height: 900 }, MIN_SIZES.heroMobile)).not.toBeNull();
+  });
+
   /* The hero once asked for 2400px when the widest it is ever stored at is
      2000, so a usable photograph was refused over 400px nobody would have
      seen. A floor above the cap is always a bug. */

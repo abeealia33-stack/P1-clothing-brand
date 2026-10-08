@@ -238,6 +238,8 @@
   --------------------------------------------------------------------------- */
   .fold-hero {
     position: relative;
+    /* Clear the header and fixed tabs, leaving a hint of the next section. */
+    height: calc(100svh - var(--spacing-tabbar) - 5.5rem);
     z-index: 0;
   }
   @media (min-width: 768px) {
@@ -249,22 +251,22 @@
   }
 
   /* The hero's one button: paper on the photo, square, capitals. */
-  /* Outlined rather than filled: the photograph shows through, and the rule
-     holds the shape. Ink on the pale cottons this shop photographs; the
-     scrim under it in HeroBanner is what keeps it readable. */
   .hero-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 52px;
-    padding: 0 2rem;
-    background: transparent;
+    min-height: 52px;
+    max-width: 100%;
+    padding: 0.75rem 2rem;
+    background: var(--color-paper);
     border: 1px solid var(--color-ink);
     color: var(--color-ink);
     font-size: 0.8125rem;
     font-weight: 500;
-    letter-spacing: 0.12em;
+    letter-spacing: 0;
     text-transform: uppercase;
+    text-align: center;
+    overflow-wrap: anywhere;
     transition:
       background 0.2s,
       color 0.2s;
@@ -278,30 +280,6 @@
     position: relative;
     z-index: 1;
     background: var(--color-paper);
-  }
-
-  /* The hero image drifts and dims as the fold closes over it. Scroll-driven
-     animations run off the main thread; browsers without them simply hold the
-     image still, which is a perfectly good hero. */
-  @supports (animation-timeline: view()) {
-    @media (min-width: 768px) and (prefers-reduced-motion: no-preference) {
-      .fold-parallax {
-        animation: fold-drift linear both;
-        animation-timeline: view();
-        animation-range: exit-crossing 0% exit-crossing 100%;
-      }
-    }
-  }
-
-  @keyframes fold-drift {
-    from {
-      transform: scale(1.06) translateY(0);
-      filter: brightness(1);
-    }
-    to {
-      transform: scale(1.14) translateY(-3rem);
-      filter: brightness(0.82);
-    }
   }
 
   /* A product card's second photo is for hover only; below the width where a
@@ -1453,36 +1431,48 @@
 }
 
 /* ---------------------------------------------------------------------------
-   The hero's photographs, crossfading.
-
-   Stacked, and faded between rather than slid: the button sits over them, and
-   anything travelling sideways under it is movement asking to be watched.
+   The hero's slide carousel and accessible pagination bars.
 --------------------------------------------------------------------------- */
 @layer components {
   .hero-photo {
     background: var(--color-khaddar);
   }
-  .hero-slide {
-    position: absolute;
-    inset: 0;
-    display: block;
-    opacity: 0;
+  .hero-swiper {
+    height: 100%;
+    width: 100%;
+    --swiper-wrapper-transition-timing-function: ease;
+    --swiper-pagination-color: transparent;
+    --swiper-pagination-bullet-inactive-color: transparent;
+    --swiper-pagination-bullet-inactive-opacity: 0.45;
+    --swiper-pagination-bullet-width: 40px;
+    --swiper-pagination-bullet-height: 44px;
+    --swiper-pagination-bullet-border-radius: 0;
+    --swiper-pagination-bullet-horizontal-gap: 0px;
+    --swiper-pagination-bottom: 8px;
   }
-  /* The first is painted even before the script that runs the timer arrives,
-     so the hero is never a blank rectangle waiting on JavaScript. */
-  .hero-slide:first-child,
-  .hero-slide[data-on="true"] {
-    opacity: 1;
-  }
-  .hero-slide:first-child:not([data-on="true"]) {
-    opacity: 0;
-  }
-
-  @media (prefers-reduced-motion: no-preference) {
-    .hero-slide {
-      transition: opacity 1.2s ease-in-out;
+  @media (min-width: 768px) {
+    .hero-swiper {
+      --swiper-pagination-bullet-width: 56px;
     }
   }
+}
+
+.hero-swiper .hero-pagination-hit {
+  position: relative;
+}
+.hero-swiper .hero-pagination-hit::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  background: var(--color-paper);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+.hero-swiper .hero-pagination-hit:focus-visible {
+  outline: 1px solid var(--color-paper);
+  outline-offset: -3px;
 }
 
 /* ---------------------------------------------------------------------------

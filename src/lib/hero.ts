@@ -18,11 +18,11 @@ export type HeroPosition = (typeof heroPositions)[number];
 export const heroFocuses = ["top", "center", "bottom"] as const;
 export type HeroFocus = (typeof heroFocuses)[number];
 
-/** One photograph in the hero, shared across screen sizes. */
+/** One hero slide with landscape desktop and portrait mobile artwork. */
 export type HeroSlide = {
   /** "" while nothing has been uploaded; the storefront uses a placeholder. */
   desktopImage: string;
-  /** Retained for stored settings compatibility; no longer rendered or edited. */
+  /** An empty value falls back to the desktop image on phones. */
   mobileImage: string;
 };
 

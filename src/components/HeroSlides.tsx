@@ -1,10 +1,24 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
+import { A11y, Autoplay, Keyboard, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
 import type { HeroFocus, HeroSlide } from "@/lib/hero";
 
-/** Long enough to look at a photograph rather than be shown one. */
-const HOLD_MS = 6000;
+const HOLD_MS = 10000;
+const TRANSITION_MS = 1000;
+const MOTION_QUERY = "(prefers-reduced-motion: reduce)";
+
+function subscribeMotion(onChange: () => void) {
+  const query = window.matchMedia(MOTION_QUERY);
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
+
+const readReducedMotion = () => window.matchMedia(MOTION_QUERY).matches;
+const reducedMotionOnServer = () => true;
 
 const FOCUS: Record<HeroFocus, string> = {
   top: "50% 15%",
@@ -13,14 +27,9 @@ const FOCUS: Record<HeroFocus, string> = {
 };
 
 /**
- * The hero's photographs, crossfading on a timer.
- *
- * Stacked and faded rather than slid: the button and the words sit over this,
- * and anything travelling sideways underneath them is movement asking to be
- * watched. One photograph simply sits there, with no timer running at all.
- *
- * Under prefers-reduced-motion it holds on the first — the photographs still
- * do their job, nothing just moves for its own sake.
+ * Matches the reference's horizontal Swiper transition. Reduced motion and
+ * server rendering hold the first picture, which also keeps the hero visible
+ * before hydration without downloading every slide.
  */
 export default function HeroSlides({
   slides,
@@ -31,42 +40,60 @@ export default function HeroSlides({
   focus: HeroFocus;
   alt: string;
 }) {
-  const [shown, setShown] = useState(0);
+  const reducedMotion = useSyncExternalStore(
+    subscribeMotion,
+    readReducedMotion,
+    reducedMotionOnServer,
+  );
 
-  useEffect(() => {
-    if (slides.length < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const photo = (slide: HeroSlide, index: number) => (
+    <picture className="block h-full w-full">
+      {slide.mobileImage && (
+        <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
+      )}
+      <img
+        src={slide.desktopImage}
+        alt={index === 0 ? alt : ""}
+        loading={index === 0 ? "eager" : "lazy"}
+        decoding="async"
+        fetchPriority={index === 0 ? "high" : "low"}
+        className="block h-full w-full object-cover"
+        style={{ objectPosition: FOCUS[focus] }}
+      />
+    </picture>
+  );
 
-    const id = setInterval(() => {
-      setShown((i) => (i + 1) % slides.length);
-    }, HOLD_MS);
-    return () => clearInterval(id);
-  }, [slides.length]);
+  if (slides.length < 2 || reducedMotion) {
+    return slides[0] ? photo(slides[0], 0) : null;
+  }
 
   return (
-    <>
-      {slides.map((slide, i) => (
-        <div
-          key={slide.desktopImage}
-          className="hero-slide first:relative md:first:absolute"
-          data-on={i === shown ? "true" : undefined}
-        >
-          <img
-            src={slide.desktopImage}
-            /* Only the first is described: the rest are the same subject
-               photographed again, not extra information to read out. */
-            alt={i === 0 ? alt : ""}
-            loading={i === 0 ? "eager" : "lazy"}
-            decoding={i === 0 ? "sync" : "async"}
-            fetchPriority={i === 0 ? "high" : "low"}
-            className={`block w-full object-contain md:h-full md:object-cover ${i === 0 ? "h-auto" : "h-full"}`}
-            style={{
-              objectPosition: FOCUS[focus],
-              aspectRatio: i === 0 ? "auto 1920 / 860" : undefined,
-            }}
-          />
-        </div>
+    <Swiper
+      className="hero-swiper"
+      modules={[A11y, Autoplay, Keyboard, Pagination]}
+      effect="slide"
+      speed={TRANSITION_MS}
+      slidesPerView={1}
+      spaceBetween={0}
+      loop
+      autoplay={{ delay: HOLD_MS, disableOnInteraction: false, waitForTransition: true }}
+      keyboard={{ enabled: true, onlyInViewport: true }}
+      pagination={{
+        clickable: true,
+        renderBullet: (index, className) =>
+          `<button type="button" class="${className} hero-pagination-hit" aria-label="Show photo ${index + 1}"></button>`,
+      }}
+      a11y={{
+        containerMessage: "Home banner photos",
+        slideLabelMessage: "Photo {{index}} of {{slidesLength}}",
+        paginationBulletMessage: "Show photo {{index}}",
+      }}
+    >
+      {slides.map((slide, index) => (
+        <SwiperSlide key={`${index}-${slide.desktopImage}`}>
+          {photo(slide, index)}
+        </SwiperSlide>
       ))}
-    </>
+    </Swiper>
   );
 }

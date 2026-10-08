@@ -13,7 +13,7 @@ const POSITION: Record<HeroPosition, string> = {
  * the alt text and a hidden heading, so search engines and screen readers
  * still get the tagline the eye no longer has to read.
  *
- * Phones show the complete shared photo; desktop uses the selected crop.
+ * Portrait artwork fills the phone hero; desktop uses the landscape photo.
  */
 export default function HeroBanner({
   slides,
@@ -34,20 +34,18 @@ export default function HeroBanner({
     <section className="fold-hero md:-mt-16">
       <h1 className="sr-only">{alt}</h1>
 
-      <div className="hero-photo relative overflow-hidden md:absolute md:inset-0">
-        <div className="fold-parallax relative w-full origin-center md:h-full">
-          <HeroSlides slides={slides} focus={focus} alt={alt} />
-        </div>
+      <div className="hero-photo absolute inset-0 overflow-hidden">
+        <HeroSlides slides={slides} focus={focus} alt={alt} />
       </div>
 
       {/* Just enough shade behind the button to keep it legible on a pale photo. */}
       <div
-        className="pointer-events-none absolute inset-x-0 bottom-0 hidden h-2/5 md:block"
-        style={{ background: "linear-gradient(to top, rgba(0,0,0,.12), rgba(0,0,0,0))" }}
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-10 h-2/5"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0))" }}
       />
 
       <div
-        className={`hero-cta relative mx-auto flex max-w-7xl px-5 py-4 md:absolute md:inset-x-0 md:bottom-8 md:px-16 md:py-0 ${POSITION[position]}`}
+        className={`hero-cta absolute inset-x-0 z-20 ${slides.length > 1 ? "bottom-16" : "bottom-8"} mx-auto flex max-w-7xl px-5 md:px-16 ${POSITION[position]}`}
       >
         <Link href={href} className="hero-button">
           {buttonLabel}
