@@ -237,14 +237,13 @@
      sticky positioning, so it costs no JavaScript and no repaints.
   --------------------------------------------------------------------------- */
   .fold-hero {
-    position: sticky;
-    top: 0;
-    /* A shorter phone frame keeps more of the shared wide photo in view. */
-    height: min(100vw, 75svh);
+    position: relative;
     z-index: 0;
   }
   @media (min-width: 768px) {
     .fold-hero {
+      position: sticky;
+      top: 0;
       height: min(88vh, 860px);
     }
   }

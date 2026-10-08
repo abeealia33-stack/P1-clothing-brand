@@ -112,7 +112,7 @@ export default function SiteHeader({
       ref={bar}
       className={`sticky top-0 z-40 transition-colors duration-200 ${
         overHero ? "" : "border-b border-line"
-      } ${onHome ? (overHero ? "" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
+      } ${onHome ? (overHero ? "bg-paper md:bg-transparent" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-5 md:px-16 md:h-16">
         <Link href="/" className="shrink-0">

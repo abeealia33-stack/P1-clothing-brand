@@ -48,7 +48,7 @@ export default function HeroSlides({
       {slides.map((slide, i) => (
         <div
           key={slide.desktopImage}
-          className="hero-slide"
+          className="hero-slide first:relative md:first:absolute"
           data-on={i === shown ? "true" : undefined}
         >
           <img
@@ -59,8 +59,11 @@ export default function HeroSlides({
             loading={i === 0 ? "eager" : "lazy"}
             decoding={i === 0 ? "sync" : "async"}
             fetchPriority={i === 0 ? "high" : "low"}
-            className="block h-full w-full object-cover"
-            style={{ objectPosition: FOCUS[focus] }}
+            className={`block w-full object-contain md:h-full md:object-cover ${i === 0 ? "h-auto" : "h-full"}`}
+            style={{
+              objectPosition: FOCUS[focus],
+              aspectRatio: i === 0 ? "auto 1920 / 860" : undefined,
+            }}
           />
         </div>
       ))}
