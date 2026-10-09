@@ -5,7 +5,7 @@ import { A11y, Autoplay, Keyboard, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-import type { HeroFocus, HeroSlide } from "@/lib/hero";
+import { heroImageUrl, type HeroFocus, type HeroSlide } from "@/lib/hero";
 
 const HOLD_MS = 10000;
 const TRANSITION_MS = 1000;
@@ -49,10 +49,10 @@ export default function HeroSlides({
   const photo = (slide: HeroSlide, index: number) => (
     <picture className="block h-full w-full">
       {slide.mobileImage && (
-        <source media="(max-width: 767px)" srcSet={slide.mobileImage} />
+        <source media="(max-width: 767px)" srcSet={heroImageUrl(slide.mobileImage, "mobile")} />
       )}
       <img
-        src={slide.desktopImage}
+        src={heroImageUrl(slide.desktopImage, "desktop")}
         alt={index === 0 ? alt : ""}
         loading={index === 0 ? "eager" : "lazy"}
         decoding="async"

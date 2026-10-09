@@ -1,5 +1,33 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_HERO_BUTTON, MAX_HERO_SLIDES, emptyHero, normaliseHero } from "./hero";
+import { DEFAULT_HERO_BUTTON, HERO_IMAGE_SIZES, MAX_HERO_SLIDES, emptyHero, heroImageUrl, normaliseHero } from "./hero";
+
+describe("heroImageUrl", () => {
+  const stored = "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,c_limit,w_2000/v123/bilques/banner.jpg?test=1";
+
+  it("keeps the requested artwork dimensions", () => {
+    expect(HERO_IMAGE_SIZES.desktop).toEqual({ width: 2880, height: 1620 });
+    expect(HERO_IMAGE_SIZES.mobile).toEqual({ width: 1504, height: 3080 });
+  });
+
+  it("updates existing managed hero URLs without changing the original or query", () => {
+    expect(heroImageUrl(stored, "desktop")).toBe(stored.replace("w_2000", "w_2880"));
+    expect(heroImageUrl(stored, "mobile")).toBe(stored.replace("w_2000", "w_1504"));
+    expect(heroImageUrl(heroImageUrl(stored, "desktop"), "desktop")).toBe(
+      heroImageUrl(stored, "desktop")
+    );
+  });
+
+  it("leaves local, external and custom or signed Cloudinary URLs unchanged", () => {
+    for (const source of [
+      "", "/cloth/hero.svg", "data:image/png;base64,AA==",
+      stored.replace("res.cloudinary.com", "example.com"),
+      stored.replace("f_auto,q_auto,c_limit,w_2000/", ""),
+      stored.replace("f_auto,q_auto,c_limit,w_2000", "c_fill,w_1000,h_500"),
+      stored.replace("/upload/", "/upload/s--signature--/"),
+      stored.replace("/image/", "/video/"),
+    ]) expect(heroImageUrl(source, "desktop")).toBe(source);
+  });
+});
 
 describe("normaliseHero", () => {
   it("reads nothing stored as an empty hero", () => {

@@ -3,6 +3,7 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { HERO_IMAGE_SIZES } from "./hero";
 
 /**
  * Where an uploaded file actually goes.
@@ -33,15 +34,20 @@ export const MAX_VIDEO_BYTES = 40 * 1024 * 1024;
  *
  * A product photo is never shown wider than about 530 points, so 1200 covers
  * it twice over on a retina screen and no further pixel is ever seen. The
- * hero and the promo banners run the full width of a desktop window, which is
- * why they are allowed nearly twice that.
+ * promo banners allow 2000px. Hero artwork keeps its larger desktop or
+ * portrait resolution without increasing downloads for other banners.
  */
-export const IMAGE_WIDTHS = { product: 1200, feature: 2000 } as const;
+export const IMAGE_WIDTHS = {
+  product: 1200,
+  feature: 2000,
+  heroDesktop: HERO_IMAGE_SIZES.desktop.width,
+  heroMobile: HERO_IMAGE_SIZES.mobile.width,
+} as const;
 
 export type ImagePurpose = keyof typeof IMAGE_WIDTHS;
 
 export const isImagePurpose = (value: string): value is ImagePurpose =>
-  value === "product" || value === "feature";
+  Object.hasOwn(IMAGE_WIDTHS, value);
 
 const EXTENSIONS: Record<string, string> = {
   "image/jpeg": "jpg",

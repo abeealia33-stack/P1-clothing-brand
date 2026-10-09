@@ -57,7 +57,7 @@ export async function POST(request: Request) {
   try {
     /* Says how big the picture is allowed to be kept: a hero runs the width of
        a desktop window, a product photo never does. An unrecognised value
-       falls back to the smaller of the two rather than the larger. */
+       falls back to the product limit. */
     const asked = String(form.get("purpose") ?? "");
     const purpose = isImagePurpose(asked) ? asked : "product";
 

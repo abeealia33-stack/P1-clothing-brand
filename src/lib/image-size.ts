@@ -8,8 +8,8 @@
  * turns away usable work is working against the person it is meant to help.
  *
  * Nothing here asks for more than the picture is ever served at either:
- * IMAGE_WIDTHS in uploads.ts caps a feature photo at 2000px wide and a
- * product photo at 1200, and the rest is discarded on the way in.
+ * IMAGE_WIDTHS in uploads.ts caps delivered hero photos at 2880px on desktop
+ * or 1504px on mobile, other banners at 2000px and products at 1200px.
  */
 export type MinSize = { width: number; height: number };
 

@@ -1,14 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { MIN_SIZES, tooSmall, type MinSize } from "./image-size";
-
-/** Mirrors IMAGE_WIDTHS in uploads.ts, which cannot be imported: it is
-    server-only, and this module is read by the admin's client components. */
-const SERVED_WIDTH = { product: 1200, feature: 2000 };
+import { IMAGE_WIDTHS } from "./uploads";
+import { HERO_IMAGE_SIZES } from "./hero";
 
 /** Which cap each slot's photograph is stored under. */
-const PURPOSE: Record<keyof typeof MIN_SIZES, keyof typeof SERVED_WIDTH> = {
-  heroDesktop: "feature",
-  heroMobile: "feature",
+const PURPOSE: Record<keyof typeof MIN_SIZES, keyof typeof IMAGE_WIDTHS> = {
+  heroDesktop: "heroDesktop",
+  heroMobile: "heroMobile",
   product: "product",
   tile: "product",
   pair: "feature",
@@ -33,6 +31,11 @@ describe("tooSmall", () => {
 });
 
 describe("the floors themselves", () => {
+  it("accepts both high-resolution hero recommendations", () => {
+    expect(tooSmall(HERO_IMAGE_SIZES.desktop, MIN_SIZES.heroDesktop)).toBeNull();
+    expect(tooSmall(HERO_IMAGE_SIZES.mobile, MIN_SIZES.heroMobile)).toBeNull();
+  });
+
   it("accepts the recommended portrait hero and rejects a short image", () => {
     expect(tooSmall({ width: 752, height: 1540 }, MIN_SIZES.heroMobile)).toBeNull();
     expect(tooSmall({ width: 752, height: 900 }, MIN_SIZES.heroMobile)).not.toBeNull();
@@ -43,7 +46,7 @@ describe("the floors themselves", () => {
      seen. A floor above the cap is always a bug. */
   it("never ask for more than the photo is stored at", () => {
     for (const [slot, min] of Object.entries(MIN_SIZES)) {
-      const cap = SERVED_WIDTH[PURPOSE[slot as keyof typeof MIN_SIZES]];
+      const cap = IMAGE_WIDTHS[PURPOSE[slot as keyof typeof MIN_SIZES]];
       expect({ slot, width: min.width }).toEqual({
         slot,
         width: Math.min(min.width, cap),
@@ -53,7 +56,7 @@ describe("the floors themselves", () => {
 
   it("leave room under the cap, so a photo near the mark still goes up", () => {
     for (const [slot, min] of Object.entries(MIN_SIZES)) {
-      const cap = SERVED_WIDTH[PURPOSE[slot as keyof typeof MIN_SIZES]];
+      const cap = IMAGE_WIDTHS[PURPOSE[slot as keyof typeof MIN_SIZES]];
       expect({ slot, tight: min.width > cap * 0.9 }).toEqual({ slot, tight: false });
     }
   });

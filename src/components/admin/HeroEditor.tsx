@@ -6,6 +6,7 @@ import BannerPhoto from "./BannerPhoto";
 import { MIN_SIZES } from "@/lib/image-size";
 import {
   emptySlide,
+  HERO_IMAGE_SIZES,
   MAX_HERO_BUTTON,
   MAX_HERO_SLIDES,
   type HeroFocus,
@@ -76,9 +77,9 @@ export default function HeroEditor({
                   image={slide.desktopImage}
                   onUploaded={(desktopImage) => setSlide(i, { desktopImage })}
                   onBusyChange={onBusyChange}
-                  purpose="feature"
+                  purpose="heroDesktop"
                   frame="aspect-video"
-                  sizeHint="A wide photo, around 1920 x 1080 px (16:9), JPG or WebP."
+                  sizeHint={`A wide photo, around ${HERO_IMAGE_SIZES.desktop.width} x ${HERO_IMAGE_SIZES.desktop.height} px (16:9), JPG or WebP.`}
                   minSize={MIN_SIZES.heroDesktop}
                 />
               </div>
@@ -89,9 +90,9 @@ export default function HeroEditor({
                     image={slide.mobileImage}
                     onUploaded={(mobileImage) => setSlide(i, { mobileImage })}
                     onBusyChange={onBusyChange}
-                    purpose="feature"
+                    purpose="heroMobile"
                     frame="aspect-[752/1540]"
-                    sizeHint="A portrait photo, around 752 x 1540 px, JPG or WebP."
+                    sizeHint={`A portrait photo, around ${HERO_IMAGE_SIZES.mobile.width} x ${HERO_IMAGE_SIZES.mobile.height} px, JPG or WebP.`}
                     minSize={MIN_SIZES.heroMobile}
                   />
                 </div>

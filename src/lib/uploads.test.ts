@@ -27,6 +27,17 @@ describe("deliveryUrl", () => {
     );
   });
 
+  it("delivers desktop and mobile heroes at their dedicated widths", () => {
+    expect(deliveryUrl(uploaded("image"), "image", "heroDesktop")).toContain(
+      "f_auto,q_auto,c_limit,w_2880/"
+    );
+    expect(deliveryUrl(uploaded("image"), "image", "heroMobile")).toContain(
+      "f_auto,q_auto,c_limit,w_1504/"
+    );
+    expect(IMAGE_WIDTHS.feature).toBe(2000);
+    expect(IMAGE_WIDTHS.product).toBe(1200);
+  });
+
   it("holds a product photo to the width it is actually shown at", () => {
     expect(deliveryUrl(uploaded("image"), "image", "product")).toContain(
       `w_${IMAGE_WIDTHS.product}`
@@ -53,13 +64,17 @@ describe("deliveryUrl", () => {
 });
 
 describe("isImagePurpose", () => {
-  it("accepts the two the shop uses", () => {
+  it("accepts the shop's banner and product purposes", () => {
     expect(isImagePurpose("product")).toBe(true);
     expect(isImagePurpose("feature")).toBe(true);
+    expect(isImagePurpose("heroDesktop")).toBe(true);
+    expect(isImagePurpose("heroMobile")).toBe(true);
   });
 
   it("rejects anything else, so a stray value cannot ask for a huge file", () => {
     expect(isImagePurpose("")).toBe(false);
     expect(isImagePurpose("original")).toBe(false);
+    expect(isImagePurpose("toString")).toBe(false);
+    expect(isImagePurpose("__proto__")).toBe(false);
   });
 });

@@ -26,6 +26,29 @@ export type HeroSlide = {
   mobileImage: string;
 };
 
+export const HERO_IMAGE_SIZES = {
+  desktop: { width: 2880, height: 1620 },
+  mobile: { width: 1504, height: 3080 },
+} as const;
+
+/** Update only our managed Cloudinary transform, retaining the stored original. */
+export function heroImageUrl(source: string, variant: keyof typeof HERO_IMAGE_SIZES): string {
+  try {
+    const url = new URL(source);
+    if (url.hostname !== "res.cloudinary.com" || url.protocol !== "https:") return source;
+    const parts = url.pathname.split("/");
+    if (
+      parts[2] !== "image" || parts[3] !== "upload" ||
+      !/^f_auto,q_auto,c_limit,w_\d+$/.test(parts[4] ?? "")
+    ) return source;
+    parts[4] = `f_auto,q_auto,c_limit,w_${HERO_IMAGE_SIZES[variant].width}`;
+    url.pathname = parts.join("/");
+    return url.toString();
+  } catch {
+    return source;
+  }
+}
+
 /** Past this nobody waits to see the end, and every one is a download. */
 export const MAX_HERO_SLIDES = 5;
 

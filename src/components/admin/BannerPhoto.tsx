@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { checkImageSize, sizeLabel, type MinSize } from "@/lib/image-size";
+import type { ImagePurpose } from "@/lib/uploads";
 
 /**
  * The photograph half of a banner row: the preview, the button that replaces
@@ -24,7 +25,7 @@ export default function BannerPhoto({
   /** Told when an upload starts and ends, so the form can hold its Save. */
   onBusyChange: (busy: boolean) => void;
   /** How large the stored photo may be: see IMAGE_WIDTHS in lib/uploads.ts. */
-  purpose: "product" | "feature";
+  purpose: ImagePurpose;
   /** The preview's shape, matching how the photo is cropped on the page. */
   frame: string;
   sizeHint: string;
