@@ -13,7 +13,7 @@ const POSITION: Record<HeroPosition, string> = {
  * the alt text and a hidden heading, so search engines and screen readers
  * still get the tagline the eye no longer has to read.
  *
- * Portrait artwork fills the phone hero; desktop uses the landscape photo.
+ * Portrait artwork fills the phone hero; desktop shows the full landscape photo.
  */
 export default function HeroBanner({
   slides,
@@ -31,7 +31,7 @@ export default function HeroBanner({
   const alt = `${site.name} — ${site.tagline}`;
 
   return (
-    <section className="fold-hero md:-mt-16">
+    <section className="fold-hero">
       <h1 className="sr-only">{alt}</h1>
 
       <div className="hero-photo absolute inset-0 overflow-hidden">

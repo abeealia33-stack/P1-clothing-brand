@@ -104,15 +104,12 @@ export default function SiteHeader({
   const overHero = useOverHero(onHome, bar);
 
   return (
-    /* Over the hero the bar is nothing but its words and marks, so the
-       photograph runs the full height of the screen behind them. It takes on
-       paper and its hairline the moment the page body rises to meet it —
-       without that, everything scrolling underneath would read through it. */
+    /* Keep the navigation readable as the full hero scrolls beneath it. */
     <header
       ref={bar}
       className={`sticky top-0 z-40 transition-colors duration-200 ${
         overHero ? "" : "border-b border-line"
-      } ${onHome ? (overHero ? "bg-paper md:bg-transparent" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
+      } ${onHome ? (overHero ? "bg-paper" : "bg-paper/80 backdrop-blur-md") : "bg-paper"}`}
     >
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-6 px-5 md:px-16 md:h-16">
         <Link href="/" className="shrink-0">
@@ -201,10 +198,10 @@ export default function SiteHeader({
 }
 
 /**
- * True while the home page's hero is still behind the bar.
+ * True until the home page's hero has passed the navigation.
  *
  * Measured against the hero's own height rather than a fixed distance, so it
- * holds whatever the photograph is cropped to and wherever the bar sits —
+ * follows the photograph's size and position, wherever the bar sits —
  * and it is simply false on every other page, which has no hero to sit over.
  */
 function useOverHero(onHome: boolean, bar: React.RefObject<HTMLElement | null>) {
@@ -225,7 +222,8 @@ function useOverHero(onHome: boolean, bar: React.RefObject<HTMLElement | null>) 
     let reach = 0;
     const check = () => setPastHero(window.scrollY >= reach);
     const measure = () => {
-      reach = hero.offsetHeight - (bar.current?.offsetHeight ?? 0);
+      reach = hero.getBoundingClientRect().top + window.scrollY + hero.offsetHeight -
+        (bar.current?.offsetHeight ?? 0);
       check();
     };
 

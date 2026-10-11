@@ -84,7 +84,7 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* The fold: this stays put while the paper below slides up over it. */}
+      {/* The hero keeps its artwork visible above the home-page sections. */}
       <HeroBanner
         slides={hero.slides.length > 0 ? hero.slides : [DEFAULT_SLIDE]}
         buttonLabel={hero.buttonLabel}
