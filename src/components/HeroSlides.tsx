@@ -57,7 +57,7 @@ export default function HeroSlides({
         loading={index === 0 ? "eager" : "lazy"}
         decoding="async"
         fetchPriority={index === 0 ? "high" : "low"}
-        className="block h-full w-full object-cover md:object-contain"
+        className="block h-full w-full object-cover"
         style={{ objectPosition: FOCUS[focus] }}
       />
     </picture>

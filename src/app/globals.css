@@ -230,7 +230,11 @@
 
 @layer components {
   /* ---------------------------------------------------------------------------
-     The home hero and the body beneath it.
+     The fold
+
+     The one piece of orchestrated motion on the site. The hero stays put while
+     the paper body slides up over it, the way cloth folds over cloth. Done with
+     sticky positioning, so it costs no JavaScript and no repaints.
   --------------------------------------------------------------------------- */
   .fold-hero {
     position: relative;
@@ -240,11 +244,9 @@
   }
   @media (min-width: 768px) {
     .fold-hero {
-      /* Match desktop artwork instead of cropping it to the viewport height. */
-      width: 100%;
-      height: auto;
-      aspect-ratio: 16 / 9;
-      max-height: calc(100svh - 6rem);
+      position: sticky;
+      top: 0;
+      height: min(88vh, 860px);
     }
   }
 
