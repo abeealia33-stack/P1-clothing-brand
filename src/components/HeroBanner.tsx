@@ -13,7 +13,7 @@ const POSITION: Record<HeroPosition, string> = {
  * the alt text and a hidden heading, so search engines and screen readers
  * still get the tagline the eye no longer has to read.
  *
- * Portrait artwork fills the phone hero; desktop uses the landscape photo.
+ * Portrait artwork fills the phone hero; desktop preserves landscape artwork.
  */
 export default function HeroBanner({
   slides,
@@ -44,12 +44,14 @@ export default function HeroBanner({
         style={{ background: "linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0))" }}
       />
 
-      <div
-        className={`hero-cta absolute inset-x-0 z-20 ${slides.length > 1 ? "bottom-16" : "bottom-8"} mx-auto flex max-w-7xl px-5 md:px-16 ${POSITION[position]}`}
-      >
-        <Link href={href} className="hero-button">
-          {buttonLabel}
-        </Link>
+      <div className="pointer-events-none absolute inset-0 z-20 flex flex-col justify-end">
+        <div
+          className={`hero-cta pointer-events-auto absolute inset-x-0 ${slides.length > 1 ? "bottom-16 md:mb-16" : "bottom-8 md:mb-8"} mx-auto flex max-w-7xl px-5 md:sticky md:bottom-20 md:w-full md:px-16 ${POSITION[position]}`}
+        >
+          <Link href={href} className="hero-button">
+            {buttonLabel}
+          </Link>
+        </div>
       </div>
     </section>
   );

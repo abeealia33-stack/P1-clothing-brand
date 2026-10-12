@@ -84,26 +84,27 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* The fold: this stays put while the paper below slides up over it. */}
-      <HeroBanner
-        slides={hero.slides.length > 0 ? hero.slides : [DEFAULT_SLIDE]}
-        buttonLabel={hero.buttonLabel}
-        href={bannerHref(hero.link, productSlugs)}
-        position={hero.position}
-        focus={hero.focus}
-      />
+      <div className="hero-stage">
+        <HeroBanner
+          slides={hero.slides.length > 0 ? hero.slides : [DEFAULT_SLIDE]}
+          buttonLabel={hero.buttonLabel}
+          href={bannerHref(hero.link, productSlugs)}
+          position={hero.position}
+          focus={hero.focus}
+        />
 
-      <div className="fold-body">
         {/* The three promises, first thing under the photo, where they can
             still change someone's mind rather than at the foot of the page. */}
-        <p className="trust-strip tnum px-5 py-2.5 text-center">
+        <p className="hero-promises trust-strip tnum px-5 py-2.5 text-center">
           Cash on delivery <span aria-hidden="true">·</span> Free over PKR{" "}
           {rupees(site.freeShippingOver)} <span aria-hidden="true">·</span>{" "}
           <Link href="/shipping" className="underline-offset-4 hover:underline">
             7-day exchange
           </Link>
         </p>
+      </div>
 
+      <div className="fold-body">
         {banners.order.map((block) => (
           <Fragment key={block}>{blocks[block]}</Fragment>
         ))}

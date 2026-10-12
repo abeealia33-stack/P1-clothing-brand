@@ -230,11 +230,8 @@
 
 @layer components {
   /* ---------------------------------------------------------------------------
-     The fold
-
-     The one piece of orchestrated motion on the site. The hero stays put while
-     the paper body slides up over it, the way cloth folds over cloth. Done with
-     sticky positioning, so it costs no JavaScript and no repaints.
+     The hero scrolls at its artwork's proportions. Its promises stay visible
+     while a tall desktop photograph passes through the viewport.
   --------------------------------------------------------------------------- */
   .fold-hero {
     position: relative;
@@ -242,11 +239,19 @@
     height: calc(100svh - var(--spacing-tabbar) - 5.5rem);
     z-index: 0;
   }
+  .hero-stage {
+    display: flow-root;
+  }
   @media (min-width: 768px) {
     .fold-hero {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 16 / 9;
+    }
+    .hero-promises {
       position: sticky;
-      top: 0;
-      height: min(88vh, 860px);
+      bottom: 0;
+      z-index: 1;
     }
   }
 
