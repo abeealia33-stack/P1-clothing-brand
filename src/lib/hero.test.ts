@@ -5,16 +5,23 @@ describe("heroImageUrl", () => {
   const stored = "https://res.cloudinary.com/demo/image/upload/f_auto,q_auto,c_limit,w_2000/v123/bilques/banner.jpg?test=1";
 
   it("keeps the requested artwork dimensions", () => {
-    expect(HERO_IMAGE_SIZES.desktop).toEqual({ width: 2880, height: 1620 });
-    expect(HERO_IMAGE_SIZES.mobile).toEqual({ width: 1504, height: 3080 });
+    expect(HERO_IMAGE_SIZES.desktop).toEqual({ width: 3840, height: 2160 });
+    expect(HERO_IMAGE_SIZES.mobile).toEqual({ width: 2000, height: 4096 });
   });
 
   it("updates existing managed hero URLs without changing the original or query", () => {
-    expect(heroImageUrl(stored, "desktop")).toBe(stored.replace("w_2000", "w_2880"));
-    expect(heroImageUrl(stored, "mobile")).toBe(stored.replace("w_2000", "w_1504"));
+    expect(heroImageUrl(stored, "desktop")).toBe(stored.replace("w_2000", "w_3840"));
+    expect(heroImageUrl(stored, "mobile")).toBe(stored);
     expect(heroImageUrl(heroImageUrl(stored, "desktop"), "desktop")).toBe(
       heroImageUrl(stored, "desktop")
     );
+  });
+
+  it("upgrades URLs saved with the earlier desktop and mobile limits", () => {
+    expect(heroImageUrl(stored.replace("w_2000", "w_2880"), "desktop")).toBe(
+      stored.replace("w_2000", "w_3840")
+    );
+    expect(heroImageUrl(stored.replace("w_2000", "w_1504"), "mobile")).toBe(stored);
   });
 
   it("leaves local, external and custom or signed Cloudinary URLs unchanged", () => {

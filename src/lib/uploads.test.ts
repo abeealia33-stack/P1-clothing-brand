@@ -29,10 +29,10 @@ describe("deliveryUrl", () => {
 
   it("delivers desktop and mobile heroes at their dedicated widths", () => {
     expect(deliveryUrl(uploaded("image"), "image", "heroDesktop")).toContain(
-      "f_auto,q_auto,c_limit,w_2880/"
+      "f_auto,q_auto,c_limit,w_3840/"
     );
     expect(deliveryUrl(uploaded("image"), "image", "heroMobile")).toContain(
-      "f_auto,q_auto,c_limit,w_1504/"
+      "f_auto,q_auto,c_limit,w_2000/"
     );
     expect(IMAGE_WIDTHS.feature).toBe(2000);
     expect(IMAGE_WIDTHS.product).toBe(1200);

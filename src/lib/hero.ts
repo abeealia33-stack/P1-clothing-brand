@@ -27,8 +27,8 @@ export type HeroSlide = {
 };
 
 export const HERO_IMAGE_SIZES = {
-  desktop: { width: 2880, height: 1620 },
-  mobile: { width: 1504, height: 3080 },
+  desktop: { width: 3840, height: 2160 },
+  mobile: { width: 2000, height: 4096 },
 } as const;
 
 /** Update only our managed Cloudinary transform, retaining the stored original. */
