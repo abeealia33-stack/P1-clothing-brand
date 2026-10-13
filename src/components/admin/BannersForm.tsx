@@ -11,8 +11,10 @@ import HomeOrderEditor from "./HomeOrderEditor";
 import { saveBannersAction, type BannersFormState } from "@/app/admin/banners/actions";
 import {
   DAY_PIECES,
+  DEFAULT_NEW_IN_HEADING,
   MAX_ANNOUNCEMENTS,
   MAX_TILES,
+  MAX_NEW_IN_HEADING,
   MIN_TILES,
   type BannerSlot,
   type BannerTile,
@@ -115,7 +117,7 @@ export default function BannersForm({
       <input type="hidden" name="banners" value={JSON.stringify(banners)} />
       <FormErrors errors={state.errors} />
 
-      <fieldset className="border-0 p-0">
+      <fieldset className="min-w-0 border-0 p-0">
         <legend className="text-2xl">Order on the home page</legend>
         <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
           Top to bottom, under the photo and the promises strip. A section with nothing in it
@@ -124,8 +126,22 @@ export default function BannersForm({
         </p>
         <HomeOrderEditor
           order={banners.order}
+          newInHeading={banners.newInHeading}
           onChange={(order) => setBanners((b) => ({ ...b, order }))}
         />
+        <div className="mt-5">
+          <label htmlFor="new-in-heading" className="block text-sm font-medium">
+            Just in section name
+          </label>
+          <input
+            id="new-in-heading"
+            value={banners.newInHeading}
+            onChange={(e) => setBanners((b) => ({ ...b, newInHeading: e.target.value }))}
+            maxLength={MAX_NEW_IN_HEADING}
+            placeholder={DEFAULT_NEW_IN_HEADING}
+            className="field mt-1"
+          />
+        </div>
       </fieldset>
 
       <fieldset className="rule mt-10 border-0 p-0 pt-8">
@@ -310,9 +326,9 @@ export default function BannersForm({
 
       <fieldset className="rule mt-10 border-0 p-0 pt-8">
         <legend className="text-2xl">The carousel</legend>
-        <p className="measure mt-1 text-sm" style={{ color: "var(--color-ink-soft)" }}>
-          A panel of words with a row of photos beside it, under &ldquo;Just
-          in&rdquo;. The photos move along by themselves — three at a time on a
+        <p className="measure mt-1 text-sm [overflow-wrap:anywhere]" style={{ color: "var(--color-ink-soft)" }}>
+          A panel of words with a row of photos beside it, under &ldquo;{banners.newInHeading.trim() || DEFAULT_NEW_IN_HEADING}
+          &rdquo;. The photos move along by themselves — three at a time on a
           computer, two on a phone. It appears once {MIN_TILES} tiles have photos.
         </p>
         <Status {...strip} />

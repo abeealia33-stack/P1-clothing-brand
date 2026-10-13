@@ -71,6 +71,9 @@ export const homeBlockLabels: Record<HomeBlock, string> = {
   reels: "See it worn (reels)",
 };
 
+export const DEFAULT_NEW_IN_HEADING = homeBlockLabels.newIn;
+export const MAX_NEW_IN_HEADING = 80;
+
 /**
  * "Aaj ka din kaisa hai?" — the shopper picks what their day looks like and
  * the pieces under it change. The owner chooses the pieces for each day and
@@ -112,6 +115,7 @@ export type SaleBand = {
 export type HomeBanners = {
   /** The order the blocks above are drawn in, top to bottom. */
   order: HomeBlock[];
+  newInHeading: string;
   /**
    * A panel of words beside a carousel of tiles — the shop's ranges, laid
    * out the way a lookbook contents page is.
@@ -154,6 +158,7 @@ const emptyTile = (): BannerTile => ({ image: "", label: "", link: { kind: "shop
 /** Both sections switched on and waiting for photos. */
 export const emptyHomeBanners = (): HomeBanners => ({
   order: [...homeBlocks],
+  newInHeading: DEFAULT_NEW_IN_HEADING,
   strip: {
     show: true,
     eyebrow: "",
@@ -267,6 +272,7 @@ export function normaliseHomeBanners(value: unknown): HomeBanners {
 
   return {
     order: normaliseHomeOrder(source.order),
+    newInHeading: text(source.newInHeading).slice(0, MAX_NEW_IN_HEADING) || DEFAULT_NEW_IN_HEADING,
     strip: {
       show: strip.show !== false,
       eyebrow: text(strip.eyebrow),

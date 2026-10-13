@@ -65,7 +65,7 @@ export default async function HomePage() {
    */
   const blocks: Record<HomeBlock, React.ReactNode> = {
     collections: <CollectionsBlock shownCollections={shownCollections} />,
-    newIn: <NewInBlock newIn={newIn} />,
+    newIn: <NewInBlock newIn={newIn} heading={banners.newInHeading} />,
     dayPicker: days.length > 0 && <DayPicker days={days} />,
     groupOrders: <GroupOrdersSection image={banners.groupImage} />,
     pair: split && <SplitBanner panels={split.panels} />,
@@ -141,14 +141,14 @@ function CollectionsBlock({ shownCollections }: { shownCollections: ResolvedColl
 /* Nothing new to show until there are pieces: an empty band under a "Just in"
    heading reads as a broken page, not an empty shop. A piece without a photo
    is left out for the same reason. */
-function NewInBlock({ newIn }: { newIn: Product[] }) {
+function NewInBlock({ newIn, heading }: { newIn: Product[]; heading: string }) {
   const shown = newIn.filter((p) => p.photos.length > 0);
   if (shown.length === 0) return null;
 
   return (
     <section className="home-section mx-auto max-w-7xl px-5 md:px-16">
       <div className="flex items-baseline justify-between gap-4">
-        <h2 className="home-h2">Just in</h2>
+        <h2 className="home-h2 min-w-0 [overflow-wrap:anywhere]">{heading}</h2>
         <Link href="/shop" className="shrink-0 text-sm underline underline-offset-4">
           See all
         </Link>

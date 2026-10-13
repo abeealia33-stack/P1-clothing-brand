@@ -5,6 +5,8 @@ import {
   homeBlocks,
   normaliseHomeOrder,
   DEFAULT_CTA_LABEL,
+  DEFAULT_NEW_IN_HEADING,
+  MAX_NEW_IN_HEADING,
   emptyHomeBanners,
   linkedProductIds,
   normaliseHomeBanners,
@@ -31,6 +33,27 @@ const slot = (image: string, link: Link = { kind: "shop" }) => ({
 const tile = (image: string, link: Link = { kind: "shop" }) => ({ image, label: "", link });
 
 describe("normaliseHomeBanners", () => {
+  it("defaults the latest-products heading for older settings and blank values", () => {
+    for (const value of [undefined, "", "   ", 42, null]) {
+      expect(normaliseHomeBanners({ newInHeading: value }).newInHeading).toBe(DEFAULT_NEW_IN_HEADING);
+    }
+    expect(emptyHomeBanners().newInHeading).toBe("Just in");
+  });
+
+  it("keeps a renamed latest-products section through the settings JSON round trip", () => {
+    const initial = emptyHomeBanners();
+    const stored = normaliseHomeBanners({ ...initial, newInHeading: "  New arrivals  " });
+    expect(stored.newInHeading).toBe("New arrivals");
+    expect(normaliseHomeBanners(JSON.parse(JSON.stringify(stored)))).toEqual(stored);
+    expect({ ...stored, newInHeading: initial.newInHeading }).toEqual(initial);
+  });
+
+  it("limits the section heading length on the server", () => {
+    expect(normaliseHomeBanners({ newInHeading: "W".repeat(200) }).newInHeading).toHaveLength(
+      MAX_NEW_IN_HEADING
+    );
+  });
+
   it("reads the old list of single banners as nothing set up yet", () => {
     const old = [{ image: "/a.jpg", heading: "Sale", subtext: "", buttonLabel: "Shop", href: "/shop" }];
     expect(normaliseHomeBanners(old)).toEqual(emptyHomeBanners());
