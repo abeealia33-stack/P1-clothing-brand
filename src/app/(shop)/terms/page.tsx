@@ -2,13 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { rupees } from "@/lib/format";
 import { site } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Terms",
-  description:
-    "The terms you buy under at Bilques: pricing, when an order is agreed, delivery, exchanges, custom pieces and how to reach us.",
-  alternates: { canonical: "/terms" },
-};
+export const metadata: Metadata = pageMetadata("Terms", "The terms you buy under at Bilques: pricing, when an order is agreed, delivery, exchanges, custom pieces and how to reach us.", "/terms");
 
 export default function TermsPage() {
   return (

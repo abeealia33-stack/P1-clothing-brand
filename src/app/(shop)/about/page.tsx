@@ -3,12 +3,9 @@ import Link from "next/link";
 import ClothImage from "@/components/ClothImage";
 import { site } from "@/lib/site";
 import { getCollectionNames } from "@/lib/settings";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "About",
-  description:
-    "Bilques makes everyday cotton and khaddar clothing in small runs, sold from Lahore with cash on delivery across Pakistan.",
-};
+export const metadata: Metadata = pageMetadata("About", "Bilques makes everyday cotton and khaddar clothing in small runs, sold from Lahore with cash on delivery across Pakistan.", "/about");
 
 const WONT = [
   "Run a permanent sale. The price on the piece is the price.",

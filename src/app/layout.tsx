@@ -27,7 +27,7 @@ const nastaliq = Noto_Nastaliq_Urdu({
 });
 
 const description =
-  "Everyday kurtas, home sets and oversized pieces in cotton and khaddar. Cash on delivery across Pakistan, free shipping over PKR 3,000.";
+  "Everyday kurtas, home sets and oversized pieces in cotton and khaddar. Cash on delivery across Pakistan, free shipping from PKR 3,000.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -44,14 +44,12 @@ export const metadata: Metadata = {
     title: `${site.name} — ${site.tagline}`,
     description,
     locale: "en_PK",
-    url: site.url,
   },
   twitter: {
     card: "summary_large_image",
     title: `${site.name} — ${site.tagline}`,
     description,
   },
-  alternates: { canonical: "/" },
 };
 
 export const viewport: Viewport = {

@@ -172,6 +172,32 @@ is needed for this browser integration.
 
 ---
 
+## Search metadata and structured data
+
+The canonical production address defaults to `https://bilques.com`. If you set
+`NEXT_PUBLIC_SITE_URL` in your hosting environment, it must be the public address
+you want indexed. Set it before building. Public page metadata is generated with
+`src/lib/seo.ts`; the root layout does not give every page the homepage canonical.
+
+Product pages emit server-rendered Product/Offer and BreadcrumbList JSON-LD using
+the catalogue's current name, colour, price in PKR, stock, sizes and image URLs.
+The storefront also identifies Bilques with OnlineStore markup. Shipping rates
+use the same helper as checkout. The full exchange policy stays on the shipping
+page rather than being reduced to an inaccurate generic return policy.
+
+Visible, populated collection and category pages have their own canonical URLs.
+Sort, price, combined, hidden and empty filter views are marked noindex. The
+sitemap includes populated public ranges and the custom-design page; customer
+utility pages and order tracking are excluded. Utility routes also emit noindex.
+
+Run `npm test -- src/lib/seo.test.ts` for metadata, filter, stock and serialization
+regressions. After deployment, validate a real product URL in Google's Rich
+Results Test and inspect the canonical and indexing status in Search Console.
+Search Console/Bing verification and Merchant Center enrollment require access
+to those accounts and are separate from the website code.
+
+---
+
 ## How it is put together
 
 **Database.** One schema, [prisma/schema.prisma](prisma/schema.prisma), set to

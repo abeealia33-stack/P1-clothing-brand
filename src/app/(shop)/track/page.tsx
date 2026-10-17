@@ -4,8 +4,9 @@ import { findOrderForCustomer } from "@/lib/orders-db";
 import { priceLabel } from "@/lib/format";
 import { isTransferMethod, statusLabel, type OrderStatus } from "@/lib/types";
 import { whatsappLink } from "@/lib/site";
+import { noIndex } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Track your order" };
+export const metadata: Metadata = { title: "Track your order", robots: noIndex };
 
 const steps: { key: OrderStatus; label: string }[] = [
   { key: "new", label: "Received" },

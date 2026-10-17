@@ -3,7 +3,7 @@ export const site = {
   /* Where the site actually lives. Needed for absolute URLs in link previews
      and the sitemap — a relative OG image is ignored by WhatsApp and every
      other unfurler. Set NEXT_PUBLIC_SITE_URL in production. */
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://bilques.pk",
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://bilques.com",
   tagline: "Aaram se tayaar",
   taglineUrdu: "آرام سے تیار",
   /* wa.me takes the number in international form, digits only — no plus, no

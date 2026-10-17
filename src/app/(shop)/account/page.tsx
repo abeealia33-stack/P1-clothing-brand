@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { instagramLink, whatsappLink } from "@/lib/site";
+import { noIndex } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Account" };
+export const metadata: Metadata = { title: "Account", robots: noIndex };
 
 /**
  * There are no customer accounts in v1 — orders are looked up by phone number

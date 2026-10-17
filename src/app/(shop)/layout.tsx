@@ -8,6 +8,8 @@ import { getNavCollections, getSettings } from "@/lib/settings";
 import { Suspense } from "react";
 import MetaPixel from "@/components/MetaPixel";
 import { metaPixelId } from "@/lib/meta-pixel";
+import JsonLd from "@/components/JsonLd";
+import { organizationSchema } from "@/lib/seo";
 
 /**
  * Everything a customer sees. The admin sits outside this group so it gets
@@ -34,6 +36,7 @@ export default async function ShopLayout({
 
   return (
     <>
+      <JsonLd data={organizationSchema()} />
       {metaPixelId && (
         <Suspense fallback={null}>
           <MetaPixel pixelId={metaPixelId} />

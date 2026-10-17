@@ -7,8 +7,14 @@ import { listCategories } from "@/lib/categories";
 import { countLiveProducts, listProducts } from "@/lib/catalogue";
 import { getNavCollections, getSettings } from "@/lib/settings";
 import { isPriceTier, isSortOption, resolveCollection } from "@/lib/types";
+import { shopMetadata, type ShopSearch } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Shop" };
+export async function generateMetadata({ searchParams }: { searchParams: Promise<ShopSearch> }): Promise<Metadata> {
+  const [query, collections, categories, products] = await Promise.all([
+    searchParams, getNavCollections(), listCategories(), listProducts(),
+  ]);
+  return shopMetadata(query, collections, categories, products);
+}
 
 export default async function ShopPage({
   searchParams,
@@ -56,7 +62,7 @@ export default async function ShopPage({
         </div>
       )}
       <h1 className="text-[2.25rem] md:text-[3.5rem]">
-        {active ? active.name : "Everything"}
+        {active ? active.name : activeCategory?.name ?? "Shop clothing"}
       </h1>
       {active ? (
         <p className="urdu mt-1 text-2xl" style={{ color: "var(--color-sage-deep)" }}>

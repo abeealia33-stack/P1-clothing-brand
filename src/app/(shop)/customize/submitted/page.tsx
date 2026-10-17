@@ -3,8 +3,9 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { getCustomRequest } from "@/lib/custom-requests-db";
 import { whatsappLink } from "@/lib/site";
+import { noIndex } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Request sent" };
+export const metadata: Metadata = { title: "Request sent", robots: noIndex };
 
 export default async function CustomRequestSubmittedPage() {
   const store = await cookies();

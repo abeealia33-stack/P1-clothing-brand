@@ -10,6 +10,8 @@ import { collectionNames, resolveCollection } from "@/lib/types";
 import { photoAlt, priceLabel, rupees } from "@/lib/format";
 import { site, whatsappLink } from "@/lib/site";
 import { WhatsAppGlyph } from "@/components/WhatsAppButton";
+import JsonLd from "@/components/JsonLd";
+import { noIndex, productLabel, productMetadata, productSchema } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -18,21 +20,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
-  if (!product) return { title: "Piece not found" };
-
-  return {
-    title: product.name,
-    description: product.description,
-    alternates: { canonical: `/product/${product.slug}` },
-    // The image itself comes from opengraph-image.tsx alongside this file.
-    openGraph: {
-      type: "website",
-      title: product.name,
-      description: product.description,
-      url: `/product/${product.slug}`,
-    },
-    twitter: { card: "summary_large_image", title: product.name },
-  };
+  if (!product) return { title: "Piece not found", robots: noIndex };
+  return productMetadata(product);
 }
 
 /** A folded panel. <details> so it works before the JavaScript arrives. */
@@ -110,6 +99,14 @@ export default async function ProductPage({
 
   return (
     <div className="pb-28 md:pb-0">
+      <JsonLd data={productSchema(product)} />
+      <nav aria-label="Breadcrumb" className="mx-auto flex max-w-7xl flex-wrap gap-2 px-5 pt-5 text-sm md:px-16" style={{ color: "var(--color-ink-soft)" }}>
+        <Link href="/" className="underline underline-offset-4">Home</Link>
+        <span aria-hidden="true">/</span>
+        <Link href="/shop" className="underline underline-offset-4">Shop</Link>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">{productLabel(product)}</span>
+      </nav>
       <div className="mx-auto max-w-7xl md:grid md:grid-cols-2 md:gap-12 md:px-16 md:py-12">
         <div className="md:sticky md:top-24 md:self-start">
           <Gallery
@@ -122,7 +119,7 @@ export default async function ProductPage({
           <p className="field-label" style={{ color: "var(--color-sage-deep)" }}>
             {collection.name}
           </p>
-          <h1 className="mt-2 text-[2.25rem] md:text-[3.5rem]">{product.name}</h1>
+          <h1 className="mt-2 text-[2.25rem] md:text-[3.5rem]">{productLabel(product)}</h1>
           {product.urdu && (
             <p className="urdu mt-1 text-2xl" style={{ color: "var(--color-sage-deep)" }}>
               {product.urdu}
@@ -158,8 +155,8 @@ export default async function ProductPage({
               <Van />
               <span className="tnum">
                 {shipsFree
-                  ? "Ships free — this piece is over the threshold"
-                  : `PKR 250 delivery, free over PKR ${rupees(site.freeShippingOver)}`}
+                  ? "Ships free — this piece qualifies for free delivery"
+                  : `PKR 250 delivery, free from PKR ${rupees(site.freeShippingOver)}`}
               </span>
             </li>
             <li>
@@ -174,7 +171,7 @@ export default async function ProductPage({
 
           <div className="mt-9">
             {product.details.length > 0 && (
-              <Fold title="Fabric and details" open>
+              <Fold title="What are the fabric and details?" open>
                 <ul className="space-y-2">
                   {product.details.map((detail) => (
                     <li key={detail}>{detail}</li>
@@ -182,7 +179,7 @@ export default async function ProductPage({
                 </ul>
               </Fold>
             )}
-            <Fold title="Size and fit">
+            <Fold title="How do I choose the right size?">
               <p>
                 Everything is cut loose over the body measurements on the{" "}
                 <Link href="/shipping#sizes" className="underline underline-offset-4">
@@ -192,9 +189,12 @@ export default async function ProductPage({
                 {names.azad} pieces run two sizes wider on purpose.
               </p>
             </Fold>
-            <Fold title="Delivery, care and returns">
+            <Fold title="Can I pay cash on delivery?">
+              <p>Yes. Cash on delivery is available across Pakistan. You pay the courier when your order arrives. Bank transfer, JazzCash and EasyPaisa are also available at checkout.</p>
+            </Fold>
+            <Fold title="When will my order arrive, and can I exchange it?">
               <p>
-                {site.shipping.majorCities} to Karachi, Lahore and Islamabad,{" "}
+                {site.shipping.majorCities} to Karachi, Lahore, Islamabad and Rawalpindi,{" "}
                 {site.shipping.elsewhere} everywhere else. We call to confirm
                 before the parcel goes out.
               </p>

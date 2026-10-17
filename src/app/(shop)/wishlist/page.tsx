@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import WishlistView from "./WishlistView";
+import { noIndex } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Saved" };
+export const metadata: Metadata = { title: "Saved", robots: noIndex };
 
 /**
  * The saved list lives in the shopper's own browser, so there is nothing for

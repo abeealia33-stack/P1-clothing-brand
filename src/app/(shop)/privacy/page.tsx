@@ -2,13 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/lib/site";
 import { metaPixelId } from "@/lib/meta-pixel";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy",
-  description:
-    "What Bilques asks you for, how we use cookies and advertising tools, who else sees your information, and how to have it deleted.",
-  alternates: { canonical: "/privacy" },
-};
+export const metadata: Metadata = pageMetadata("Privacy", "What Bilques asks you for, how we use cookies and advertising tools, who else sees your information, and how to have it deleted.", "/privacy");
 
 export default function PrivacyPage() {
   return (

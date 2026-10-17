@@ -1,5 +1,8 @@
 import { getCollectionNames } from "@/lib/settings";
 import CartView from "./CartView";
+import { noIndex } from "@/lib/seo";
+
+export const metadata = { title: "Cart", robots: noIndex };
 
 /**
  * The basket lives in the shopper's browser, so the cart itself is a client

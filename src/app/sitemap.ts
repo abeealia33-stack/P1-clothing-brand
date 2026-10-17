@@ -3,6 +3,7 @@ import { listProducts } from "@/lib/catalogue";
 import { listCategories } from "@/lib/categories";
 import { getNavCollections } from "@/lib/settings";
 import { site } from "@/lib/site";
+import { indexableShopPaths } from "@/lib/seo";
 
 /* Rebuilt hourly rather than at build time, so a piece added in the admin is
    listed without a redeploy. */
@@ -26,21 +27,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: url("/shipping"), priority: 0.5 },
     { url: url("/privacy"), priority: 0.3 },
     { url: url("/terms"), priority: 0.3 },
-    { url: url("/track"), priority: 0.3 },
+    { url: url("/customize"), priority: 0.5 },
   ];
 
   /* A collection the owner has hidden still has a working page, but it is not
      one to send search engines at. */
-  for (const c of collections) {
+  for (const path of indexableShopPaths(collections, categories, products)) {
     pages.push({
-      url: url(`/shop?collection=${c.slug}`),
+      url: url(path),
       priority: 0.7,
       changeFrequency: "weekly",
     });
-  }
-
-  for (const c of categories) {
-    pages.push({ url: url(`/shop?category=${c.slug}`), priority: 0.6 });
   }
 
   for (const product of products) {

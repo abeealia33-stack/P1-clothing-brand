@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { instagramLink, site, whatsappLink } from "@/lib/site";
 import { WhatsAppGlyph } from "@/components/WhatsAppButton";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Contact",
-  description:
-    "Message Bilques on WhatsApp or Instagram for sizing help, order updates and exchanges.",
-};
+export const metadata: Metadata = pageMetadata("Contact", "Message Bilques on WhatsApp or Instagram for sizing help, order updates and exchanges.", "/contact");
 
 export default function ContactPage() {
   return (

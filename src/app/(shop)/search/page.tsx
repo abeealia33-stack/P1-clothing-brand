@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { noIndex } from "@/lib/seo";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { searchProducts } from "@/lib/catalogue";
 import { getNavCollections } from "@/lib/settings";
 
-export const metadata: Metadata = { title: "Search" };
+export const metadata: Metadata = { title: "Search", robots: noIndex };
 
 export default async function SearchPage({
   searchParams,

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import CustomizeForm from "@/components/CustomizeForm";
 import { listProductChoices } from "@/lib/catalogue";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = { title: "Custom design" };
+export const metadata: Metadata = pageMetadata("Custom Clothing Requests", "Request a Bilques design with your measurements. Choose a starting piece and agree a price with us before anything is made.", "/customize");
 
 export default async function CustomizePage() {
   const products = await listProductChoices();

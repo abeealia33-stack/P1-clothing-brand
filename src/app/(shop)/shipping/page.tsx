@@ -3,12 +3,9 @@ import Link from "next/link";
 import { rupees } from "@/lib/format";
 import { getCollectionNames } from "@/lib/settings";
 import { site, whatsappLink } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Shipping and returns",
-  description:
-    "Cash on delivery across Pakistan, free shipping over PKR 3,000, and seven-day exchanges on unworn pieces.",
-};
+export const metadata: Metadata = pageMetadata("Shipping, Returns and Size Guide", "Cash on delivery across Pakistan, delivery times, shipping charges, size measurements and seven-day exchanges on unworn Bilques pieces.", "/shipping");
 
 const sizes = [
   { size: "S", bust: "36", waist: "30", hip: "38" },
@@ -62,7 +59,7 @@ export default async function ShippingPage() {
           </div>
           <div className="flex justify-between gap-6">
             <dt style={{ color: "var(--color-ink-soft)" }}>
-              Orders over PKR {rupees(site.freeShippingOver)}
+              Orders of PKR {rupees(site.freeShippingOver)} or more
             </dt>
             <dd className="tnum shrink-0">Free</dd>
           </div>

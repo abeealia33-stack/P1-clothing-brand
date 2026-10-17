@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { pageMetadata } from "@/lib/seo";
 import { Fragment } from "react";
 import CollectionRail from "@/components/CollectionRail";
 import DayPicker, { type ShownDay } from "@/components/DayPicker";
@@ -27,6 +28,15 @@ import type { Product, ResolvedCollection } from "@/lib/types";
 import { site } from "@/lib/site";
 
 const DEFAULT_SLIDE = { desktopImage: "/cloth/hero.svg", mobileImage: "" };
+
+export const metadata = {
+  ...pageMetadata(
+    "Bilques | Everyday Clothing in Pakistan",
+    "Shop everyday clothing from Bilques, sold from Lahore with cash on delivery across Pakistan. Free shipping on orders of PKR 3,000 or more.",
+    "/",
+  ),
+  title: { absolute: "Bilques | Everyday Clothing in Pakistan" },
+};
 
 export default async function HomePage() {
   // None of these depends on the others, and this is the page most people
