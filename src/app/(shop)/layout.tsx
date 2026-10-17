@@ -5,6 +5,9 @@ import TabBar from "@/components/TabBar";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { shownAnnouncement } from "@/lib/banners";
 import { getNavCollections, getSettings } from "@/lib/settings";
+import { Suspense } from "react";
+import MetaPixel from "@/components/MetaPixel";
+import { metaPixelId } from "@/lib/meta-pixel";
 
 /**
  * Everything a customer sees. The admin sits outside this group so it gets
@@ -31,6 +34,11 @@ export default async function ShopLayout({
 
   return (
     <>
+      {metaPixelId && (
+        <Suspense fallback={null}>
+          <MetaPixel pixelId={metaPixelId} />
+        </Suspense>
+      )}
       <a
         href="#main"
         className="btn btn-ink sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-60"

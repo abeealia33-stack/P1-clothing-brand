@@ -5,6 +5,8 @@ import ClothImage from "@/components/ClothImage";
 import OrderCelebration from "@/components/OrderCelebration";
 import PaymentTransfer from "@/components/PaymentTransfer";
 import PrintReceipt from "@/components/PrintReceipt";
+import MetaPixel from "@/components/MetaPixel";
+import { metaPixelId } from "@/lib/meta-pixel";
 import { getOrder } from "@/lib/orders-db";
 import { getSettings } from "@/lib/settings";
 import { priceLabel } from "@/lib/format";
@@ -66,6 +68,22 @@ export default async function ConfirmedPage({
 
   return (
     <div className="confirm mx-auto max-w-7xl px-5 py-12 md:px-16 md:py-16">
+      {metaPixelId &&
+        order.status !== "cancelled" &&
+        store.get("bilques_meta_purchase")?.value === order.id && (
+          <MetaPixel
+            pixelId={metaPixelId}
+            purchase={{
+              orderId: order.id,
+              value: order.total,
+              contents: order.lines.map((line) => ({
+                id: line.slug,
+                quantity: line.qty,
+                item_price: line.price,
+              })),
+            }}
+          />
+        )}
       <div className="md:grid md:grid-cols-[1.2fr_1fr] md:items-start md:gap-14">
         <div className="confirm-main">
           <div className="flex items-start gap-4">

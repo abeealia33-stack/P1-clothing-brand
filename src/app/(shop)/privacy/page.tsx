@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { site } from "@/lib/site";
+import { metaPixelId } from "@/lib/meta-pixel";
 
 export const metadata: Metadata = {
   title: "Privacy",
   description:
-    "What Bilques asks you for, why, who else sees it, and how to have it deleted. No tracking, no advertising pixels, no accounts.",
+    "What Bilques asks you for, how we use cookies and advertising tools, who else sees your information, and how to have it deleted.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -22,10 +23,11 @@ export default function PrivacyPage() {
         <h2 className="text-3xl">The short version</h2>
         <div className="measure mt-4 space-y-4 text-[1.0625rem] leading-[1.7]">
           <p>
-            There are no accounts, no advertising pixels and no analytics on
-            this site. Nobody is following you around the internet on our
-            behalf. We ask for what it takes to get a parcel to your door and
-            nothing else.
+            We ask for the details needed to deliver your order. There are no
+            customer accounts.
+            {metaPixelId
+              ? " We also use the Meta Pixel to measure visits from our Facebook and Instagram advertising."
+              : " Advertising pixels and analytics are currently disabled on this site."}
           </p>
         </div>
       </section>
@@ -73,11 +75,11 @@ export default function PrivacyPage() {
         <h2 className="text-3xl">Cookies</h2>
         <div className="measure mt-4 space-y-4 text-[1.0625rem] leading-[1.7]">
           <p>
-            Three, all of them doing a job rather than watching you. One keeps
-            the shop owner signed in to the admin, one holds the second step of
-            that sign-in, and one remembers that this browser placed a
-            particular order so it can show you the confirmation. There are no
-            advertising or analytics cookies, so there is no banner to dismiss.
+            Essential cookies keep the shop owner signed in, hold the second
+            step of that sign-in, and remember that this browser placed a
+            particular order so it can show you the confirmation.
+            {metaPixelId &&
+              " The Meta Pixel also uses advertising cookies to help measure our ads and connect site visits with activity on Meta services. A short-lived cookie identifies a newly placed order for purchase measurement, and a browser storage entry helps prevent counting it twice. You can block cookies in your browser settings."}
           </p>
         </div>
       </section>
@@ -89,9 +91,25 @@ export default function PrivacyPage() {
             The courier gets your name, address and phone number, because that
             is how a parcel arrives. Our hosting provider stores the site and
             its database, and our image host stores the photographs — including
-            any transfer screenshot you send. Nobody buys this data and we do
-            not sell or share it for marketing.
+            any transfer screenshot you send. We do not sell your order details.
           </p>
+          {metaPixelId && (
+            <p>
+              The Meta Pixel sends page visits, order totals in PKR, product
+              identifiers, prices and quantities, the page URL, and browser and
+              device information to Meta to measure advertising and help show
+              relevant ads. Meta processes this information under its{" "}
+              <a
+                href="https://www.facebook.com/privacy/policy/"
+                className="underline underline-offset-4"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                privacy policy
+              </a>
+              . You can manage advertising preferences in your Meta account.
+            </p>
+          )}
           <p>
             If you message us on WhatsApp or Instagram, that conversation lives
             on their service under their terms, not ours.

@@ -7,6 +7,7 @@ import { getProductBySlug } from "@/lib/catalogue";
 import { paymentMethods, type PaymentMethod } from "@/lib/types";
 import { shippingFor } from "@/lib/shipping";
 import { orderableQty } from "@/lib/stock";
+import { metaPixelId } from "@/lib/meta-pixel";
 
 const orderLimit = createRateLimit(5, 10 * 60 * 1000);
 
@@ -158,6 +159,18 @@ export async function placeOrderAction(input: {
     path: "/",
     maxAge: 60 * 60 * 24 * 7,
   });
+
+  if (metaPixelId) {
+    // Marks only orders created after tracking was enabled. Old confirmation
+    // links cannot create new conversions when this integration is deployed.
+    store.set("bilques_meta_purchase", order.id, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/checkout/confirmed",
+      maxAge: 60 * 60 * 24,
+    });
+  }
 
   return { ok: true, orderId: order.id };
 }

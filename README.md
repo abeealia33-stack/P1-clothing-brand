@@ -140,6 +140,38 @@ in [src/lib/site.ts](src/lib/site.ts).
 
 ---
 
+## Meta Pixel
+
+The storefront is configured with Meta Pixel ID `1056053744116056`. This public
+ID is included in the source so it also works when deployed. To use a different
+pixel, set `NEXT_PUBLIC_META_PIXEL_ID` in `.env` locally and in your hosting
+environment. Restart `npm run dev` locally; for production, set overrides before
+`npm run build` and redeploy.
+
+The storefront sends `PageView` on the initial visit and client-side navigation,
+including query changes. Admin, order lookup, order confirmation and custom request
+confirmation pages do not send page views. A verified order confirmation sends
+`Purchase` with the saved total (including shipping) in PKR, product slugs,
+quantities and item prices. Customer contact and delivery details are not included
+in the event parameters. This counts an order placed, including COD and unpaid
+manual transfers; it does not confirm payment collection. Cancelled orders do not
+emit a new purchase. A checkout cookie restricts tracking to newly created orders,
+and a per-order browser storage guard prevents refreshes from counting them again.
+Each event also has a stable order-based event ID. Storage blocking can limit
+deduplication across reloads, and ad blocking can prevent browser event delivery.
+Automatic event detection is disabled; product view and add-to-cart events are
+not configured.
+Setting the environment override to an empty value disables the integration.
+The privacy page reflects whether the integration is configured.
+
+After deploying, open your pixel's **Test events** in Meta Events Manager, visit
+the storefront, and navigate to another page. Confirm `PageView` arrives for both
+visits. Complete a test checkout and confirm one `Purchase` with the correct PKR
+value; reloading the confirmation should not send another. No Meta access token
+is needed for this browser integration.
+
+---
+
 ## How it is put together
 
 **Database.** One schema, [prisma/schema.prisma](prisma/schema.prisma), set to
