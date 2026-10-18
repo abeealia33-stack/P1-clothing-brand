@@ -36,6 +36,13 @@ export const metadata: Metadata = {
     template: `%s · ${site.name}`,
   },
   description,
+  // Public ownership tags must remain present after webmaster verification.
+  verification: {
+    google: "-56rf4ZiUYsum4C2YjkQrTc30Kz3Aq3LVi-RHYK8a4g",
+    other: {
+      "msvalidate.01": "E1640182BF201FD1C6CD7E4BABC97D7E",
+    },
+  },
   /* The brand sells through WhatsApp and Instagram, where every shared link is
      unfurled. Without these a product link arrives as a bare URL. */
   openGraph: {
